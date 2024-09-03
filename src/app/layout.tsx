@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import MySessionProvider from "@/components/Provider/SessionProvider";
+import { ThemeProvider } from "@/components/Provider/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +18,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}
+      >
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <MySessionProvider>
+              {children}
+            </MySessionProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

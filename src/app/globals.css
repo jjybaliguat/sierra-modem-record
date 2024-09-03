@@ -16,18 +16,67 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer base {
+  
+
+  :root  {
+    --background: 186 100% 95%;
+    --foreground: 186 5% 0%;
+    --card: 186 50% 90%;
+    --card-foreground: 186 5% 10%;
+    --popover: 186 100% 95%;
+    --popover-foreground: 186 100% 0%;
+    --primary: 186 85% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 186 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 148 30% 85%;
+    --muted-foreground: 186 5% 35%;
+    --accent: 148 30% 80%;
+    --accent-foreground: 186 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 186 5% 90%;
+    --border: 186 30% 50%;
+    --input: 186 30% 18%;
+    --ring: 186 85% 34%;
+    --radius: 0.5rem;
+  }
+  .dark  {
+    --background: 186 50% 5%;
+    --foreground: 186 5% 90%;
+    --card: 186 50% 0%;
+    --card-foreground: 186 5% 90%;
+    --popover: 186 50% 5%;
+    --popover-foreground: 186 5% 90%;
+    --primary: 186 85% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 186 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 148 30% 15%;
+    --muted-foreground: 186 5% 60%;
+    --accent: 148 30% 15%;
+    --accent-foreground: 186 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 186 5% 90%;
+    --border: 186 30% 18%;
+    --input: 186 30% 18%;
+    --ring: 186 85% 34%;
+    --radius: 0.5rem;
+  }  
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
