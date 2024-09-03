@@ -35,48 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { EntryProps } from "@/types"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-]
-
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<EntryProps>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -103,38 +64,39 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "raffleCode",
     header: "Raffle Code",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("rafleCode")}</div>
+      <div className="capitalize">{row.getValue("raffleCode")}</div>
     ),
   },
   {
-    accessorKey: "Name",
+    accessorKey: "clientName",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("clientName")}</div>,
+    cell: ({ row }) => <div>{row.getValue("clientName")}</div>,
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div>{row.getValue("address")}</div>
+    ),
   },
   {
     accessorKey: "phone",
-    header: () => <div className="text-right">Phone</div>,
+    header: () => "Phone",
     cell: ({ row }) => {
-      <div className="text-right font-medium">{row.getValue("phone")}</div>
+      <div>{row.getValue("phone")}</div>
     },
   },
-  {
-    accessorKey: "entrie",
-    header: () => <div className="text-right">Entries</div>,
-    cell: ({ row }) => {
-      <div className="text-right font-medium">{row.getValue("entries")}</div>
-    },
-  },
+
   {
     id: "actions",
     enableHiding: false,
@@ -151,14 +113,14 @@ export const columns: ColumnDef<Payment>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(payment.id)}
             >
               Copy payment ID
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            {/* <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>View payment details</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -166,7 +128,9 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ]
 
-export function EntriesTable() {
+export function EntriesTable({
+  data
+}: {data: EntryProps[]}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -197,14 +161,14 @@ export function EntriesTable() {
   return (
     <div className="w-full">
         <div className="flex justify-center">
-            <h1 className="text-xl font-bold">Your Branch Raffle Entries</h1>
+            <h1 className="text-xl font-bold">Raffle Entries</h1>
         </div>
       <div className="flex items-center py-4">
         <Input
           placeholder="Search Entries"
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("clientName")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("clientName")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

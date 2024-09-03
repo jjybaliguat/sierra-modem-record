@@ -16,7 +16,7 @@ export const authOptions : any = {
         },
         async authorize(credentials) {
 
-          console.log(credentials)
+          // console.log(credentials)
           if(!credentials?.branchName || !credentials.password){
             return null
           }
@@ -27,7 +27,7 @@ export const authOptions : any = {
             }
           })
 
-          // console.log(user)
+          console.log(user)
 
           if(!user){
             throw new Error("Invalid Credentials")

@@ -6,10 +6,13 @@ import { getServerSession } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React from 'react'
+import { getEntries } from '../actions'
 
 async function Dashboard() {
-    const user = await getServerSession(authOptions)
-    console.log(user)
+    const user: any = await getServerSession(authOptions)
+    // console.log(user)
+    const entries: any = await getEntries()
+    console.log(entries)
   return (
     <div className='min-h-screen'>
         <div className='container mx-auto md:py-12 py-4 px-4'>
@@ -23,7 +26,7 @@ async function Dashboard() {
                 <h1 className='text-center text-2xl font-bold uppercase'>Raffle Entries</h1>
             </div>
             <div className='mt-4 flex justify-center'>
-                <h1 className='text-xl tracking-wide'>Welcome Sierra <span className='text-[#0eb0c2] font-bold'>{}</span></h1>
+                <h1 className='text-xl tracking-wide'>Welcome Sierra <span className='text-[#0eb0c2] font-bold'>{user.user.branchName}</span></h1>
             </div>
             {/* <div className='flex justify-center mt-10'>
                 <div className='flex items-center gap-2'>
@@ -32,7 +35,7 @@ async function Dashboard() {
             </div> */}
             <div className='grid grid-cols-12 mt-10 gap-8'>
                 <div className='col-span-12 lg:col-span-8'>
-                    <EntriesTable />
+                    <EntriesTable data={entries} />
                 </div>
                 <div className='col-span-12 lg:col-span-4'>
                     <CreateEntriesForm />

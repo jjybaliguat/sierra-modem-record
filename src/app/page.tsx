@@ -58,8 +58,8 @@ export default function Login() {
   }
 
   return (
-    <div className="bg-black flex justify-center items-center h-screen">
-      <div className="bg-background p-5 rounded-md w-[350px]">
+    <div className="flex justify-center items-center h-screen">
+      <div className="p-5 rounded-md w-[350px]">
         <h1 className="text-center font-bold text-[24px]">Sierra Raffle Entries</h1>
         <h3 className="text-destructive text-center font-bold mt-2">{errorMess}</h3>
         <Form {...form}>

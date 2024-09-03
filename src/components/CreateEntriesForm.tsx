@@ -7,6 +7,8 @@ import { Button } from './ui/button'
 import { createEntry } from '@/app/actions'
 import { useSession } from 'next-auth/react'
 import { authOptions } from '@/lib/auth'
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation'
 
 function CreateEntriesForm() {
     const session = useSession(authOptions)
@@ -17,21 +19,30 @@ function CreateEntriesForm() {
         phone: ''
     })
     const [numEntries, setNumEntries] = useState(0)
+    const router = useRouter()
 
    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         try {
-            const data = await createEntry({
+            const response:any = await createEntry({
                 ...formData,
                 branchId: user?.id,
                 numEntries
             })
-            console.log(data)
-        } catch (error) {
+           if(response.error){
+            toast.error('Something Went Wrong');
+           }else{
+            toast.success(`${numEntries > 1 ? "Entries" : "Entry"} added successfully!`);
+            setFormData({
+                clientName: '',
+                address: '',
+                phone: ''
+            })
+            router.refresh()
+        }} catch (error) {
             console.log(error)
         }
     }
-
   return (
     <div className='w-full p-4 rounded-md'>
         <div className='flex justify-center'>
@@ -82,6 +93,8 @@ function CreateEntriesForm() {
                             value={numEntries}
                             onChange={(e)=>setNumEntries(Number(e.target.value))}
                             required
+                            min="1"
+                            step="1"
                         />
                     </div>
                     <div className='flex justify-end'>
