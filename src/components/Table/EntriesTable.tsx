@@ -160,6 +160,7 @@ export function EntriesTable({
   const [openEdit, setOpenEdit] = React.useState(false)
   const [selectedIndex, setSelectedIndex] = React.useState(0)
   const [singleEntry, setSingleEntry] = React.useState<any>(null)
+  const [isdeleting, setIsDeleting] = React.useState(false)
   // let selectedIds = []
 
   React.useEffect(()=>{
@@ -315,7 +316,7 @@ export function EntriesTable({
       </div>
       {selectedIds.length > 0 &&
         <div className="flex items-center gap-2 mb-4">
-        <Button variant="destructive" size="sm" onClick={deleteEntries}>Delete</Button>
+        <Button disabled={isdeleting} variant="destructive" size="sm" onClick={deleteEntries}>{isdeleting ? "Deleting..." : "Delete"}</Button>
         {/* <Button size="sm">Print</Button> */}
         {selectedIds.length == 1 && <EditDialog setSingleEntry={setSingleEntry} data={singleEntry} />}
         </div>

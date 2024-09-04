@@ -20,9 +20,11 @@ function CreateEntriesForm() {
     })
     const [numEntries, setNumEntries] = useState(0)
     const router = useRouter()
+    const [submitting, setSubmitting] = useState(false)
 
    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
+        setSubmitting(true)
         try {
             const response:any = await createEntry({
                 ...formData,
@@ -31,6 +33,7 @@ function CreateEntriesForm() {
             })
            if(response.error){
             toast.error('Something Went Wrong');
+            setSubmitting(false)
            }else{
             toast.success(`${numEntries > 1 ? "Entries" : "Entry"} added successfully!`);
             setFormData({
@@ -38,8 +41,10 @@ function CreateEntriesForm() {
                 address: '',
                 phone: ''
             })
+            setSubmitting(false)
             router.refresh()
         }} catch (error) {
+            setSubmitting(false)
             console.log(error)
         }
     }
@@ -98,7 +103,7 @@ function CreateEntriesForm() {
                         />
                     </div>
                     <div className='flex justify-end'>
-                        <Button type='submit'>Submit</Button>
+                        <Button disabled={submitting} type='submit'>{submitting ? "Saving..." : "Submit"}</Button>
                     </div>
                 </div>
             </form>
