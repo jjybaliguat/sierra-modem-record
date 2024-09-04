@@ -143,8 +143,11 @@ export const columns: ColumnDef<EntryProps>[] = [
 ]
 
 export function EntriesTable({
-  data
-}: {data: EntryProps[]}) {
+  data,
+  entriesCount
+}: {data: EntryProps[],
+  entriesCount: number
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -242,7 +245,7 @@ export function EntriesTable({
     <>
     <div className="w-full">
         <div className="flex justify-center">
-            <h1 className="text-xl font-bold">Raffle Entries</h1>
+            <h1 className="text-xl font-bold">Raffle Entries - {entriesCount} total</h1>
         </div>
       <div className="flex items-center py-4">
           <DropdownMenu>

@@ -6,13 +6,15 @@ import { getServerSession } from 'next-auth'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React from 'react'
-import { getEntries } from '../actions'
+import { getEntries, getEntriesCount } from '../actions'
 import LogoutBtn from '@/components/btn/LogoutBtn'
 
 async function Dashboard() {
     const user: any = await getServerSession(authOptions)
     // console.log(user)
     const entries: any = await getEntries()
+    const entriesCount: any = await getEntriesCount()
+    // console.log(entriesCount)
     // console.log(entries)
   return (
     <div className='min-h-screen'>
@@ -42,7 +44,7 @@ async function Dashboard() {
                     <CreateEntriesForm />
                 </div>
                 <div className='col-span-12 lg:col-span-8'>
-                    <EntriesTable data={entries} />
+                    <EntriesTable entriesCount={entriesCount} data={entries} />
                 </div>
                 <div className='hidden lg:block col-span-12 lg:col-span-4'>
                     <CreateEntriesForm />

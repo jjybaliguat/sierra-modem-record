@@ -107,3 +107,12 @@ export async function editEntry(formData: any){
         console.log(error)
     }
 }
+
+export async function getEntriesCount(){
+    try {
+        const count = await prisma.entries.count()
+        return count
+    } catch (error) {
+        console.log(error)
+    }
+}
