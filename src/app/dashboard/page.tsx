@@ -8,9 +8,10 @@ import Image from 'next/image'
 import React from 'react'
 import { getEntries, getEntriesCount } from '../actions'
 import LogoutBtn from '@/components/btn/LogoutBtn'
+import Link from 'next/link'
 
 async function Dashboard() {
-    const user: any = await getServerSession(authOptions)
+    const session: any = await getServerSession(authOptions)
     // console.log(user)
     const entries: any = await getEntries()
     const entriesCount: any = await getEntriesCount()
@@ -29,10 +30,17 @@ async function Dashboard() {
                 <h1 className='text-center text-2xl font-bold uppercase'>Raffle Entries</h1>
             </div>
             <div className='mt-4 flex justify-center'>
-                <h1 className='text-xl tracking-wide'>Welcome Sierra <span className='text-[#0eb0c2] font-bold'>{user.user.branchName}</span></h1>
+                <h1 className='text-xl tracking-wide'>Welcome Sierra <span className='text-[#0eb0c2] font-bold'>{session.user.branchName}</span></h1>
             </div>
             <div className='flex justify-center mt-4'>
-                <LogoutBtn />
+                <div className='flex items-center gap-2'>
+                    {session.user.role === "SUPERADMIN" && (
+                        <Button disabled={true}>
+                            <Link href="/dashboard/raffle">Start Raffle</Link>
+                        </Button>
+                    )}
+                    <LogoutBtn />
+                </div>
             </div>
             {/* <div className='flex justify-center mt-10'>
                 <div className='flex items-center gap-2'>
