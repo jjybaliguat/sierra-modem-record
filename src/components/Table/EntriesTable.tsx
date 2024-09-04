@@ -207,6 +207,7 @@ export function EntriesTable({
   }
 
   async function deleteEntries(){
+    setIsDeleting(true)
     try {
       const response: any = await deleteEntry(selectedIds)
       // console.log(response)
@@ -216,8 +217,10 @@ export function EntriesTable({
         toast.success(`${selectedIds.length > 1 ? "Entries" : "Entry"} deleted successfully!`);
       }
       setRowSelection({})
+      setIsDeleting(false)
       router.refresh()
     } catch (error) {
+      setIsDeleting(false)
       console.log(error)
     }
   }
