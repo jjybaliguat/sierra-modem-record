@@ -316,7 +316,7 @@ export function EntriesTable({
       {selectedIds.length > 0 &&
         <div className="flex items-center gap-2 mb-4">
         <Button variant="destructive" size="sm" onClick={deleteEntries}>Delete</Button>
-        <Button size="sm">Print</Button>
+        {/* <Button size="sm">Print</Button> */}
         {selectedIds.length == 1 && <EditDialog setSingleEntry={setSingleEntry} data={singleEntry} />}
         </div>
       }
