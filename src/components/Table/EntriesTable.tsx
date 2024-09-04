@@ -36,20 +36,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { EntryProps } from "@/types"
+import { deleteEntry, getSingleEntry } from "@/app/actions"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useSession } from "next-auth/react"
+import { authOptions } from "@/lib/auth"
+import EditDialog from "../dialog/EditDialog"
 
 export const columns: ColumnDef<EntryProps>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+    header: "Select",
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -62,7 +59,17 @@ export const columns: ColumnDef<EntryProps>[] = [
   },
   {
     accessorKey: "raffleCode",
-    header: "Raffle Code",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Raffle Code
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("raffleCode")}</div>
     ),
@@ -90,42 +97,49 @@ export const columns: ColumnDef<EntryProps>[] = [
     ),
   },
   {
-    accessorKey: "phone",
-    header: () => "Phone",
-    cell: ({ row }) => {
-      <div>{row.getValue("phone")}</div>
-    },
+    accessorKey: "branch",
+    header: "Branch",
+    accessorFn: (row) => row.branch.branchName,
+    cell: ({ row }) => (
+      <div>{row.getValue("branch")}</div>
+    ),
   },
-
   {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            {/* <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem> */}
-            <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    accessorKey: "phone",
+    header: "Phone",
+    cell: ({ row }) => (
+      <div>{row.getValue("phone")}</div>
+    ),
   },
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     const payment = row.original
+
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           {/* <DropdownMenuItem
+  //             onClick={() => navigator.clipboard.writeText(payment.id)}
+  //           >
+  //             Copy payment ID
+  //           </DropdownMenuItem> */}
+  //           <DropdownMenuSeparator />
+  //           {/* <DropdownMenuItem>View customer</DropdownMenuItem>
+  //           <DropdownMenuItem>View payment details</DropdownMenuItem> */}
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
 ]
 
 export function EntriesTable({
@@ -138,6 +152,71 @@ export function EntriesTable({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [filterIndex, setFilterIndex] = React.useState(0)
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([])
+  const router = useRouter()
+  const session = useSession(authOptions)
+  const user = session.data?.user
+  const [openEdit, setOpenEdit] = React.useState(false)
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
+  const [singleEntry, setSingleEntry] = React.useState<any>(null)
+  // let selectedIds = []
+
+  React.useEffect(()=>{
+    setSelectedIds((prevSelectedIds: any) => {
+      // Create a new array based on the previous state
+      const newSelectedIds: any = [];
+
+      Object.entries(rowSelection).map(([key, value]) => {
+        const keyAsNumber = Number(key);
+
+        newSelectedIds.push(data[keyAsNumber].id)
+      })
+      
+      // Object.keys(rowSelection).forEach(function (key: any, value) {
+      //     // Avoid duplicates
+      //     if (!newSelectedIds.includes(data[key].id)) {
+      //         newSelectedIds.push(data[key].id);
+      //     }
+      // });
+      
+      return newSelectedIds;
+  });
+
+    // console.log('Updated selectedIds:', selectedIds);
+  }, [rowSelection])
+
+  React.useEffect(()=>{
+    if(selectedIds.length == 1){
+      getEntry()
+    }
+  }, [selectedIds])
+
+  async function getEntry(){
+    try {
+      const data = await getSingleEntry(selectedIds[0])
+      setSingleEntry(data)
+      console.log(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function deleteEntries(){
+    try {
+      const response: any = await deleteEntry(selectedIds)
+      // console.log(response)
+      if(response.error){
+        toast.error('Something Went Wrong');
+      }else{
+        toast.success(`${selectedIds.length > 1 ? "Entries" : "Entry"} deleted successfully!`);
+      }
+      setRowSelection({})
+      router.refresh()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const table = useReactTable({
     data,
@@ -159,19 +238,54 @@ export function EntriesTable({
   })
 
   return (
+    <>
     <div className="w-full">
         <div className="flex justify-center">
             <h1 className="text-xl font-bold">Raffle Entries</h1>
         </div>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Search Entries"
-          value={(table.getColumn("clientName")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("clientName")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Filter By <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              <DropdownMenuCheckboxItem
+                className="capitalize"
+                checked={filterIndex === 0}
+                onCheckedChange={()=>setFilterIndex(0)}
+              >
+                Name
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                className="capitalize"
+                checked={filterIndex === 1}
+                onCheckedChange={()=>setFilterIndex(1)}
+              >
+                Branch
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {filterIndex === 0 ? (
+              <Input
+              placeholder="Search by name"
+              value={(table.getColumn("clientName")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("clientName")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          ) : (
+            <Input
+              placeholder="Search by branch"
+              value={(table.getColumn("branch")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("branch")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -199,10 +313,17 @@ export function EntriesTable({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      {selectedIds.length > 0 &&
+        <div className="flex items-center gap-2 mb-4">
+        <Button variant="destructive" size="sm" onClick={deleteEntries}>Delete</Button>
+        <Button size="sm">Print</Button>
+        {selectedIds.length == 1 && <EditDialog setSingleEntry={setSingleEntry} data={singleEntry} />}
+        </div>
+      }
+      <div className="rounded-md border text-neutral-300">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {data && table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
@@ -220,20 +341,41 @@ export function EntriesTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {data && table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    if(cell.column.id === "select"){
+                      if((row.getValue('branch')) === user?.branchName){
+                        return (
+                          <TableCell key={cell.id}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                        )
+                      }else{
+                        return <TableCell key={cell.id}
+                        >
+                        </TableCell>
+                      }
+                    }else{
+                      return (
+                        <TableCell key={cell.id}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                      )
+                    }
+                  })}
                 </TableRow>
               ))
             ) : (
@@ -274,5 +416,6 @@ export function EntriesTable({
         </div>
       </div>
     </div>
+    </>
   )
 }

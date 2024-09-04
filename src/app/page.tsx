@@ -29,6 +29,7 @@ const formSchema = z.object({
 
 export default function Login() {
   const [errorMess, setErrorMess] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,6 +43,7 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    setSubmitting(true)
     const response: any = await signIn('credentials', {
       ...values,
       redirect: false
@@ -50,8 +52,10 @@ export default function Login() {
     if(response?.error){
       console.log(response.error)
       setErrorMess(response.error)
+      setSubmitting(false)
     }else{
       setErrorMess("")
+      setSubmitting(false)
       window.location.href = "/dashboard"
     }
     // console.log(values)
@@ -91,7 +95,7 @@ export default function Login() {
               )}
             />
             <div className="flex justify-end">
-              <Button type="submit">Login</Button>
+              <Button disabled={submitting} type="submit">{submitting ? "Logging in..." : "Login"}</Button>
             </div>
           </form>
         </Form>
