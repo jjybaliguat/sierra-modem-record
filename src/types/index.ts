@@ -1,5 +1,6 @@
 export interface EntryProps {
     id: string
+    raffleCode: string
     clientName: string
     address: string
     phone: string

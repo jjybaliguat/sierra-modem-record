@@ -42,6 +42,7 @@ import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { authOptions } from "@/lib/auth"
 import EditDialog from "../dialog/EditDialog"
+import GenerateVirtualTicketDialog from "../dialog/GenerateVirtualTicketDialog"
 
 export const columns: ColumnDef<EntryProps>[] = [
   {
@@ -164,17 +165,20 @@ export function EntriesTable({
   const [selectedIndex, setSelectedIndex] = React.useState(0)
   const [singleEntry, setSingleEntry] = React.useState<any>(null)
   const [isdeleting, setIsDeleting] = React.useState(false)
+  const [selectedEntries, setSelectedEntries] = React.useState(null)
   // let selectedIds = []
 
   React.useEffect(()=>{
     setSelectedIds((prevSelectedIds: any) => {
       // Create a new array based on the previous state
       const newSelectedIds: any = [];
+      const newSelectedEntries: any = [];
 
       Object.entries(rowSelection).map(([key, value]) => {
         const keyAsNumber = Number(key);
 
         newSelectedIds.push(data[keyAsNumber].id)
+        newSelectedEntries.push(data[keyAsNumber])
       })
       
       // Object.keys(rowSelection).forEach(function (key: any, value) {
@@ -186,6 +190,16 @@ export function EntriesTable({
       
       return newSelectedIds;
   });
+
+  setSelectedEntries((prevEntries: any)=> {
+      const newSelectedEntries: any = [];
+      Object.entries(rowSelection).map(([key, value]) => {
+        const keyAsNumber = Number(key);
+
+        newSelectedEntries.push(data[keyAsNumber])
+      })
+      return newSelectedEntries;
+    })  
 
     // console.log('Updated selectedIds:', selectedIds);
   }, [rowSelection])
@@ -325,6 +339,7 @@ export function EntriesTable({
         <Button disabled={isdeleting} variant="destructive" size="sm" onClick={deleteEntries}>{isdeleting ? "Deleting..." : "Delete"}</Button>
         {/* <Button size="sm">Print</Button> */}
         {selectedIds.length == 1 && <EditDialog setSingleEntry={setSingleEntry} data={singleEntry} />}
+        <GenerateVirtualTicketDialog data={selectedEntries} />
         </div>
       }
       <div className="rounded-md border text-neutral-300">
