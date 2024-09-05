@@ -39,7 +39,7 @@ function GenerateVirtualTicketDialog({
           <DialogTitle>Virtual Ticket</DialogTitle>
             <div ref={targetRef} className='flex flex-wrap gap-2 p-8'>
                 {data?.map((entry: EntryProps)=>(
-                    <div className='relative w-[300px] h-[100px]'>
+                    <div key={entry.id} className='relative w-[300px] h-[100px]'>
                         <Image 
                         src="/raffleticket.png"
                         alt='raffle-ticket-layout'
