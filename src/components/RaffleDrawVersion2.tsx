@@ -5,15 +5,16 @@ import { Button } from './ui/button';
 import Confetti from 'react-confetti'
 
 function RaffleDrawVersion2() {
-    const bgMusic = new Audio('/raffle-draw.mp3');
-    const drawMusic = new Audio('/draw.mp3');
+    const [bgAudio, setBgAudio] = useState<any>(null)
+    const [drawAudio, setDrawAudio] = useState<any>(null)
     const [isStarted, setIsStarted] = useState(false)
     const [randomNumber, setRandomNumber] = useState<string>('0000');
     const [windowDimension, setWindowDimension] = useState<any | null>()
     const [showConfetti, setShowConfetti] = useState(false)
 
     useEffect(()=>{
-        bgMusic.play()
+        setBgAudio(new Audio('/raffle-draw.mp3'))
+        setDrawAudio(new Audio('/draw.mp3'))
         if(window !== undefined){
             setWindowDimension({
                 width: window.innerWidth,
@@ -22,12 +23,18 @@ function RaffleDrawVersion2() {
         }
     }, [])
 
+    useEffect(()=>{
+        if(bgAudio){
+            bgAudio.play()
+        }
+    }, [bgAudio])
+
     const handleGetRandomNumber = () => {
-        bgMusic.pause()
-        drawMusic.play()
+        bgAudio.pause()
+        drawAudio.play()
         setIsStarted(true)
         const interval = setInterval(() => {
-            const number = Math.floor(1 + Math.random() * 1000);
+            const number = Math.floor(1 + Math.random() * 2000);
             const paddedNumber = number.toString().padStart(4, '0'); // Pad to 4 digits
             setRandomNumber(paddedNumber);
           }, 100); // Update every 100ms
@@ -69,12 +76,12 @@ function RaffleDrawVersion2() {
             <div className='flex items-center gap-4'>
                 <button 
                 className='rounded-full p-6 bg-muted'
-                onClick={()=>bgMusic.pause()}>Pause Music</button>
+                onClick={()=>bgAudio.pause()}>Pause Music</button>
                 <button
                 className='rounded-full p-6 bg-primary'
                 onClick={()=>{
-                    if(bgMusic.paused){
-                        bgMusic.play()
+                    if(bgAudio.paused){
+                        bgAudio.play()
                     }
                 }}>Play Music</button>
             </div>
