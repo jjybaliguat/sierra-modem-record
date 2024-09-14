@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button';
 import Confetti from 'react-confetti'
+import WinnerDialog from './dialog/WinnerDialog';
 
 function RaffleDrawVersion2() {
     const [bgAudio, setBgAudio] = useState<any>(null)
@@ -11,6 +12,7 @@ function RaffleDrawVersion2() {
     const [randomNumber, setRandomNumber] = useState<string>('0000');
     const [windowDimension, setWindowDimension] = useState<any | null>()
     const [showConfetti, setShowConfetti] = useState(false)
+    const [showWinner, setShowWinner] = useState(false)
 
     useEffect(()=>{
         setBgAudio(new Audio('/raffle-draw.mp3'))
@@ -43,6 +45,7 @@ function RaffleDrawVersion2() {
             clearInterval(interval); // Stop after 8 seconds
             setIsStarted(false)
             setShowConfetti(true)
+            setShowWinner(true)
           }, 5000);
 
       
@@ -54,6 +57,7 @@ function RaffleDrawVersion2() {
 
   return (
     <>
+    {<WinnerDialog setShowWinner={setShowWinner} />}
     {showConfetti && <Confetti width={windowDimension?.width} height={windowDimension?.height} />}
         <div className='flex flex-col gap-12 mt-12 items-center'>
             <div className='flex flex-col gap-4'>
