@@ -1,4 +1,5 @@
 import { getEntries } from '@/app/actions';
+import Prizes from '@/components/dialog/Prizes';
 import RaffleDrawVersion2 from '@/components/RaffleDrawVersion2';
 import RandomNamePicker from '@/components/RandomNamePicker';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,11 @@ async function Raffle() {
             width={150}
           />
           <h1 className='text-3xl font-bold'>RAFFLE DRAW</h1>
+        </div>
+        <div className='flex items-center gap-4'>
+          <Prizes label='Grand Prize' img='/e-bike.png' alt='e-bike-image' title='Grand Price - E-Bike' />
+          <Prizes label='2nd Prize' img='/smart-tv.png' alt='smart-tv-image' title='2nd Price - 43" Smart TV' />
+          <Prizes label='3rd Prize' img='/washing-machine.png' alt='washing-machine-image' title='3rd Price - Washing Machine' />
         </div>
         {/* <RandomNamePicker data={data} /> */}
         <RaffleDrawVersion2 />

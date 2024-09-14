@@ -37,7 +37,7 @@ function RaffleDrawVersion2() {
             const number = Math.floor(1 + Math.random() * 2000);
             const paddedNumber = number.toString().padStart(4, '0'); // Pad to 4 digits
             setRandomNumber(paddedNumber);
-          }, 100); // Update every 100ms
+          }, 50); // Update every 100ms
       
           const timeout = setTimeout(() => {
             clearInterval(interval); // Stop after 8 seconds
