@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from './ui/button';
 import Confetti from 'react-confetti'
 import WinnerDialog from './dialog/WinnerDialog';
@@ -8,6 +8,8 @@ import WinnerDialog from './dialog/WinnerDialog';
 function RaffleDrawVersion2() {
     const [bgAudio, setBgAudio] = useState<any>(null)
     const [drawAudio, setDrawAudio] = useState<any>(null)
+    const [applause, setApplauseAdio] = useState<any>(null)
+    const winnerBtnRef = useRef<any>(null)
     const [isStarted, setIsStarted] = useState(false)
     const [randomNumber, setRandomNumber] = useState<string>('0000');
     const [windowDimension, setWindowDimension] = useState<any | null>()
@@ -17,6 +19,7 @@ function RaffleDrawVersion2() {
     useEffect(()=>{
         setBgAudio(new Audio('/raffle-draw.mp3'))
         setDrawAudio(new Audio('/draw.mp3'))
+        setApplauseAdio(new Audio('/applause.mp3'))
         if(window !== undefined){
             setWindowDimension({
                 width: window.innerWidth,
@@ -43,9 +46,15 @@ function RaffleDrawVersion2() {
       
           const timeout = setTimeout(() => {
             clearInterval(interval); // Stop after 8 seconds
+            bgAudio.play()
+            applause.play()
             setIsStarted(false)
             setShowConfetti(true)
-            setShowWinner(true)
+            if(winnerBtnRef){
+                setTimeout(()=>{
+                    winnerBtnRef?.current.click()
+                }, 1000)
+            }
           }, 5000);
 
       
@@ -57,8 +66,8 @@ function RaffleDrawVersion2() {
 
   return (
     <>
-    {<WinnerDialog setShowWinner={setShowWinner} />}
-    {showConfetti && <Confetti width={windowDimension?.width} height={windowDimension?.height} />}
+    {<WinnerDialog btnRef={winnerBtnRef} />}
+    {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
         <div className='flex flex-col gap-12 mt-12 items-center'>
             <div className='flex flex-col gap-4'>
                 <div className='flex items-center gap-2'>

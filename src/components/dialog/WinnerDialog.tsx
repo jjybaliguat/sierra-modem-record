@@ -14,23 +14,23 @@ import { Button } from '../ui/button'
 import Image from 'next/image';
 
 function WinnerDialog({
-    setShowWinner
+  btnRef
 }: {
-    setShowWinner: (open: boolean) => void
+  btnRef: any
 }) {
     const buttonRef = useRef<HTMLButtonElement>(null);
   return (
     <>
         <Dialog>
-        <DialogTrigger asChild>
-            <Button variant="outline"></Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+                <Button ref={btnRef} className='hidden' variant="outline"></Button>
+            </DialogTrigger>
             <DialogClose ref={buttonRef} asChild>
                 <Button type="button" variant="secondary" className='hidden'>
                 Close
                 </Button>
             </DialogClose>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] z-100">
                 <DialogHeader>
                 <DialogTitle>Congratulations</DialogTitle>
                 {/* <DialogDescription>
