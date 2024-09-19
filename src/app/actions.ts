@@ -116,3 +116,16 @@ export async function getEntriesCount(){
         console.log(error)
     }
 }
+
+export async function getWinner(number: string){
+    try {
+        const winner = await prisma.entries.findUnique({
+            where: {
+                raffleCode: number
+            }
+        })
+        return winner
+    } catch (error) {
+        console.log(error)
+    }
+}

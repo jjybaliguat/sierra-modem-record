@@ -24,7 +24,7 @@ model User {
 
 model Entries {
   id  String   @id @default(auto()) @map("_id") @db.ObjectId
-  raffleCode  String
+  raffleCode  String @unique
   clientName  String
   address     String
   phone       String

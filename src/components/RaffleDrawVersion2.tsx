@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from './ui/button';
 import Confetti from 'react-confetti'
 import WinnerDialog from './dialog/WinnerDialog';
+import { getWinner } from '@/app/actions';
 
 function RaffleDrawVersion2() {
     const [bgAudio, setBgAudio] = useState<any>(null)
@@ -36,7 +37,7 @@ function RaffleDrawVersion2() {
 
     const handleGetRandomNumber = () => {
         bgAudio.pause()
-        drawAudio.play()
+        drawAudio?.play()
         setIsStarted(true)
         const interval = setInterval(() => {
             const number = Math.floor(1 + Math.random() * 2000);
@@ -47,7 +48,7 @@ function RaffleDrawVersion2() {
           const timeout = setTimeout(() => {
             clearInterval(interval); // Stop after 8 seconds
             bgAudio.play()
-            applause.play()
+            applause?.play()
             setIsStarted(false)
             setShowConfetti(true)
             if(winnerBtnRef){
@@ -63,6 +64,14 @@ function RaffleDrawVersion2() {
             clearTimeout(timeout);
           };
     }
+
+    
+    useEffect(()=>{
+        if(!isStarted && randomNumber !== '0000'){
+            const winner = getWinner(randomNumber)
+            console.log(winner)
+        }
+    }, [randomNumber])
 
   return (
     <>

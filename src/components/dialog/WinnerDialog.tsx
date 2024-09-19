@@ -22,6 +22,7 @@ function WinnerDialog({
   return (
     <>
         <Dialog>
+          <DialogDescription></DialogDescription>
             <DialogTrigger asChild>
                 <Button ref={btnRef} className='hidden' variant="outline"></Button>
             </DialogTrigger>
