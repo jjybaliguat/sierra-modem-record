@@ -129,3 +129,20 @@ export async function getWinner(number: string){
         console.log(error)
     }
 }
+
+export async function searchEntriesByName(number: string){
+    try {
+        const entries = await prisma.entries.findMany({
+            where: {
+                phone: {
+                    contains: number,
+                    mode: "insensitive"
+                }
+            }
+        })
+
+        return entries
+    } catch (error) {
+        console.log(error)
+    }
+}
