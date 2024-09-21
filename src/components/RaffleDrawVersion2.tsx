@@ -24,9 +24,14 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
-    const bgAudio = document.getElementById('bg-audio') as HTMLAudioElement
-    const drawAudio = document.getElementById('draw-audio') as HTMLAudioElement
-    const applauseAudio = document.getElementById('applause-audio') as HTMLAudioElement
+    let bgAudio = null
+    let drawAudio = null
+    let applauseAudio = null
+    if(document !== undefined){
+        bgAudio = document?.getElementById('bg-audio') as HTMLAudioElement
+        drawAudio = document?.getElementById('draw-audio') as HTMLAudioElement
+        applauseAudio = document?.getElementById('applause-audio') as HTMLAudioElement
+    }
 
     useEffect(()=>{
         // setApplauseAdio(new Audio('/applause.mp3'))
