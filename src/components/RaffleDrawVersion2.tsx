@@ -30,9 +30,9 @@ function RaffleDrawVersion2({
         setDrawAudio(new Audio('/draw.mp3'))
         setBgAudio(new Audio('/raffle-draw.mp3'))
 
-        if(videoBtnRef){
-            videoBtnRef.current.click()
-        }
+        // if(videoBtnRef){
+        //     videoBtnRef.current.click()
+        // }
         if(window !== undefined){
             setWindowDimension({
                 width: window.innerWidth,
