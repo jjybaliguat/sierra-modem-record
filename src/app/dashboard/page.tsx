@@ -36,7 +36,7 @@ async function Dashboard() {
                 <div className='flex items-center gap-2'>
                     {session.user.role === "SUPERADMIN" && (
                         
-                        <Link href="/dashboard/raffle"><Button>Test Raffle</Button></Link>
+                        <Link href="/dashboard/raffle"><Button>Start Raffle</Button></Link>
                         
                     )}
                     <LogoutBtn />

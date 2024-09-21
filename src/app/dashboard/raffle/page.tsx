@@ -1,4 +1,5 @@
 import { getEntries } from '@/app/actions';
+import CustomLink from '@/components/btn/CustomLink';
 import Prizes from '@/components/dialog/Prizes';
 import RaffleDrawVersion2 from '@/components/RaffleDrawVersion2';
 import RandomNamePicker from '@/components/RandomNamePicker';
@@ -16,7 +17,7 @@ async function Raffle() {
     {/* <div>Raffle</div> */}
     <div className='py-8 flex flex-col min-h-screen'>
       <div className='flex flex-col items-center gap-4'>
-        <Link href="/dashboard"><Button>Back to Dashboard</Button></Link>
+        <CustomLink href='/dashboard' spa={false} />
         <h1 className='text-3xl font-bold'>Welcome To</h1>
         <div className='flex items-center gap-2'>
           <Image
@@ -33,7 +34,7 @@ async function Raffle() {
           <Prizes label='3rd Prize' img='/washing-machine.png' alt='washing-machine-image' title='3rd Price - Washing Machine' />
         </div>
         {/* <RandomNamePicker data={data} /> */}
-        <RaffleDrawVersion2 />
+        <RaffleDrawVersion2 entries={data} />
       </div>
     </div>
     </>

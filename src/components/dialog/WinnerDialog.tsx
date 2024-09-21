@@ -12,11 +12,14 @@ import {
   } from "@/components/ui/dialog"
 import { Button } from '../ui/button'
 import Image from 'next/image';
+import { EntryProps } from '@/types';
 
 function WinnerDialog({
-  btnRef
+  btnRef,
+  winner
 }: {
-  btnRef: any
+  btnRef: any,
+  winner: EntryProps | null | undefined
 }) {
     const buttonRef = useRef<HTMLButtonElement>(null);
   return (
@@ -33,11 +36,26 @@ function WinnerDialog({
             </DialogClose>
           <DialogContent className="sm:max-w-[425px] z-100">
                 <DialogHeader>
-                <DialogTitle>Congratulations</DialogTitle>
+                <DialogTitle className='text-center text-2xl'>Congratulations</DialogTitle>
                 {/* <DialogDescription>
                     Make changes to your profile here. Click save when you're done.
                 </DialogDescription> */}
                 </DialogHeader>
+                <div className='mt-4 flex flex-col items-center gap-2'>
+                  {winner?.id ? (
+                    <>
+                      <h1 className='text-center text-4xl font-bold tracking-widest'>{winner?.raffleCode}</h1>
+                      <h1 className='text-center text-3xl font-bold text-primary'>{winner?.clientName}</h1>
+                      <h1 className='text-center'>{winner?.address}</h1>
+                      <h1 className='text-center'>{winner?.branch?.branchName} Branch</h1>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className='text-3xl'>INVALID DRAW!</h1>
+                      <h1>Entry Code Not Found</h1>
+                    </>
+                  )}
+                </div>
           </DialogContent>
         </Dialog>
     </>

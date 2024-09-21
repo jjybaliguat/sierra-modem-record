@@ -117,11 +117,23 @@ export async function getEntriesCount(){
     }
 }
 
+export async function getCounter(){
+    try {
+        const count = await prisma.counter.findMany({})
+        return count[0].value
+    } catch (error) {
+        console.log()
+    }
+}
+
 export async function getWinner(number: string){
     try {
         const winner = await prisma.entries.findUnique({
             where: {
                 raffleCode: number
+            },
+            include: {
+                branch: true
             }
         })
         return winner

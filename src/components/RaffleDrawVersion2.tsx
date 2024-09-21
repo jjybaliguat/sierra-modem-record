@@ -4,9 +4,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from './ui/button';
 import Confetti from 'react-confetti'
 import WinnerDialog from './dialog/WinnerDialog';
-import { getWinner } from '@/app/actions';
+import { getCounter, getEntriesCount, getWinner } from '@/app/actions';
+import { EntryProps } from '@/types';
 
-function RaffleDrawVersion2() {
+function RaffleDrawVersion2({
+    entries
+} : { entries : EntryProps[] }) {
     const [bgAudio, setBgAudio] = useState<any>(null)
     const [drawAudio, setDrawAudio] = useState<any>(null)
     const [applause, setApplauseAdio] = useState<any>(null)
@@ -16,6 +19,9 @@ function RaffleDrawVersion2() {
     const [windowDimension, setWindowDimension] = useState<any | null>()
     const [showConfetti, setShowConfetti] = useState(false)
     const [showWinner, setShowWinner] = useState(false)
+    const [winner, setWinner] = useState<EntryProps | null>()
+    const [totalEntries, setTotalEntries] = useState<number | null>()
+    const [counter, setCounter] = useState<number | null>()
 
     useEffect(()=>{
         setBgAudio(new Audio('/raffle-draw.mp3'))
@@ -36,48 +42,73 @@ function RaffleDrawVersion2() {
     }, [bgAudio])
 
     const handleGetRandomNumber = () => {
-        bgAudio.pause()
-        drawAudio?.play()
-        setIsStarted(true)
-        const interval = setInterval(() => {
-            const number = Math.floor(1 + Math.random() * 2000);
-            const paddedNumber = number.toString().padStart(4, '0'); // Pad to 4 digits
-            setRandomNumber(paddedNumber);
-          }, 50); // Update every 100ms
-    
-          const timeout = setTimeout(() => {
-            clearInterval(interval); // Stop after 8 seconds
-            bgAudio.play()
-            applause?.play()
-            setIsStarted(false)
-            setShowConfetti(true)
-            if(winnerBtnRef){
-                setTimeout(()=>{
-                    winnerBtnRef?.current.click()
-                }, 1000)
-            }
-          }, 5000);
+        if(totalEntries && counter){
+            bgAudio.pause()
+            drawAudio?.play()
+            setIsStarted(true)
 
-      
-          return () => {
-            clearInterval(interval);
-            clearTimeout(timeout);
-          };
+            const interval = setInterval(() => {
+                const number = Math.floor(1 + Math.random() * counter);
+                const paddedNumber = number.toString().padStart(4, '0'); // Pad to 4 digits
+                setRandomNumber(paddedNumber);
+              }, 50); // Update every 100ms
+        
+              const timeout = setTimeout(() => {
+                clearInterval(interval); // Stop after 8 seconds
+                bgAudio.play()
+                applause?.play()
+                setIsStarted(false)
+                setShowConfetti(true)
+              }, 5000);
+    
+          
+              return () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+              };
+        }
     }
 
     
     useEffect(()=>{
         if(!isStarted && randomNumber !== '0000'){
-            const winner = getWinner(randomNumber)
-            console.log(winner)
+            getSingleEntry(randomNumber)
         }
     }, [randomNumber])
 
+    const getSingleEntry = async(code: string) => {
+        try {
+            const entry: any = await getWinner(code)
+            setWinner(entry)
+            if(winnerBtnRef){
+                setTimeout(()=>{
+                    winnerBtnRef?.current.click()
+                }, 1000)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        const getCount = async() => {
+            const count: any = await getEntriesCount()
+            const counter: any = await getCounter()
+            setTotalEntries(count)
+            setCounter(counter)
+        }
+
+        return () => {
+            getCount()
+        }
+    }, [])
+
   return (
     <>
-    {<WinnerDialog btnRef={winnerBtnRef} />}
+    {<WinnerDialog winner={winner} btnRef={winnerBtnRef} />}
     {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
-        <div className='flex flex-col gap-12 mt-12 items-center'>
+            <h1>{totalEntries? totalEntries : "..."} Total Entries</h1>
+        <div className='flex flex-col gap-12 mt-6 items-center'>
             <div className='flex flex-col gap-4'>
                 <div className='flex items-center gap-2'>
                     <div className='h-[100px] w-[80px] p-4 bg-white flex items-center justify-center rounded-md'>
@@ -93,7 +124,7 @@ function RaffleDrawVersion2() {
                         <h1 className='text-6xl font-bold text-black'>{randomNumber[3]}</h1>
                     </div>
                 </div>
-                <button className='rounded-full p-6 bg-primary' onClick={()=>{handleGetRandomNumber(); setShowConfetti(false)}} disabled={isStarted}>Start</button>
+                <button disabled={!counter || !totalEntries || isStarted} className='rounded-full p-6 bg-primary' onClick={()=>{handleGetRandomNumber(); setShowConfetti(false)}}>Start</button>
             </div>
             <div className='flex items-center gap-4'>
                 <button 
