@@ -29,6 +29,7 @@ function RaffleDrawVersion2({
         setApplauseAdio(new Audio('/applause.mp3'))
         setDrawAudio(new Audio('/draw.mp3'))
         setBgAudio(new Audio('/raffle-draw.mp3'))
+        getCount()
 
         // if(videoBtnRef){
         //     videoBtnRef.current.click()
@@ -95,19 +96,13 @@ function RaffleDrawVersion2({
             console.log(error)
         }
     }
-
-    useEffect(() => {
-        const getCount = async() => {
-            const count: any = await getEntriesCount()
-            const counter: any = await getCounter()
-            setTotalEntries(count)
-            setCounter(counter)
-        }
-
-        return () => {
-            getCount()
-        }
-    }, [])
+    
+    const getCount = async() => {
+        const count: any = await getEntriesCount()
+        const counter: any = await getCounter()
+        setTotalEntries(count)
+        setCounter(counter)
+    }
 
   return (
     <>
