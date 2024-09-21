@@ -7,7 +7,7 @@ import Link from 'next/link'
 function CustomLink({
     href,
     spa
-}: {href: string, spa: boolean}) {
+}: {href: string, spa?: boolean}) {
   return (
     <>
     {spa? (

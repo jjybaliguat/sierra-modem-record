@@ -6,14 +6,16 @@ import Confetti from 'react-confetti'
 import WinnerDialog from './dialog/WinnerDialog';
 import { getCounter, getEntriesCount, getWinner } from '@/app/actions';
 import { EntryProps } from '@/types';
+import IntroVideoDialog from './dialog/IntroVideoDialog';
 
 function RaffleDrawVersion2({
     entries
 } : { entries : EntryProps[] }) {
-    const [bgAudio, setBgAudio] = useState<any>(null)
-    const [drawAudio, setDrawAudio] = useState<any>(null)
-    const [applause, setApplauseAdio] = useState<any>(null)
+    // const [bgAudio, setBgAudio] = useState<any>(null)
+    // const [drawAudio, setDrawAudio] = useState<any>(null)
+    // const [applause, setApplauseAdio] = useState<any>(null)
     const winnerBtnRef = useRef<any>(null)
+    const videoBtnRef = useRef<any>(null)
     const [isStarted, setIsStarted] = useState(false)
     const [randomNumber, setRandomNumber] = useState<string>('0000');
     const [windowDimension, setWindowDimension] = useState<any | null>()
@@ -22,11 +24,18 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
+    const bgAudio = document.getElementById('bg-audio') as HTMLAudioElement
+    const drawAudio = document.getElementById('draw-audio') as HTMLAudioElement
+    const applauseAudio = document.getElementById('applause-audio') as HTMLAudioElement
 
     useEffect(()=>{
-        setBgAudio(new Audio('/raffle-draw.mp3'))
-        setDrawAudio(new Audio('/draw.mp3'))
-        setApplauseAdio(new Audio('/applause.mp3'))
+        // setApplauseAdio(new Audio('/applause.mp3'))
+        if(bgAudio?.paused){
+            bgAudio.play()
+        }
+        if(videoBtnRef){
+            videoBtnRef.current.click()
+        }
         if(window !== undefined){
             setWindowDimension({
                 width: window.innerWidth,
@@ -35,15 +44,15 @@ function RaffleDrawVersion2({
         }
     }, [])
 
-    useEffect(()=>{
-        if(bgAudio){
-            bgAudio.play()
-        }
-    }, [bgAudio])
+    // useEffect(()=>{
+    //     if(bgAudio){
+    //         bgAudio.play()
+    //     }
+    // }, [bgAudio])
 
     const handleGetRandomNumber = () => {
         if(totalEntries && counter){
-            bgAudio.pause()
+            bgAudio?.pause()
             drawAudio?.play()
             setIsStarted(true)
 
@@ -55,8 +64,8 @@ function RaffleDrawVersion2({
         
               const timeout = setTimeout(() => {
                 clearInterval(interval); // Stop after 8 seconds
-                bgAudio.play()
-                applause?.play()
+                bgAudio?.play()
+                applauseAudio?.play()
                 setIsStarted(false)
                 setShowConfetti(true)
               }, 5000);
@@ -105,6 +114,16 @@ function RaffleDrawVersion2({
 
   return (
     <>
+    <audio id="bg-audio" controls autoPlay className='hidden'>
+        <source src="/raffle-draw.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="draw-audio" controls className='hidden'>
+        <source src="/draw.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="applause-audio" controls className='hidden'>
+        <source src="/applause.mp3" type="audio/mp3" />
+    </audio>
+    <IntroVideoDialog btnRef={videoBtnRef} />
     {<WinnerDialog winner={winner} btnRef={winnerBtnRef} />}
     {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
             <h1>{totalEntries? totalEntries : "..."} Total Entries</h1>
@@ -124,18 +143,16 @@ function RaffleDrawVersion2({
                         <h1 className='text-6xl font-bold text-black'>{randomNumber[3]}</h1>
                     </div>
                 </div>
-                <button disabled={!counter || !totalEntries || isStarted} className='rounded-full p-6 bg-primary' onClick={()=>{handleGetRandomNumber(); setShowConfetti(false)}}>Start</button>
+                <button disabled={!counter || !totalEntries || isStarted} className='rounded-full p-6 bg-primary' onClick={()=>{handleGetRandomNumber(); setShowConfetti(false)}}>{(!counter || !totalEntries) ? "Please Wait" : "Start"}</button>
             </div>
             <div className='flex items-center gap-4'>
                 <button 
                 className='rounded-full p-6 bg-muted'
-                onClick={()=>bgAudio.pause()}>Pause Music</button>
+                onClick={()=>bgAudio?.pause()}>Pause Music</button>
                 <button
                 className='rounded-full p-6 bg-primary'
                 onClick={()=>{
-                    if(bgAudio.paused){
-                        bgAudio.play()
-                    }
+                    bgAudio?.play()
                 }}>Play Music</button>
             </div>
         </div>

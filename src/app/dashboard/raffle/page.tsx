@@ -17,7 +17,7 @@ async function Raffle() {
     {/* <div>Raffle</div> */}
     <div className='py-8 flex flex-col min-h-screen'>
       <div className='flex flex-col items-center gap-4'>
-        <CustomLink href='/dashboard' spa={false} />
+        <CustomLink href='/dashboard' spa={true} />
         <h1 className='text-3xl font-bold'>Welcome To</h1>
         <div className='flex items-center gap-2'>
           <Image
