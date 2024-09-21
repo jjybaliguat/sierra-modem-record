@@ -23,15 +23,15 @@ function IntroVideoDialog({
     <>
     <Dialog>
           <DialogTrigger asChild>
-            <Button ref={btnRef} className='hidden' variant="default">Watch Video</Button>
+            <Button ref={btnRef}  variant="default">Watch Video</Button>
           </DialogTrigger>
             <DialogClose ref={buttonRef} asChild>
                 <Button type="button" variant="secondary" className='hidden'>
                 Close
                 </Button>
             </DialogClose>
-          <DialogContent className="w-full lg:w-[70vw]">
-            <video width={320} height={240} autoPlay>
+          <DialogContent className="w-full h-screen">
+            <video className='w-full h-full' autoPlay>
                 <source src='/raffle-intro-video.mp4' type='video/mp4' />
             </video>
           </DialogContent>

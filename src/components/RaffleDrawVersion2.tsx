@@ -11,9 +11,9 @@ import IntroVideoDialog from './dialog/IntroVideoDialog';
 function RaffleDrawVersion2({
     entries
 } : { entries : EntryProps[] }) {
-    // const [bgAudio, setBgAudio] = useState<any>(null)
-    // const [drawAudio, setDrawAudio] = useState<any>(null)
-    // const [applause, setApplauseAdio] = useState<any>(null)
+    const [bgAudio, setBgAudio] = useState<any>(null)
+    const [drawAudio, setDrawAudio] = useState<any>(null)
+    const [applauseAudio, setApplauseAdio] = useState<any>(null)
     const winnerBtnRef = useRef<any>(null)
     const videoBtnRef = useRef<any>(null)
     const [isStarted, setIsStarted] = useState(false)
@@ -24,21 +24,12 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
-    let bgAudio: HTMLAudioElement | null = null
-    let drawAudio: HTMLAudioElement | null = null
-    let applauseAudio: HTMLAudioElement | null = null
 
     useEffect(()=>{
-        // setApplauseAdio(new Audio('/applause.mp3'))
-        if(document !== undefined){
-            bgAudio = document?.getElementById('bg-audio') as HTMLAudioElement
-            drawAudio = document?.getElementById('draw-audio') as HTMLAudioElement
-            applauseAudio = document?.getElementById('applause-audio') as HTMLAudioElement
-        }
+        setApplauseAdio(new Audio('/applause.mp3'))
+        setDrawAudio(new Audio('/draw.mp3'))
+        setBgAudio(new Audio('/raffle-draw.mp3'))
 
-        if(bgAudio?.paused){
-            bgAudio.play()
-        }
         if(videoBtnRef){
             videoBtnRef.current.click()
         }
@@ -50,11 +41,11 @@ function RaffleDrawVersion2({
         }
     }, [])
 
-    // useEffect(()=>{
-    //     if(bgAudio){
-    //         bgAudio.play()
-    //     }
-    // }, [bgAudio])
+    useEffect(()=>{
+        if(bgAudio){
+            bgAudio.play()
+        }
+    }, [bgAudio])
 
     const handleGetRandomNumber = () => {
         if(totalEntries && counter){
@@ -120,15 +111,15 @@ function RaffleDrawVersion2({
 
   return (
     <>
-    <audio id="bg-audio" controls autoPlay className='hidden'>
+    {/* <audio ref={bgAudio} controls autoPlay className='hidden'>
         <source src="/raffle-draw.mp3" type="audio/mp3" />
     </audio>
-    <audio id="draw-audio" controls className='hidden'>
+    <audio ref={drawAudio} controls className='hidden'>
         <source src="/draw.mp3" type="audio/mp3" />
     </audio>
-    <audio id="applause-audio" controls className='hidden'>
+    <audio ref={applauseAudio} controls className='hidden'>
         <source src="/applause.mp3" type="audio/mp3" />
-    </audio>
+    </audio> */}
     <IntroVideoDialog btnRef={videoBtnRef} />
     {<WinnerDialog winner={winner} btnRef={winnerBtnRef} />}
     {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
