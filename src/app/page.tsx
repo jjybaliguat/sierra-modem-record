@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState } from "react";
+import Link from "next/link";
 
 const formSchema = z.object({
   branchName: z.string().min(2, {
@@ -94,7 +95,8 @@ export default function Login() {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <Link href="/search"><Button variant="outline">Search Entries</Button></Link>
               <Button disabled={submitting} type="submit">{submitting ? "Logging in..." : "Login"}</Button>
             </div>
           </form>

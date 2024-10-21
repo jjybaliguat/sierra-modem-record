@@ -39,6 +39,7 @@ async function Dashboard() {
                         <Link href="/dashboard/raffle"><Button>Start Raffle</Button></Link>
                         
                     )}
+                    <Link href="/search"><Button variant="outline">Search</Button></Link>
                     <LogoutBtn />
                 </div>
             </div>
