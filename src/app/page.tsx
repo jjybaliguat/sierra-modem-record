@@ -96,7 +96,7 @@ export default function Login() {
               )}
             />
             <div className="flex justify-end gap-2">
-              <Link href="/search"><Button variant="outline">Search Entries</Button></Link>
+              <Link href="/search"><Button type="button" variant="outline">Search Entries</Button></Link>
               <Button disabled={submitting} type="submit">{submitting ? "Logging in..." : "Login"}</Button>
             </div>
           </form>
