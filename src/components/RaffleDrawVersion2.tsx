@@ -10,6 +10,16 @@ import IntroVideoDialog from './dialog/IntroVideoDialog';
 import { GearIcon } from '@radix-ui/react-icons';
 import { useSettingsStore } from '@/lib/store/settings';
 import SettingsDialog from './dialog/SettingsDialog';
+import { useWinnersStore, winType } from '@/lib/store/winners';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 
 function RaffleDrawVersion2({
     entries
@@ -27,9 +37,10 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
+    const [drawType, setDrawType] = useState<winType>(winType.ConsolationNocheBuena)
 
-    const delay = useSettingsStore((state: any)=>state.randomizerDelay)
-    const setRandomDelay = useSettingsStore((state: any)=>state.setRandomizerDelay)
+    const {randomizerDelay} = useSettingsStore()
+    const {addWinner, clearWinners} = useWinnersStore()
 
     useEffect(()=>{
         setApplauseAdio(new Audio('/applause.mp3'))
@@ -72,7 +83,7 @@ function RaffleDrawVersion2({
                 applauseAudio?.play()
                 setIsStarted(false)
                 setShowConfetti(true)
-              }, (delay*1000));
+              }, (randomizerDelay*1000));
     
           
               return () => {
@@ -93,6 +104,15 @@ function RaffleDrawVersion2({
         try {
             const entry: any = await getWinner(code)
             setWinner(entry)
+            if(entry?.id){
+                addWinner({
+                    name: entry.clientName,
+                    raffleCode: entry.raffleCode,
+                    phone: entry.phone,
+                    address: entry.address,
+                    winningType: drawType
+                })
+            }
             if(winnerBtnRef){
                 setTimeout(()=>{
                     winnerBtnRef?.current.click()
@@ -125,6 +145,19 @@ function RaffleDrawVersion2({
     {<WinnerDialog winner={winner} btnRef={winnerBtnRef} />}
     {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
             <h1>{totalEntries? totalEntries : "..."} Total Entries</h1>
+            <Select defaultValue={drawType} onValueChange={(value)=>setDrawType(value as winType)}>
+                <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder={drawType} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Draw Type</SelectLabel>
+                        {Object.values(winType).map((WinType) => (
+                            <SelectItem key={WinType} value={WinType}>{WinType}</SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
         <div className='flex flex-col gap-12 mt-6 items-center'>
             <div className='flex flex-col gap-4'>
                 <div className='flex items-center gap-2'>
@@ -153,7 +186,11 @@ function RaffleDrawVersion2({
                     bgAudio?.play()
                 }}>Play Music</button>
             </div>
-            <SettingsDialog />
+            <div className='flex items-center gap-2'>
+                <Button>Show Winners</Button>
+                <Button variant="destructive" onClick={clearWinners}>Clear Winners</Button>
+                <SettingsDialog />
+            </div>
         </div>
     </>
   )

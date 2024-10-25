@@ -19,10 +19,8 @@ import { toast } from 'sonner';
 function SettingsDialog() {
 
     const buttonRef = useRef<HTMLButtonElement>(null);
-    const delay = useSettingsStore((state: any) => state.randomizerDelay)
-    const deleteAfterPicked = useSettingsStore((state: any) => state.deleteAfterPicked)
-    const setRandomizerDelay = useSettingsStore((state: any) => state.setRandomizerDelay)
-    const setDeleteAfterPicked = useSettingsStore((state: any) => state.setDeleteAfterPicked)
+    const delay = useSettingsStore((state) => state.randomizerDelay)
+    const {deleteAfterPicked, setRandomizerDelay, setDeleteAfterPicked} = useSettingsStore()
 
     const [settings, setSettings] = useState({
         delay,
@@ -58,7 +56,7 @@ function SettingsDialog() {
                   </DialogHeader>
                   
                   <div className='flex flex-col gap-4 mt-4'>
-                    <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Randomizer delay in secs. </h1> <Input placeholder='' value={settings.delay} onChange={(e)=>{setSettings({...settings, delay: e.target.value})}} /></div>
+                    <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Randomizer delay in secs. </h1> <Input placeholder='' value={settings.delay} onChange={(e)=>{setSettings({...settings, delay: Number(e.target.value)})}} /></div>
                     <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Prevent Entry from multiple wins? </h1> 
                     <Select onValueChange={(value)=>setSettings({...settings, deleteAfterPicked: (value === "true"? true : false)})}>
                         <SelectTrigger>
