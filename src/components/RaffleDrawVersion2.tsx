@@ -7,6 +7,9 @@ import WinnerDialog from './dialog/WinnerDialog';
 import { getCounter, getEntriesCount, getWinner } from '@/app/actions';
 import { EntryProps } from '@/types';
 import IntroVideoDialog from './dialog/IntroVideoDialog';
+import { GearIcon } from '@radix-ui/react-icons';
+import { useSettingsStore } from '@/lib/store/settings';
+import SettingsDialog from './dialog/SettingsDialog';
 
 function RaffleDrawVersion2({
     entries
@@ -24,6 +27,9 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
+
+    const delay = useSettingsStore((state: any)=>state.randomizerDelay)
+    const setRandomDelay = useSettingsStore((state: any)=>state.setRandomizerDelay)
 
     useEffect(()=>{
         setApplauseAdio(new Audio('/applause.mp3'))
@@ -51,7 +57,7 @@ function RaffleDrawVersion2({
     const handleGetRandomNumber = () => {
         if(totalEntries && counter){
             bgAudio?.pause()
-            drawAudio?.play()
+            // drawAudio?.play()
             setIsStarted(true)
 
             const interval = setInterval(() => {
@@ -66,7 +72,7 @@ function RaffleDrawVersion2({
                 applauseAudio?.play()
                 setIsStarted(false)
                 setShowConfetti(true)
-              }, 5000);
+              }, (delay*1000));
     
           
               return () => {
@@ -147,6 +153,7 @@ function RaffleDrawVersion2({
                     bgAudio?.play()
                 }}>Play Music</button>
             </div>
+            <SettingsDialog />
         </div>
     </>
   )
