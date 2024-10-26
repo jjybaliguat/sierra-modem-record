@@ -1,41 +1,60 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface WinnnersState {
-    winners: WinnerState[],
-    addWinner: (winner: WinnerState) => void,
-    removeWinner: (raffleCode: string) => void,
-    clearWinners: () => void
-}
+// Define the type for individual winners
 interface WinnerState {
-    name: string,
-    raffleCode: string,
-    phone: string,
-    address: string,
-    winningType: winType
+  name: string;
+  raffleCode: string;
+  phone: string;
+  address: string;
+  branch: string;
+  winningType: WinType;
 }
 
-enum winType {
-    GrandPrize = "GrandPrize",
-    SecondPrize = "SecondPrize",
-    ThirdPrize = "ThirdPrize",
-    ConsolationRice = "ConsolationRice",
-    ConsolationInternet = "ConsolationInternet",
-    ConsolationNocheBuena = "ConsolationNocheBuena"
+// Enum for prize types
+enum WinType {
+  GrandPrize = "GrandPrize",
+  SecondPrize = "SecondPrize",
+  ThirdPrize = "ThirdPrize",
+  ConsolationRice = "ConsolationRice",
+  ConsolationInternet = "ConsolationInternet",
+  ConsolationNocheBuena = "ConsolationNocheBuena",
 }
 
-const useWinnersStore = create<WinnnersState>()(
-    persist(
-        (set, get) => ({
-            winners: [],
-            addWinner: (winner) => set((state)=>({winners: [...state.winners, winner]})),
-            removeWinner: (raffleCode) => set((state) => ({ winners: state.winners.filter((winner) => winner.raffleCode !== raffleCode) })),
-            clearWinners: () => set({ winners: [] }),
-        }),
-        {
-            name: 'winners-storage'
-        }
-    )
-)
+// Define the main state type with actions
+interface WinnersState {
+  winners: WinnerState[];
+  drawType: WinType;
+  getWinnerByWinType: (winType: WinType) => WinnerState[];
+  setDrawType: (type: WinType) => void;
+  addWinner: (winner: WinnerState) => void;
+  removeWinner: (raffleCode: string) => void;
+  clearWinners: () => void;
+}
 
-export {winType, useWinnersStore}
+const useWinnersStore = create<WinnersState>()(
+  persist(
+    (set, get) => ({
+      winners: [],
+      drawType: WinType.ConsolationNocheBuena,
+
+      getWinnerByWinType: (type) => get().winners.filter((winner) => winner.winningType === type),
+      setDrawType: (type) => set(() => ({ drawType: type })),
+      addWinner: (winner) =>
+        set((state) => ({ winners: [...state.winners, winner] })),
+      removeWinner: (raffleCode) =>
+        set((state) => ({
+          winners: state.winners.filter(
+            (winner) => winner.raffleCode !== raffleCode
+          ),
+        })),
+      clearWinners: () => set({ winners: [] }),
+    }),
+    {
+      name: 'winners-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+export { WinType, useWinnersStore };

@@ -10,7 +10,7 @@ import IntroVideoDialog from './dialog/IntroVideoDialog';
 import { GearIcon } from '@radix-ui/react-icons';
 import { useSettingsStore } from '@/lib/store/settings';
 import SettingsDialog from './dialog/SettingsDialog';
-import { useWinnersStore, winType } from '@/lib/store/winners';
+import { useWinnersStore, WinType } from '@/lib/store/winners';
 import {
     Select,
     SelectContent,
@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import WinnersDialog from './dialog/WinnersDialog';
 
 function RaffleDrawVersion2({
     entries
@@ -37,10 +38,9 @@ function RaffleDrawVersion2({
     const [winner, setWinner] = useState<EntryProps | null>()
     const [totalEntries, setTotalEntries] = useState<number | null>()
     const [counter, setCounter] = useState<number | null>()
-    const [drawType, setDrawType] = useState<winType>(winType.ConsolationNocheBuena)
 
     const {randomizerDelay} = useSettingsStore()
-    const {addWinner, clearWinners} = useWinnersStore()
+    const {addWinner, drawType, setDrawType} = useWinnersStore()
 
     useEffect(()=>{
         setApplauseAdio(new Audio('/applause.mp3'))
@@ -67,7 +67,7 @@ function RaffleDrawVersion2({
 
     const handleGetRandomNumber = () => {
         if(totalEntries && counter){
-            bgAudio?.pause()
+            // bgAudio?.pause()
             // drawAudio?.play()
             setIsStarted(true)
 
@@ -108,6 +108,7 @@ function RaffleDrawVersion2({
                 addWinner({
                     name: entry.clientName,
                     raffleCode: entry.raffleCode,
+                    branch: entry.branch.branchName,
                     phone: entry.phone,
                     address: entry.address,
                     winningType: drawType
@@ -145,15 +146,15 @@ function RaffleDrawVersion2({
     {<WinnerDialog winner={winner} btnRef={winnerBtnRef} />}
     {showConfetti && <Confetti className='z-50' width={windowDimension?.width} height={windowDimension?.height} />}
             <h1>{totalEntries? totalEntries : "..."} Total Entries</h1>
-            <Select defaultValue={drawType} onValueChange={(value)=>setDrawType(value as winType)}>
+            <Select onValueChange={(value)=>setDrawType(value as WinType)}>
                 <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder={drawType} />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Draw Type</SelectLabel>
-                        {Object.values(winType).map((WinType) => (
-                            <SelectItem key={WinType} value={WinType}>{WinType}</SelectItem>
+                        {Object.values(WinType).map((winType) => (
+                            <SelectItem key={winType} value={winType}>{winType}</SelectItem>
                         ))}
                     </SelectGroup>
                 </SelectContent>
@@ -187,8 +188,7 @@ function RaffleDrawVersion2({
                 }}>Play Music</button>
             </div>
             <div className='flex items-center gap-2'>
-                <Button>Show Winners</Button>
-                <Button variant="destructive" onClick={clearWinners}>Clear Winners</Button>
+                <WinnersDialog />
                 <SettingsDialog />
             </div>
         </div>
