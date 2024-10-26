@@ -13,6 +13,9 @@ import {
 import { Button } from '../ui/button'
 import Image from 'next/image';
 import { EntryProps } from '@/types';
+import { deleteOneEntry } from '@/app/actions';
+import { toast } from 'sonner'
+import { useSettingsStore } from '@/lib/store/settings';
 
 function WinnerDialog({
   btnRef,
@@ -22,6 +25,19 @@ function WinnerDialog({
   winner: EntryProps | null | undefined
 }) {
     const buttonRef = useRef<HTMLButtonElement>(null);
+    const {testMode} = useSettingsStore()
+
+    async function handleDeleteEntry(id: string) {
+      try {
+        await deleteOneEntry(id)
+        toast.success("Entry Deleted Successfully!!")
+        buttonRef.current?.click()
+      } catch (error) {
+        toast.error("Failed Deleting Entry!!")
+        console.log(error)
+      }
+    }
+
   return (
     <>
         <Dialog>
@@ -48,6 +64,7 @@ function WinnerDialog({
                       <h1 className='text-center text-3xl font-bold text-primary'>{winner?.clientName}</h1>
                       <h1 className='text-center'>{winner?.address}</h1>
                       <h1 className='text-center'>{winner?.branch?.branchName} Branch</h1>
+                      <Button disabled={testMode} className='mt-4' variant="destructive" onClick={()=>handleDeleteEntry(winner?.id)}>Delete Entry</Button>
                     </>
                   ) : (
                     <>

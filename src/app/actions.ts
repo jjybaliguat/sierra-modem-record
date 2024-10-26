@@ -76,6 +76,19 @@ export async function deleteEntry(ids: string[]){
     }
 }
 
+export async function deleteOneEntry(id: string){
+    try {
+        const response = await prisma.entries.delete({
+            where: {
+                id: id
+            }
+        })
+        return response
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function getSingleEntry(id: string){
     try {
         const data = await prisma.entries.findUnique({

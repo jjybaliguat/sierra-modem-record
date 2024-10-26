@@ -20,17 +20,17 @@ function SettingsDialog() {
 
     const buttonRef = useRef<HTMLButtonElement>(null);
     const delay = useSettingsStore((state) => state.randomizerDelay)
-    const {deleteAfterPicked, setRandomizerDelay, setDeleteAfterPicked} = useSettingsStore()
+    const {testMode, setRandomizerDelay, toggleTestMode} = useSettingsStore()
 
     const [settings, setSettings] = useState({
         delay,
-        deleteAfterPicked
+        testMode
     })
 
     const handleSave = () => {
         setRandomizerDelay(settings.delay)
-        setDeleteAfterPicked(settings.deleteAfterPicked)
-        toast.success("Settings saved!");
+        toggleTestMode(settings.testMode)
+        toast.success(`Settings saved! Activated ${settings.testMode ? "test mode" : "live mode"}`);
         buttonRef.current?.click()
     }
 
@@ -57,15 +57,15 @@ function SettingsDialog() {
                   
                   <div className='flex flex-col gap-4 mt-4'>
                     <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Randomizer delay in secs. </h1> <Input placeholder='' value={settings.delay} onChange={(e)=>{setSettings({...settings, delay: Number(e.target.value)})}} /></div>
-                    <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Prevent Entry from multiple wins? </h1> 
-                    <Select onValueChange={(value)=>setSettings({...settings, deleteAfterPicked: (value === "true"? true : false)})}>
+                    <div className='grid grid-cols-3 items-center'><h1 className='col-span-2'>Raffle Mode </h1> 
+                    <Select onValueChange={(value)=>setSettings({...settings, testMode: (value === "true"? true : false)})}>
                         <SelectTrigger>
-                            <SelectValue placeholder={settings.deleteAfterPicked? "True" : "False"} />
+                            <SelectValue placeholder={settings.testMode? "Test" : "Live"} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                            <SelectItem value="true">True</SelectItem>
-                            <SelectItem value="false">False</SelectItem>
+                            <SelectItem value="true">Test</SelectItem>
+                            <SelectItem value="false">Live</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

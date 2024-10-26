@@ -3,18 +3,18 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface SettingsState {
     randomizerDelay: number;
-    deleteAfterPicked: boolean;
+    testMode: boolean;
     setRandomizerDelay: (delay: number) => void;
-    setDeleteAfterPicked: (value: boolean) => void
+    toggleTestMode: (value: boolean) => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
     persist(
         (set, get) => ({
             randomizerDelay: 10,
-            deleteAfterPicked: false,
+            testMode: true,
             setRandomizerDelay: (delay) => set(()=> ({randomizerDelay: delay})),
-            setDeleteAfterPicked: (value) => set(()=> ({deleteAfterPicked: value}))
+            toggleTestMode: (value) => set((state)=> ({testMode: !state.testMode}))
         }),
         {
             name: 'settings-storage'

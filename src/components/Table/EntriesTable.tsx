@@ -284,6 +284,13 @@ export function EntriesTable({
                 checked={filterIndex === 1}
                 onCheckedChange={()=>setFilterIndex(1)}
               >
+                RaffleCode
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                className="capitalize"
+                checked={filterIndex === 2}
+                onCheckedChange={()=>setFilterIndex(2)}
+              >
                 Branch
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
@@ -294,6 +301,15 @@ export function EntriesTable({
               value={(table.getColumn("clientName")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("clientName")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          ) : filterIndex === 1 ? (
+            <Input
+              placeholder="Search by Raffle Code"
+              value={(table.getColumn("raffleCode")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("raffleCode")?.setFilterValue(event.target.value)
               }
               className="max-w-sm"
             />
