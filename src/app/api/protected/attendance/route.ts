@@ -23,7 +23,7 @@ export async function GET(req: Request){
                 employee: true
             },
             orderBy: {
-                createdAt: "desc"
+                updatedAt: "desc"
             }
         })
 

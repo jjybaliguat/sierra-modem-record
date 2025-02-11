@@ -11,8 +11,7 @@ export interface Attendance {
 
 export interface Employee {
     id: string,
-    firstName: string,
-    lastName: string,
+    fullName: string,
     fingerprintId: string
 }
 

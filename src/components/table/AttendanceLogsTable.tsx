@@ -29,19 +29,21 @@ import { format } from "date-fns";
             // "bg-amber-300 dark:bg-amber-600": !att.timeOut,
             // "bg-green-500 dark:bg-green-800": att.timeOut
           })}>
-            <h1 className={cn({
-            "font-medium text-xl": true,
-            "text-amber-300 dark:text-amber-600": !att.timeOut,
-            "text-green-500 dark:text-green-800": att.timeOut
-          })}>{att.employee.firstName}</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <h1 className={cn({
+              "font-medium text-xl": true,
+              "text-amber-300 dark:text-amber-600": !att.timeOut,
+              "text-green-500 dark:text-green-800": att.timeOut
+            })}>{att.employee.fullName.split(" ")[0]}</h1>
               <p className={cn({
                 "text-green-500 dark:text-green-800 text-[12px] font-bold": true,
-                "text-rose-500": att.status === AttendanceStatus.ABSENT,
-                "text-orange-700 dark:text-orange-500": att.status === AttendanceStatus.LATE,
+              "text-rose-500": att.status === AttendanceStatus.ABSENT,
+              "text-orange-700 dark:text-orange-500": att.status === AttendanceStatus.LATE,
               })}>{att.status}</p>
+            </div>
+            <div className="flex items-center gap-2">
               <p className="text-[12px]">TimeIn: {format(att.timeIn, "PPpp")}</p>
-              <p className="text-[12px]">TimeOut: {format(att.timeOut, "PPpp")}</p>
+              <p className="text-[12px]">TimeOut: {att.timeOut && format(att.timeOut, "PPpp")}</p>
             </div>
           </div>
         ))
@@ -66,10 +68,10 @@ import { format } from "date-fns";
                 "bg-green-500 dark:bg-green-800": att.timeOut
               })}>
                 <TableCell className="font-medium">{att.fingerprintId}</TableCell>
-                <TableCell>{att.employee.firstName}</TableCell>
+                <TableCell>{att.employee.fullName.split(" ")[0]}</TableCell>
                 <TableCell>{att.status}</TableCell>
                 <TableCell className="text-right">{format(att.timeIn, "PPpp")}</TableCell>
-                <TableCell className="text-right">{format(att.timeOut, "PPpp")}</TableCell>
+                <TableCell className="text-right">{att.timeOut && format(att.timeOut, "PPpp")}</TableCell>
               </TableRow>
             ))}
           </TableBody>

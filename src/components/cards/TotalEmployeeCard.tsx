@@ -11,7 +11,7 @@ export const revalidate = 0;
 async function GetTotalEmployees(session: any) {
     try {
       if(session.user){
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FONTEND_URL}/protected/employee/count?id=${session.user.id}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee/count?id=${session.user.id}`)
         const data = await response.json()
         return data
       }

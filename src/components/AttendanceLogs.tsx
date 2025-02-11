@@ -6,9 +6,9 @@ import { authOptions } from '@/lib/auth'
 
 async function GetAttendanceLogs(id: string){
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_FONTEND_URL}/protected/attendance?id=${id}`) 
+    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/attendance?id=${id}`) 
     const data = await response.json()
-
+    
     return data
   } catch (error) {
     console.log(error)

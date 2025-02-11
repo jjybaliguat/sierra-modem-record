@@ -66,8 +66,7 @@ model Employee {
   employerId    String @db.ObjectId
   employer      User @relation(fields: [employerId], references: [id], onDelete: Cascade)
   empCode       String   @unique // Unique employee code
-  firstName     String
-  lastName      String
+  fullName      String?
   email         String   @unique
   phone         String?
   department    String?
@@ -88,7 +87,7 @@ model Employee {
 model Attendance {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   employeeId    String @db.ObjectId
-  employee      Employee @relation(fields: [employeeId], references: [id])
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   fingerprintId Int      // Numeric fingerprint ID for tracking
   timeIn       DateTime @default(now()) // Check-in timestamp
   timeOut      DateTime? // Nullable check-out timestamp
@@ -96,6 +95,7 @@ model Attendance {
   verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
 
   createdAt     DateTime @default(now())
+  updatedAt     DateTime? @updatedAt
 }
 
 enum AttendanceStatus {

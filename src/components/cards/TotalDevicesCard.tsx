@@ -8,7 +8,7 @@ import { authOptions } from '@/lib/auth'
 
 async function GetTotalDevices(session: any) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_FONTEND_URL}/protected/devices/count?id=${session.user.id}`)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices/count?id=${session.user.id}`)
     const data = await response.json()
     return data
   } catch (error) {

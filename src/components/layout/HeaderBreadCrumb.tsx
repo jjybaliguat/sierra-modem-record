@@ -22,7 +22,7 @@ const HeaderBreadCrumb = (props: Props) => {
     <Breadcrumb>
         <BreadcrumbList>
             {paths.map((path, index)=> (
-                <div key={path}>
+                <div key={path} className='flex items-center gap-1'>
                     <BreadcrumbItem className="">
                         <BreadcrumbLink href={`/${index == 0 ? path : `dashboard/${path}`}`} className='capitalize'>
                             {path}

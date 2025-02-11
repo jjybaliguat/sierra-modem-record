@@ -22,13 +22,12 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { NavMain } from "./nav-main"
 import { NavUser } from "./nav-user"
 import { useSession } from "next-auth/react"
 import { authOptions } from "@/lib/auth"
 import Image from "next/image"
+import { NavMain } from "./nav-main"
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -57,7 +56,6 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const session = useSession(authOptions)
     const user = session.data?.user
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -69,15 +67,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Image
                 src="/logo-favicon.png"
                 alt="logo-favicon"
-                height={30}
-                width={30}
+                height={20}
+                width={20}
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">
-              LOGPAY
+              LogPay
             </span>
-            <span className="truncate text-xs">{user?.role === "ADMIN" ? "Employeer" : user?.role} Dashboard</span>
+            <span className="truncate text-xs">{user?.role === "ADMIN" ? "ADMIN" : user?.role} Dashboard</span>
           </div>
           <ChevronsUpDown className="ml-auto" />
         </SidebarMenuButton>

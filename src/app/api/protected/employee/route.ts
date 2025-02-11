@@ -10,13 +10,13 @@ export async function GET(req: Request){
     const filters: any = {};
 
     if(!id){
-            return NextResponse.json({message: "Missing id parameter"}, {status: 400})
+            return NextResponse.json({message: "Unauthorized"}, {status: 401})
         }else{
             filters.employerId = id
         }
 
     try {
-        const employees = prisma.employee.findMany({
+        const employees = await prisma.employee.findMany({
             where: filters
         })
 

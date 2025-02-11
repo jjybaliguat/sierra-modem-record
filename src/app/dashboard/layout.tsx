@@ -7,10 +7,10 @@ import {
 } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeToggle } from '@/components/ThemeToggler'
-import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Notifications } from '@/components/popover/Notifications'
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
 import DateTime from '@/components/DateTime'
+import { AppSidebar } from '@/components/layout/app-sidebar'
 
 const RootLayout = ({
     children
@@ -19,7 +19,7 @@ const RootLayout = ({
     <SidebarProvider>
       <Toaster />
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className='overflow-hidden'>
         <div className='sticky top-0 bg-background'>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 z-50">
             <div className="w-full pr-4 flex justify-between items-center">
@@ -35,7 +35,7 @@ const RootLayout = ({
             </div>
           </header>
         </div>
-        <div className='p-6 bg-slate-100 dark:bg-neutral-800 min-h-screen'>
+        <div className='py-6 px-2 bg-slate-100 dark:bg-neutral-800 min-h-screen'>
           {children}
         </div>
       </SidebarInset>
