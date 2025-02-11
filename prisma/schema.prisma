@@ -1,9 +1,11 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -12,50 +14,94 @@ datasource db {
 }
 
 model User {
-  id  String   @id @default(auto()) @map("_id") @db.ObjectId
-  branchName String @unique
-  password  String
-  role      Role
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String    @unique
+  password     String
+  photo        String?
+  companyId     String? @db.ObjectId
+  company      Company? @relation(fields: [companyId], references: [id])
+  role         UserRole  @default(ADMIN)
 
-  entries Entries[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  gracePeriodInMinutes  Int?  @default(15)
+  lateDeducInMinutes    Int?  @default(30)
+
+  devices      Device[]
+  employees    Employee[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([name, email])
 }
 
-model Entries {
-  id  String   @id @default(auto()) @map("_id") @db.ObjectId
-  raffleCode  String @unique
-  clientName  String
-  address     String
-  phone       String
-
-
-  branchId    String @db.ObjectId
-  branch User @relation(fields: [branchId], references: [id])
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-// model RaffleCode{
-//   id  String   @id @default(auto()) @map("_id") @db.ObjectId
-//   code  String @unique
-//   entryId String? @db.ObjectId @unique
-//   entry Entries? @relation(fields: [entryId], references: [id])
-
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-// }
-
-model Counter{
-  id  String   @id @default(auto()) @map("_id") @db.ObjectId
-  value Int
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-enum Role {
-  SUPERADMIN
+enum UserRole {
   ADMIN
+  DEVELOPER
 }
+
+model Company {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  logo  String?
+  address String
+  contact String
+
+  User User[]
+}
+
+model Device {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  deviceId  String
+  userId  String @db.ObjectId
+  user  User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Employee {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  employerId    String @db.ObjectId
+  employer      User @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  empCode       String   @unique // Unique employee code
+  firstName     String
+  lastName      String
+  email         String   @unique
+  phone         String?
+  department    String?
+  position      String
+  dailyRate     Int
+  hireDate      DateTime @default(now())
+  tinNumber     String?
+  sssNumber     String?
+
+  isActive      Boolean  @default(true)
+  fingerprintId Int      // Numeric fingerprint ID for sensor
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  Attendance Attendance[]
+}
+
+model Attendance {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId    String @db.ObjectId
+  employee      Employee @relation(fields: [employeeId], references: [id])
+  fingerprintId Int      // Numeric fingerprint ID for tracking
+  timeIn       DateTime @default(now()) // Check-in timestamp
+  timeOut      DateTime? // Nullable check-out timestamp
+  status        AttendanceStatus   @default(PRESENT) // PRESENT, LATE, ABSENT
+  verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
+
+  createdAt     DateTime @default(now())
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+}
+
+

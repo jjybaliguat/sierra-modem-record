@@ -4,10 +4,7 @@
 // import { getSession } from 'next-auth/react';
 // import { authOptions } from './lib/auth';
 // import { getServerSession } from 'next-auth';
-
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth"; 
 import { getToken } from "next-auth/jwt";
 
 
@@ -30,11 +27,14 @@ export async function middleware(req : NextRequest) {
     }
 
     if(!session){
-      if (isApiRoute(pathname)) {
-        return NextResponse.redirect(new URL('/api/auth/unauthorized', url));
-      }else if(pathname.startsWith("/dashboard")){
+      if(pathname.startsWith("/dashboard")){
         return NextResponse.redirect(new URL('/', url));
       }
+      // if (isApiRoute(pathname)) {
+      //   return NextResponse.redirect(new URL('/api/auth/unauthorized', url));
+      // }else if(pathname.startsWith("/dashboard")){
+      //   return NextResponse.redirect(new URL('/', url));
+      // }
     }
 
     return NextResponse.next()

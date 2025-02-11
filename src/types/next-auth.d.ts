@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth, { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -8,8 +8,23 @@ declare module "next-auth" {
     user: {
       /** The user's postal address. */
       id: string,
-      branchName: string,
-      role: string
-    }
+      name: string,
+      email: string,
+      photo: string,
+      role: UserRole
+    } & DefaultSession["user"];
+  }
+
+  interface User {
+    id: string,
+    name: string,
+    email: string,
+    photo: string,
+    role: UserRole
+  }
+
+  enum UserRole {
+    ADMIN = "ADMIN",
+    DEVELOPER = "DEVELOPER",
   }
 }

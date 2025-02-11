@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
 import bcrypt from 'bcryptjs'
+import { hashPassword } from "@/utils/hashPassword"
+import { NextResponse } from "next/server"
 const prisma = new PrismaClient()
 
 export const authOptions : any = {
@@ -11,23 +13,23 @@ export const authOptions : any = {
     CredentialsProvider({
         name: "credentials",
         credentials: {
-            branchName: { label: "branch name", type: "text", placeholder: ""},
+            email: { label: "Email", type: "email", placeholder: ""},
             password: { label: "Password", type: "password", }
         },
         async authorize(credentials) {
 
           // console.log(credentials)
-          if(!credentials?.branchName || !credentials.password){
+          if(!credentials?.email || !credentials.password){
             return null
           }
           // console.log(JSON.stringify(credentials))
           const user = await prisma.user.findUnique({
             where: {
-              branchName: credentials.branchName
+              email: credentials.email
             }
           })
 
-          console.log(user)
+          // console.log(user)
 
           if(!user){
             throw new Error("Invalid Credentials")
@@ -37,7 +39,7 @@ export const authOptions : any = {
           if(!passwordMatched){
             throw new Error("Invalid Credentials")
           }
-          // console.log(user)
+          console.log(user)
           return user
           },
     })
@@ -46,14 +48,18 @@ export const authOptions : any = {
     signIn: "/",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt", // Use JWT for session storage
+    maxAge: 60*60, // 1hr expiration if inactive
+    updateAge: 15*60, // update every 15mins
   },
   callbacks: {
     async jwt({ token, user }) {
       // Add user id and role to the token object
       if (user) {
         token.id = user.id;
-        token.branchName = user.branchName;
+        token.name = user.name;
+        token.email = user.email;
+        token.photo = user.photo
         token.role = user.role;
       }
       return token;
@@ -62,8 +68,11 @@ export const authOptions : any = {
       // Add id and role to the session object
       if (token) {
         session.user.id = token.id;
-        session.user.branchName = token.branchName;
+        session.user.name = token.name;
+        session.user.email = token.email;
         session.user.role = token.role;
+        session.user.photo = token.photo;
+        session.expires = new Date(token.exp * 1000).toISOString();
       }
       return session;
     }
