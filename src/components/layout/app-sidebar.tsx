@@ -46,6 +46,11 @@ const data = {
       icon: Server,
     },
     {
+      title: "User Devices",
+      url: "/dashboard/user-devices",
+      icon: Server,
+    },
+    {
       title: "Profile",
       url: "/dashboard/profile",
       icon: User,

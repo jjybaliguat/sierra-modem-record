@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 export function NavMain({
   items,
@@ -31,6 +32,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const session = useSession()
   // console.log(pathname)
 
   return (
@@ -39,18 +41,18 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           !item.items ? (
-            <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild disabled={item.disabled}
-            className={cn({
-              "bg-sidebar-accent hover:text-sidebar-accent-foreground": pathname == item.url
-            })}
-            >
-              <Link href={item.url}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+            <SidebarMenuItem className={`${item.url === "/dashboard/user-devices" && session.data?.user.role !== "DEVELOPER" ? "hidden" : "block"}`} key={item.title}>
+              <SidebarMenuButton asChild disabled={item.disabled}
+              className={cn({
+                "bg-sidebar-accent hover:text-sidebar-accent-foreground": pathname == item.url
+              })}
+              >
+                <Link href={item.url}>
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           ) : (
             <Collapsible
             key={item.title}

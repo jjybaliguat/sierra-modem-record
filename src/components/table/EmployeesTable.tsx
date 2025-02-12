@@ -38,6 +38,7 @@ import {
 import { Employees } from "@/types/employees"
 import useSWR, { mutate } from "swr"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 
 export const columns: ColumnDef<Employees>[] = [
   {
@@ -85,10 +86,28 @@ export const columns: ColumnDef<Employees>[] = [
     cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
   },
   {
-    accessorKey: "status",
+    accessorKey: "empCode",
+    header: "Employee Code",
+    cell: ({ row }) => (
+      <div>{row.getValue("empCode")}</div>
+    ),
+  },
+  {
+    accessorKey: "isActive",
     header: "Status",
     cell: ({ row }) => (
-      <div>{row.getValue("status")}</div>
+      <div>{row.getValue("isActive")? "Active" : "Inactive"}</div>
+    ),
+  },
+  {
+    accessorKey: "fingerEnrolled",
+    header: "Biometric",
+    cell: ({ row }) => (
+      <div>
+        <h1 className={`rounded-md ${row.getValue("fingerEnrolled")? "text-green-500" : "text-red-500"}`}>
+        {row.getValue("fingerEnrolled")? "Enrolled" : "Not Enrolled"}
+        </h1>
+      </div>
     ),
   },
   {
@@ -107,14 +126,9 @@ export const columns: ColumnDef<Employees>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(employee.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.fingerprintId}`}>Enroll Biometric</Link></DropdownMenuItem>
+            <DropdownMenuItem>View Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

@@ -23,6 +23,9 @@ import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import BackButton from '@/components/buttons/BackButton'
+import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -34,7 +37,7 @@ const formSchema = z.object({
   phone: z.string()
   .regex(/^(\+63|0)9\d{9}$/, "Invalid Philippine mobile number"),
   position: z.string().min(1, "Required"),
-  dailyRate: z.string().min(1, "Required"),
+  dailyRate: z.coerce.number(),
   hireDate: z.date(),
   tinNumber: z.string(),
   sssNumber: z.string()
@@ -44,6 +47,9 @@ const formSchema = z.object({
 const AddEmployee = () => {
     const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
+        const router = useRouter()
+        const session = useSession()
+        const user = session.data?.user
         // 1. Define your form.
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -52,7 +58,7 @@ const AddEmployee = () => {
           email: "",
           phone: "",
           position: "",
-          dailyRate: "0",
+          dailyRate: 0,
           hireDate: new Date(),
           tinNumber: "",
           sssNumber: "",
@@ -63,26 +69,39 @@ const AddEmployee = () => {
       async function onSubmit(values: z.infer<typeof formSchema>) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
-        console.log(values)
-        // try {
-        //     setIsSubmitting(true)
-        //     await fetch(`${process.env.NEXT_PUBLIC_FRONT_END_URL}/api/protected/user`, {
-        //         method: "POST",
-        //         body: JSON.stringify({...values})
-        //     })
-        //     setIsSubmitting(false)
-        //     form.reset()
-        //     if(buttonRef.current){
-        //         buttonRef?.current.click()
-        //     }
-        //     toast("User has been created", {
-        //         description: `You successfully added a user`,
-        //         duration: 3000,
-        //       })
-        //     mutate("getUsers")
-        // } catch (error) {
-        //     console.log(error)
-        // }
+        // console.log(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`)
+        try {
+            setIsSubmitting(true)
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`, {
+                method: "POST",
+                body: JSON.stringify({...values, employerId: user?.id})
+            })
+            const data = await response.json()
+            if(!data.error){
+                form.reset()
+                if(buttonRef.current){
+                    buttonRef?.current.click()
+                }
+                toast("Employee has been added", {
+                    description: `You successfully added an employee`,
+                    duration: 3000,
+                })
+                router.back()
+                setIsSubmitting(false)
+            }else{
+                setIsSubmitting(false)
+                toast("Error", {
+                    description: data.error,
+                    duration: 3000,
+                })
+            }
+        } catch (error: any) {
+            console.log(error)
+            toast("Error", {
+                description: error.message,
+                duration: 3000,
+            })
+        }
       }
 
   return (
@@ -249,7 +268,7 @@ const AddEmployee = () => {
                     </div>
                     </div>
                     <div className='flex justify-end'>
-                        <Button disabled={isSubmitting} type="submit">{isSubmitting ? "Creating..." : "Submit"}</Button>
+                        <Button disabled={isSubmitting} type="submit">{isSubmitting ? "Creating..." : "Create"}</Button>
                     </div>
                 </form>
             </Form>
