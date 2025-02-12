@@ -31,8 +31,7 @@ export async function POST(req: Request){
     const {
         employerId,
         empCode,
-        firstName,
-        lastName,
+        fullName,
         email,
         phone,
         position,
@@ -40,7 +39,7 @@ export async function POST(req: Request){
         fingerprintId
     } = await req.json()
 
-    if(!employerId || !empCode || !firstName || !lastName || !email || !position || !dailyRate || !fingerprintId){
+    if(!employerId || !empCode || !fullName || !email || !position || !dailyRate || !fingerprintId){
         return NextResponse.json({message: "Missing Required Fields."}, {status: 400})
     }
 

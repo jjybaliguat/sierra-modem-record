@@ -1,3 +1,4 @@
+import { AddEmployeeDialog } from '@/components/dialogs/AddEmployeeDialog'
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
 import { EmployeesTable } from '@/components/table/EmployeesTable'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,7 @@ const EmployeesPage = () => {
       <Card>
         <CardHeader className='flex flex-row justify-between items-center'>
           <CardTitle>Employees</CardTitle>
-          <Button>Add Employee</Button>
+          <AddEmployeeDialog />
         </CardHeader>
         <CardContent className='w-full'>
             <EmployeesTable />
