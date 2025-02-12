@@ -1,8 +1,10 @@
+import { DatePicker } from '@/components/DatePicker'
 import { AddEmployeeDialog } from '@/components/dialogs/AddEmployeeDialog'
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
 import { EmployeesTable } from '@/components/table/EmployeesTable'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
 import React from 'react'
 
 const EmployeesPage = () => {
@@ -12,7 +14,9 @@ const EmployeesPage = () => {
       <Card>
         <CardHeader className='flex flex-row justify-between items-center'>
           <CardTitle>Employees</CardTitle>
-          <AddEmployeeDialog />
+          <Button asChild>
+            <Link href="/dashboard/employees/add">Add Employee</Link>
+          </Button>
         </CardHeader>
         <CardContent className='w-full'>
             <EmployeesTable />

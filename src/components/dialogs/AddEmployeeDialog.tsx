@@ -17,10 +17,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { useRef, useState } from "react"
-import { mutate } from "swr"
-import { toast } from "sonner"
+import { format } from "date-fns"
 import { DatePicker } from "../DatePicker"
-import { Label } from "../ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { Calendar } from "../ui/calendar"
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -103,123 +103,149 @@ export function AddEmployeeDialog() {
 
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-                <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Name <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                        <Input placeholder="jhon doe" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                        <Input placeholder="example@gmail.com" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Phone <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                        <Input placeholder="+63..." {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="position"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Position <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                        <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="dailyRate"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Daily Rate <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                        <Input type="number" placeholder="" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="tinNumber"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Tin Number (optional)</FormLabel>
-                    <FormControl>
-                        <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="sssNumber"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>SSS Number (optional)</FormLabel>
-                    <FormControl>
-                        <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                        
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <div className="w-full space-y-2">
-                  <Label htmlFor="hiredate">Hire Date</Label>
-                  <div id="hiredate">
-                    <DatePicker />
-                  </div>
+                <div className="space-y-2">
+                  <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Name <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                          <Input placeholder="jhon doe" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                          <Input placeholder="example@gmail.com" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Phone <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                          <Input placeholder="+63..." {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="position"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Position <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                          <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="dailyRate"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Daily Rate <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                          <Input type="number" placeholder="" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="tinNumber"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Tin Number (optional)</FormLabel>
+                      <FormControl>
+                          <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="sssNumber"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>SSS Number (optional)</FormLabel>
+                      <FormControl>
+                          <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
+                  <FormField
+                  control={form.control}
+                  name="hireDate"
+                  render={({ field }) => (
+                      <FormItem>
+                      <FormLabel>Hire Date</FormLabel>
+                      <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button variant="outline" className="w-full justify-start">
+                            {field.value ? format(field.value, "PPP") : "Pick a date"}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent forceMount side="bottom" align="start" className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                      <FormDescription>
+                          
+                      </FormDescription>
+                      <FormMessage />
+                      </FormItem>
+                  )}
+                  />
                 </div>
                 <Button disabled={isSubmitting} type="submit">{isSubmitting ? "Creating..." : "Submit"}</Button>
             </form>
