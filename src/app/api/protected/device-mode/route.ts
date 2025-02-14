@@ -1,0 +1,35 @@
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+
+const prisma = new PrismaClient()
+
+export async function GET(req: Request) {
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search) 
+    const deviceToken = searchParams.get('deviceToken') as string
+    let filters: any = {};
+    if(deviceToken){
+        filters.deviceId = deviceToken
+    }
+    if(!deviceToken){
+        return NextResponse.json({error: "Unauthorized"}, {status: 401})
+    }
+
+    try {
+        const device = await prisma.device.findUnique({
+            where: filters,
+            select: {
+                isEnrollmentMode: true
+            }
+        })
+
+        if(!device){
+            return NextResponse.json({error: `Device with id ${deviceToken} not found.`})
+        }
+
+        return NextResponse.json({isEnrollment: device?.isEnrollmentMode}, {status: 200})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error"}, {status: 500})
+    }
+}

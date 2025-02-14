@@ -23,7 +23,7 @@ declare module "next-auth" {
     role: UserRole
   }
 
-  enum UserRole {
+  export enum UserRole {
     ADMIN = "ADMIN",
     DEVELOPER = "DEVELOPER",
   }

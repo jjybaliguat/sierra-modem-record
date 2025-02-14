@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -24,15 +25,21 @@ import {
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { generateDeviceId } from "@/utils/generateDeviceId"
 import { RotateCcw } from "lucide-react"
+import { toast } from "sonner"
+import { mutate } from "swr"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export function CreateDeviceDialog() {
     const [deviceId, setDeviceId] = useState(generateDeviceId())
     const [isGeneratingId, setIsGeneratingId] = useState(false)
-      const buttonRef = useRef<HTMLButtonElement>(null)
-        const [isSubmitting, setIsSubmitting] = useState(false)
+    const [creating, setCreating] = useState(false)
+    const buttonRef = useRef<HTMLButtonElement>(null)
+    const session = useSession()
+    const router = useRouter()
 
       const handleRegenerateId = () => {
         setIsGeneratingId(true)
@@ -40,34 +47,50 @@ export function CreateDeviceDialog() {
         setIsGeneratingId(false)
       }
 
-    async function onSubmit() {
+    async function onSubmit(e: React.FormEvent) {
+      e.preventDefault()
+      setCreating(true)
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    // try {
-    //     setIsSubmitting(true)
-    //     await fetch(`${process.env.NEXT_PUBLIC_FRONT_END_URL}/api/protected/user`, {
-    //         method: "POST",
-    //         body: JSON.stringify({...values})
-    //     })
-    //     setIsSubmitting(false)
-    //     form.reset()
-    //     if(buttonRef.current){
-    //         buttonRef?.current.click()
-    //     }
-    //     toast("User has been created", {
-    //         description: `You successfully added a user`,
-    //         duration: 3000,
-    //       })
-    //     mutate("getUsers")
-    // } catch (error) {
-    //     console.log(error)
-    // }
+    try {
+        setCreating(true)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices?id=${session.data?.user.id}`, {
+            method: "POST",
+            body: JSON.stringify({deviceId})
+        })
+        const data = await response.json()
+
+        if(data.error){
+          toast("ERROR!", {
+            description: data.error,
+            duration: 3000,
+          })
+        }else{
+        setCreating(false)
+        setDeviceId("")
+        if(buttonRef.current){
+            buttonRef?.current.click()
+        }
+        toast("Device has been created", {
+            description: `You successfully added a device`,
+            duration: 3000,
+          })
+          router.refresh()
+        }
+    } catch (error: any) {
+        console.log(error)
+        setCreating(false)
+        toast("ERROR!", {
+          description: error.error,
+          duration: 3000,
+        })
+    }
   }
      
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Create Device</Button>
+        <Button onClick={()=>setDeviceId(generateDeviceId())}>Create Device</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -85,10 +108,13 @@ export function CreateDeviceDialog() {
                         </div>
                     </div>
                 </div>
+              <DialogFooter>
+                <DialogClose ref={buttonRef}>
+                  Cancel
+                </DialogClose>
+                <Button type="submit" disabled={creating}>{creating? "Creating..." : "Create"}</Button>
+              </DialogFooter>
             </form>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

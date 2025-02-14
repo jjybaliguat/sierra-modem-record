@@ -53,7 +53,7 @@ model Company {
 model Device {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   name  String?
-  deviceId  String
+  deviceId  String @unique
   isEnrollmentMode  Boolean @default(false)
   userId  String? @db.ObjectId
   user  User? @relation(fields: [userId], references: [id])
