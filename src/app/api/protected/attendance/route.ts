@@ -42,10 +42,10 @@ export async function POST(req: Request){
     // const filters: any = {};
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
             // Get start and end of today
-        const startOfDay = new Date();
+        const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
         
-        const endOfDay = new Date();
+        const endOfDay = new Date(now);
         endOfDay.setHours(23, 59, 59, 999);
         // Get 12:00 PM timestamp for today
         const noonTime = new Date(now);
