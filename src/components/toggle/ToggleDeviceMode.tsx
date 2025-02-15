@@ -26,10 +26,14 @@ const ToggleDeviceMode = ({
         })
 
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
         if(!data.error){
             // alert("ok")
-            setIsSuccessEnrollment(true)
+            if(data.isEnrollmentMode){
+                setIsSuccessEnrollment(true)
+            }else{
+                setIsSuccessEnrollment(false)
+            }
         }else{
             setIsSuccessEnrollment(false)
             // alert(data.error)

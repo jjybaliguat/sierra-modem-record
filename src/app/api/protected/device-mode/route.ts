@@ -47,6 +47,8 @@ export async function POST(req: Request){
             }
         })
 
+        console.log(device)
+
         return NextResponse.json(device, {status: 200})
     } catch (error) {
         console.log(error)
