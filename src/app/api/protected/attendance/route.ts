@@ -60,7 +60,8 @@ export async function POST(req: Request){
         const employee = await prisma.employee.findFirst({
             where: {
                 deviceId: deviceToken,
-                fingerprintId: fingerId
+                fingerprintId: fingerId,
+                fingerEnrolled: true
             }
         })
 
