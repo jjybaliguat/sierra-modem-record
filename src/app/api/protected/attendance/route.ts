@@ -47,6 +47,9 @@ export async function POST(req: Request){
         
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
+        // Get 12:00 PM timestamp for today
+        const noonTime = new Date(now);
+        noonTime.setHours(12, 0, 0, 0);
 
     if(!deviceToken){
         return NextResponse.json({error: "Unauthorized"}, {status: 401})
@@ -80,6 +83,11 @@ export async function POST(req: Request){
             // If timeOut is already recorded, prevent duplicate updates
             if (existingRecord.timeOut) {
               return NextResponse.json({error: "Already signed out."}, {status: 400})
+            }
+
+                    // Prevent duplicate login if already signed in before 12:00 PM
+            if (now < noonTime) {
+                return NextResponse.json({ message: "Already signed in before 12:00 PM. Duplicate login not allowed." }, { status: 400 });
             }
         
             // Update timeOut with the exact time of API call
