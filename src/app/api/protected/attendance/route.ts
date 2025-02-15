@@ -63,6 +63,10 @@ export async function POST(req: Request){
                 fingerprintId: fingerId
             }
         })
+
+        if(!employee){
+            return NextResponse.json({error: `Employee with fingerId ${fingerId} not found.`}, {status: 404})
+        }
         // Check if there's already a time-in record for today
         const existingRecord = await prisma.attendance.findFirst({
             where: {
