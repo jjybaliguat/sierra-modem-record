@@ -40,7 +40,7 @@ export async function POST(req: Request){
     const deviceToken = searchParams.get('deviceToken') as string
     const {fingerId, timeIn} = await req.json()
     // const filters: any = {};
-    const now = new Date();
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
             // Get start and end of today
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
