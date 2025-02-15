@@ -79,7 +79,7 @@ export async function POST(req: Request){
         if (existingRecord) {
             // If timeOut is already recorded, prevent duplicate updates
             if (existingRecord.timeOut) {
-              throw new Error("Time-out already recorded for today.");
+              return NextResponse.json({error: "Already signed out."}, {status: 400})
             }
         
             // Update timeOut with the exact time of API call
