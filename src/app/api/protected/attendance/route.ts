@@ -87,7 +87,7 @@ export async function POST(req: Request){
 
                     // Prevent duplicate login if already signed in before 12:00 PM
             if (now < noonTime) {
-                return NextResponse.json({ message: "Already signed in before 12:00 PM. Duplicate login not allowed." }, { status: 400 });
+                return NextResponse.json({ error: "Already signed in before 12:00 PM. Duplicate login not allowed." }, { status: 400 });
             }
         
             // Update timeOut with the exact time of API call
