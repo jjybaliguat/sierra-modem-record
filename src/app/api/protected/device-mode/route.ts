@@ -17,19 +17,39 @@ export async function GET(req: Request) {
 
     try {
         const device = await prisma.device.findUnique({
-            where: filters,
-            select: {
-                isEnrollmentMode: true
-            }
+            where: filters
         })
 
         if(!device){
             return NextResponse.json({error: `Device with id ${deviceToken} not found.`})
         }
 
-        return NextResponse.json({isEnrollment: device?.isEnrollmentMode}, {status: 200})
+        return NextResponse.json({isEnrollment: device?.isEnrollmentMode, fingerId: device.toEnrollId}, {status: 200})
     } catch (error) {
         console.log(error)
         return NextResponse.json({error: "Internal Server Error"}, {status: 500})
+    }
+}
+
+export async function POST(req: Request){
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search) 
+    const deviceId = searchParams.get('deviceId') as string
+    const {fingerId, isEnrollmentMode} = await req.json();
+    try {
+        const device = await prisma.device.update({
+            where: {
+                deviceId
+            },
+            data: {
+                isEnrollmentMode,
+                toEnrollId: fingerId
+            }
+        })
+
+        return NextResponse.json(device, {status: 200})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error."}, {status: 500})
     }
 }

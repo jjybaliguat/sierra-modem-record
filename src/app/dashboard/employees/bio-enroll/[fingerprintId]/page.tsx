@@ -43,7 +43,7 @@ const BiometricEnroll = async({
             <CardContent>
                 <h1>Enroll ID <span className='p-1 rounded-md dark:bg-primary bg-blue-400 px-4'>{fingerprintId}</span> to your biometric device</h1>
                 <div className='mt-8'>
-                    <ToggleDeviceMode devices={devices} />
+                    <ToggleDeviceMode fingerprintId={Number(fingerprintId)} devices={devices} />
                 </div>
             </CardContent>
         </Card>
