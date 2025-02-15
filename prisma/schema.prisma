@@ -100,8 +100,8 @@ model Attendance {
   timeOut      DateTime? // Nullable check-out timestamp
   status        AttendanceStatus   @default(PRESENT) // PRESENT, LATE, ABSENT
   verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
-  deviceId      String @db.ObjectId
-  device        Device  @relation(fields: [deviceId], references: [id])
+  deviceId      String
+  device        Device  @relation(fields: [deviceId], references: [deviceId])
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime? @updatedAt
