@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { AttendanceStatus, PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient()
@@ -34,6 +34,93 @@ export async function GET(req: Request){
     }
 }
 
-export async function POST(){
+export async function POST(req: Request){
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search) 
+    const deviceToken = searchParams.get('deviceToken') as string
+    const {fingerId, timeIn} = await req.json()
+    // const filters: any = {};
+    const now = new Date();
+            // Get start and end of today
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
 
+    if(!deviceToken){
+        return NextResponse.json({error: "Unauthorized"}, {status: 401})
+    }
+
+    if(!fingerId){
+        return NextResponse.json({error: "Missing required field."}, {status: 400})
+    }
+
+    try {
+        const employee = await prisma.employee.findFirst({
+            where: {
+                deviceId: deviceToken,
+                fingerprintId: fingerId
+            }
+        })
+        // Check if there's already a time-in record for today
+        const existingRecord = await prisma.attendance.findFirst({
+            where: {
+            deviceId: deviceToken,
+            timeIn: { gte: startOfDay, lte: endOfDay }, // Check today's records
+            },
+        });
+
+        if (existingRecord) {
+            // If timeOut is already recorded, prevent duplicate updates
+            if (existingRecord.timeOut) {
+              throw new Error("Time-out already recorded for today.");
+            }
+        
+            // Update timeOut with the exact time of API call
+            const updatedAttendance = await prisma.attendance.update({
+              where: { id: existingRecord.id },
+              data: { timeOut: now }, // Exact time when API is called
+            });
+        
+            return NextResponse.json({name: employee?.fullName, timeOut: updatedAttendance.timeOut});
+          }
+
+        const device = await prisma.device.findUnique({
+            where: {
+                deviceId: deviceToken
+            },
+            include: {
+                user: true
+            }
+        })
+
+        if(!device){
+            return NextResponse.json({error: `No device found with deviceId ${deviceToken}`})
+        }
+
+        const cutoffTime = new Date(timeIn);
+        cutoffTime.setHours(8, Number(device.user?.gracePeriodInMinutes), 0, 0); // Set to 08:30 AM
+
+        // Determine status
+        const status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.PRESENT;
+
+        const attendance = await prisma.attendance.create({
+            data: {
+                fingerprintId: fingerId,
+                employeeId: employee?.id as string,
+                timeIn: timeIn? timeIn : now,
+                status,
+                deviceId: deviceToken,
+            },
+            include: {
+                employee: true
+            }
+        })
+
+        return NextResponse.json({name: attendance.employee.fullName, timeIn: attendance.timeIn}, {status: 201})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error."})
+    }
 }

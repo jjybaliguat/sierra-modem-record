@@ -26,7 +26,7 @@ const BiometricEnroll = async({
     params
 } : {
     params: Promise<{fingerprintId: string}>
-}) => {
+}) => {0
     const session: any = await getServerSession(authOptions)
     console.log(session)
     const fingerprintId = (await params).fingerprintId

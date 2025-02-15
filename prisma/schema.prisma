@@ -57,9 +57,12 @@ model Device {
   isEnrollmentMode  Boolean @default(false)
   userId  String? @db.ObjectId
   user  User? @relation(fields: [userId], references: [id])
+  employees Employee[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Attendance Attendance[]
 }
 
 model Employee {
@@ -84,6 +87,8 @@ model Employee {
   updatedAt     DateTime @updatedAt
 
   Attendance Attendance[]
+  deviceId    String?
+  device  Device? @relation(fields: [deviceId], references: [deviceId])
 }
 
 model Attendance {
@@ -95,6 +100,8 @@ model Attendance {
   timeOut      DateTime? // Nullable check-out timestamp
   status        AttendanceStatus   @default(PRESENT) // PRESENT, LATE, ABSENT
   verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
+  deviceId      String @db.ObjectId
+  device        Device  @relation(fields: [deviceId], references: [id])
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime? @updatedAt

@@ -8,6 +8,8 @@ import { authOptions } from '@/lib/auth'
 import { getServerSession } from 'next-auth'
 import React from 'react'
 
+export const revalidate = 0;
+
 async function getDevices(id: string){
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices?id=${id}`)
