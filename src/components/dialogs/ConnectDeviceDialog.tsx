@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -25,6 +26,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useRef, useState } from "react"
+import { toast } from "sonner"
+import { mutate } from "swr"
+import { useSession } from "next-auth/react"
 
 const formSchema = z.object({
   deviceId: z.string().min(2, {
@@ -34,6 +38,7 @@ const formSchema = z.object({
 })
 
 export function ConnectDeviceDialog() {
+      const session = useSession()
       const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
         // 1. Define your form.
@@ -46,28 +51,42 @@ export function ConnectDeviceDialog() {
       })
 
 async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-    // try {
-    //     setIsSubmitting(true)
-    //     await fetch(`${process.env.NEXT_PUBLIC_FRONT_END_URL}/api/protected/user`, {
-    //         method: "POST",
-    //         body: JSON.stringify({...values})
-    //     })
-    //     setIsSubmitting(false)
-    //     form.reset()
-    //     if(buttonRef.current){
-    //         buttonRef?.current.click()
-    //     }
-    //     toast("User has been created", {
-    //         description: `You successfully added a user`,
-    //         duration: 3000,
-    //       })
-    //     mutate("getUsers")
-    // } catch (error) {
-    //     console.log(error)
-    // }
+    try {
+        setIsSubmitting(true)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices?deviceId=${values.deviceId}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              userId: session.data?.user.id,
+              name: values.deviceName
+            })
+        })
+        const data = await response.json()
+
+        if(!data.error){
+          setIsSubmitting(false)
+          form.reset()
+          if(buttonRef.current){
+              buttonRef?.current.click()
+          }
+          toast("Device has been added", {
+              description: `You successfully added a device`,
+              duration: 3000,
+            })
+          mutate("getDevices")
+        }else{
+          toast("Error", {
+            description: data.error,
+            duration: 3000,
+          })
+          setIsSubmitting(false)
+        }
+    } catch (error: any) {
+        console.log(error)
+        toast("Error", {
+          description: error.error,
+          duration: 3000,
+        })
+    }
   }
      
   return (
@@ -118,11 +137,14 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                     )}
                     />
                 </div>
+                <div className="flex justify-end mt-8">
+                  <DialogClose>
+                    <Button variant="outline" type="button" ref={buttonRef}>Cancel</Button>
+                  </DialogClose>
+                  <Button type="submit" disabled={isSubmitting}>{isSubmitting? "Adding..." : "Add"}</Button>
+                </div>
             </form>
         </Form>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

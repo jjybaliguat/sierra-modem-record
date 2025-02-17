@@ -12,5 +12,6 @@ export interface Employees{
     tinNumber: string,
     sssNumber: string
     isActive: Boolean
-    fingerprintId: Number
+    fingerprintId: Number,
+    fingerEnrolled: boolean
 }

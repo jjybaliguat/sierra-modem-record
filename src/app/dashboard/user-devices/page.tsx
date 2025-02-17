@@ -12,7 +12,7 @@ export const revalidate = 0;
 
 async function getDevices(id: string){
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices?id=${id}`)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices`)
     const data = await response.json()
     // console.log(data)
 

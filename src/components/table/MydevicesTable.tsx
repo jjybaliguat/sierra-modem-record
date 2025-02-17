@@ -39,8 +39,9 @@ import { Employees } from "@/types/employees"
 import useSWR, { mutate } from "swr"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { Device } from "@/types/device"
 
-export const columns: ColumnDef<Employees>[] = [
+export const columns: ColumnDef<Device>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -64,50 +65,33 @@ export const columns: ColumnDef<Employees>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "fingerprintId",
-    header: "FingerprintId",
+    accessorKey: "deviceId",
+    header: "Device Id",
     cell: ({ row }) => (
-      <div>{row.getValue("fingerprintId")}</div>
+      <div>{row.getValue("deviceId")}</div>
     ),
   },
   {
-    accessorKey: "fullName",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Full Name
+          Device Name
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
+    cell: ({ row }) => <div>{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "empCode",
-    header: "Employee Code",
+    accessorKey: "employees",
+    header: "Total Employees",
+    accessorFn: (row) => row.employees.length,
     cell: ({ row }) => (
-      <div>{row.getValue("empCode")}</div>
-    ),
-  },
-  {
-    accessorKey: "isActive",
-    header: "Status",
-    cell: ({ row }) => (
-      <div>{row.getValue("isActive")? "Active" : "Inactive"}</div>
-    ),
-  },
-  {
-    accessorKey: "fingerEnrolled",
-    header: "Biometric",
-    cell: ({ row }) => (
-      <div>
-        <h1 className={`rounded-md ${row.getValue("fingerEnrolled")? "text-green-500" : "text-red-500"}`}>
-        {row.getValue("fingerEnrolled")? "Enrolled" : "Not Enrolled"}
-        </h1>
-      </div>
+      <div>{row.getValue("employees")}</div>
     ),
   },
   {
@@ -127,7 +111,6 @@ export const columns: ColumnDef<Employees>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {!employee.fingerEnrolled && <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.fingerprintId}`}>Enroll Biometric</Link></DropdownMenuItem>}
             <DropdownMenuItem>View Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -136,15 +119,15 @@ export const columns: ColumnDef<Employees>[] = [
   },
 ]
 
-export function EmployeesTable() {
+export function MydevicesTable() {
   const session = useSession()
   const userId = session?.data?.user?.id;
 
-  const {data, isLoading} = useSWR("getEmployees", getEmployees)
+  const {data, isLoading} = useSWR("getDevices", getDevices)
 
-  async function getEmployees(){
+  async function getDevices(){
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${userId}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/devices?id=${userId}`)
 
       const data = await response.json()
 
@@ -156,7 +139,7 @@ export function EmployeesTable() {
 
   React.useEffect(()=>{
     if(session.data?.user){
-      mutate("getEmployees")
+      mutate("getDevices")
     }
   }, [session])
 
@@ -188,15 +171,18 @@ export function EmployeesTable() {
   })
 
   if(isLoading) return <p>Loading...</p>
+  if(!data){
+    return <h1>Something went wrong. Try refreshing the page</h1>
+  }
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter Name..."
-          value={(table.getColumn("fullName")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter Device..."
+          value={(table.getColumn("deviceId")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("fullName")?.setFilterValue(event.target.value)
+            table.getColumn("deviceId")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

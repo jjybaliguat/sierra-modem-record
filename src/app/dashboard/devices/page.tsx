@@ -3,6 +3,7 @@ import { AddEmployeeDialog } from '@/components/dialogs/AddEmployeeDialog'
 import { ConnectDeviceDialog } from '@/components/dialogs/ConnectDeviceDialog'
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
 import { EmployeesTable } from '@/components/table/EmployeesTable'
+import { MydevicesTable } from '@/components/table/MydevicesTable'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -18,7 +19,7 @@ const DevicesPage = () => {
           <ConnectDeviceDialog />
         </CardHeader>
         <CardContent className='w-full'>
-            {/* <EmployeesTable /> */}
+            <MydevicesTable />
         </CardContent>
       </Card>
     </div>
