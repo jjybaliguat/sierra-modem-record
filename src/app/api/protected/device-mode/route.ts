@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     }
 }
 
-export async function POST(req: Request){
+export async function PATCH(req: Request){
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search) 
     const deviceId = searchParams.get('deviceId') as string

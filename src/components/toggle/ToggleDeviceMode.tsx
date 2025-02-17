@@ -21,7 +21,7 @@ const ToggleDeviceMode = ({
     async function handleToggleEnrollmentMode(){
        try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/device-mode?deviceId=${deviceId}`, {
-            method: "POST",
+            method: "PATCH",
             body: JSON.stringify({fingerId: fingerprintId, isEnrollmentMode: enrollmentMode})
         })
 
