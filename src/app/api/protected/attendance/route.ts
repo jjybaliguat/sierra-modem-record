@@ -75,6 +75,7 @@ export async function POST(req: Request){
         const existingRecord = await prisma.attendance.findFirst({
             where: {
             deviceId: deviceToken,
+            fingerprintId: fingerId,
             timeIn: { gte: startOfDay, lte: endOfDay }, // Check today's records
             },
         });
