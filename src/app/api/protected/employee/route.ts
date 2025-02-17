@@ -87,3 +87,42 @@ export async function POST(req: Request){
         return NextResponse.json({error: "Internal Server Error"}, {status: 500})
     }
 }
+
+export async function PATCH(req: Request){
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search) 
+    const deviceId = searchParams.get('deviceToken') as string
+    const fingerId = searchParams.get('fingerId') as string
+    const body = await req.json()
+
+    // console.log(url)
+
+    if(!deviceId || !fingerId){
+        return NextResponse.json({error: "Missing required fields"}, {status: 400})
+    }
+
+    try {
+        const employee = await prisma.employee.findFirst({
+            where: {
+                deviceId,
+                fingerprintId: Number(fingerId)
+            }
+        })
+
+        if(!employee){
+            return NextResponse.json({error: "Employee not found"}, {status: 404})
+        }
+
+        const response = await prisma.employee.update({
+            where: {
+                id: employee.id
+            },
+            data: body
+        })
+
+        return NextResponse.json(response, {status: 200})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error"}, {status: 500})
+    }
+}
