@@ -7,6 +7,7 @@ import { Device } from '@/types/device'
 import { cn } from '@/lib/utils'
 import { enrollEmployeeFinger, getNextFingerPrintId, getSingleEmployee } from '@/app/actions'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 const ToggleDeviceMode = ({
     devices,
@@ -25,6 +26,7 @@ const ToggleDeviceMode = ({
     const [isSuccessEnrollment, setIsSuccessEnrollment] = useState(false)
     const [sendingEnrollmentRequest, setSendingEnrollmentRequest] = useState(false)
     const session: any = useSession()
+    const router = useRouter()
     // console.log(fingerprintId)
 
     useEffect(()=> {
@@ -58,6 +60,8 @@ const ToggleDeviceMode = ({
             if(data.isEnrollmentMode){
                 setSendingEnrollmentRequest(true)
                 setIsSuccessEnrollment(false)
+            }else{
+                setSendingEnrollmentRequest(false)
             }
         }else{
             setSendingEnrollmentRequest(false)
@@ -65,6 +69,7 @@ const ToggleDeviceMode = ({
         }
        } catch (error) {
             console.log(error)
+            setSendingEnrollmentRequest(false)
        }
     }
 
@@ -94,15 +99,18 @@ const ToggleDeviceMode = ({
         if(!sendingEnrollmentRequest) return
         const fetchDeviceMode = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/device-mode?deviceId=${deviceId}`); // Change to your Next.js API route
+                const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/device-mode?deviceToken=${deviceId}`); // Change to your Next.js API route
                 const data = await response.json();
                 // console.log(data)
                 if(!data.error){
                     if(!data.isEnrollment && sendingEnrollmentRequest){
                         setSendingEnrollmentRequest(false)
                         setIsSuccessEnrollment(true)
-                        setEnrollmentMode(false)
                         enrollEmployeeFinger(employeeId, fingerprintId!, deviceId!)
+                        setTimeout(()=> {
+                            setEnrollmentMode(false)
+                            router.back()
+                        }, 2000)
                     }
                 }else{
                 }
