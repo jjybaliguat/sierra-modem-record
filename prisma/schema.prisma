@@ -23,6 +23,8 @@ model User {
   company      Company? @relation(fields: [companyId], references: [id])
   role         UserRole  @default(ADMIN)
 
+  workStartTime String?
+  workEndTime   String?
   gracePeriodInMinutes  Int?  @default(15)
   lateDeducInMinutes    Int?  @default(30)
 
@@ -129,7 +131,7 @@ model Payroll {
   pagIbigDeduction  Float @default(0)
   loanDeduction Float @default(0)
   insuranceDeduction Float @default(0)
-  otherDeductions Float @default(0)
+  caDeductions Float @default(0)
   bonuses       Float
   netPay        Float
   periodStart   DateTime
@@ -153,7 +155,7 @@ model EmployeeDeduction {
   employeeId  String @db.ObjectId
   employee    Employee @relation(fields: [employeeId], references: [id])
   type        DeductionType
-  amount      Float
+  precentage      Float?
   status      DeductionStatus
   createdAt   DateTime @default(now())
 }

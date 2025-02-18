@@ -49,8 +49,8 @@ export async function POST(req: Request){
         const endOfDay = new Date(now);
         endOfDay.setHours(23, 59, 59, 999);
         // Get 12:00 PM timestamp for today
-        const noonTime = new Date(now);
-        noonTime.setHours(12, 0, 0, 0);
+        // const thresholdLogin = new Date(now);
+        // thresholdLogin.setHours(8, , 0, 0);
 
     if(!deviceToken){
         return NextResponse.json({error: "Unauthorized"}, {status: 401})
@@ -87,8 +87,11 @@ export async function POST(req: Request){
               return NextResponse.json({error: AttendanceError.SIGNED_OUT_ALREADY}, {status: 400})
             }
 
+            const lastLoginTime = new Date(existingRecord.timeIn);
+            const diffInMinutes = (now.getTime() - lastLoginTime.getTime()) / (1000 * 60);
+
                     // Prevent duplicate login if already signed in before 12:00 PM
-            if (now < noonTime) {
+            if (diffInMinutes < 30) {
                 return NextResponse.json({ error: AttendanceError.SIGNED_IN_ALREADY }, { status: 400 });
             }
         

@@ -10,14 +10,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Device } from "@/types/device"
-import { DeductionType } from "@prisma/client"
+import { DeductionStatus, DeductionType } from "@prisma/client"
 
-export function SelectDeductionType({
+export function SelectDeductionStatus({
     onSelectChange,
     selected
 } : {
-    onSelectChange: (value: DeductionType) => void,
-    selected: DeductionType | ""
+    onSelectChange: (value: DeductionStatus) => void,
+    selected: DeductionStatus
 }) {
   return (
     <Select value={selected} onValueChange={onSelectChange}>
@@ -27,8 +27,8 @@ export function SelectDeductionType({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Type</SelectLabel>
-          {Object.values(DeductionType).map((type)=>(
-            <SelectItem key={type} value={type}>{type}</SelectItem>
+          {Object.values(DeductionStatus).map((status)=>(
+            <SelectItem key={status} value={status}>{status}</SelectItem>
           ))}
         </SelectGroup>
       </SelectContent>

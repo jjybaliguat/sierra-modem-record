@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { DeductionStatus, DeductionType } from '@prisma/client'
 import { SelectDeductionType } from '@/components/select/SelectDeductionType'
+import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -47,7 +48,7 @@ const formSchema = z.object({
 
 interface Deductions {
     type: DeductionType | "",
-    amount: number,
+    precentage: number | "",
     status: DeductionStatus
 }
 
@@ -56,7 +57,7 @@ const AddEmployee = () => {
     const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
 
-        const [deductions, setDeductions] = useState<Deductions[] | null>(null)
+        const [deductions, setDeductions] = useState<Deductions[]>([])
         const router = useRouter()
         const session = useSession()
         const user = session.data?.user
@@ -84,7 +85,7 @@ const AddEmployee = () => {
             setIsSubmitting(true)
             const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`, {
                 method: "POST",
-                body: JSON.stringify({...values, employerId: user?.id})
+                body: JSON.stringify({...values, employerId: user?.id, deductions})
             })
             const data = await response.json()
             if(!data.error){
@@ -118,22 +119,26 @@ const AddEmployee = () => {
         if(deductions){
             setDeductions([...deductions, {
                 type: "",
-                amount: 0,
+                precentage: "",
                 status: DeductionStatus.ACTIVE
             }])
         }else{
             setDeductions([{
                 type: "",
-                amount: 0,
+                precentage: "",
                 status: DeductionStatus.ACTIVE
             }])
         }
       }
 
-      const handleDeleteDeduction = (index: number) => {
-        const newDeduc: any = deductions?.filter((_, i) => i !== index);
-        setDeductions(newDeduc)
-      }
+      const updateItemDeduction = (index: number, updatedData: Partial<Deductions>) => {
+        setDeductions((prevItems: any) => {
+          const updatedItems = [...prevItems];
+          updatedItems[index] = { ...updatedItems[index], ...updatedData };
+            console.log(updatedItems)
+          return updatedItems;
+        });
+      };
 
   return (
     <>
@@ -298,13 +303,17 @@ const AddEmployee = () => {
                         />
                         <div className='mt-4'>
                             <div className='mt-4 flex flex-col gap-2'>
+                                <h1>Deductions:</h1>
                                 {deductions?.map((deduction, index)=>(
                                     <div key={index} className='flex items-center gap-2'>
-                                        <div className='flex items-center gap-2'>
-                                            <SelectDeductionType onSelectChange={()=>{}} />
-                                            <Input type='number' placeholder='amount' className='w-[100px]' />
+                                        <div className='flex gap-2 flex-col md:flex-row'>
+                                            <SelectDeductionType selected={deductions[index].type} onSelectChange={(value: DeductionType)=>updateItemDeduction(index, {type: value})} />
+                                            <div className='flex items-center gap-2'>
+                                                <Input type='number' placeholder='precentage' className='w-[80px]' value={deductions[index].precentage} onChange={(e)=>updateItemDeduction(index, {precentage: Number(e.target.value)})} />
+                                                <SelectDeductionStatus selected={deductions[index].status} onSelectChange={(value: DeductionStatus)=>updateItemDeduction(index, {status: value})} />
+                                                <Trash2Icon className='w-5 h-5 text-red-500 cursor-pointer' onClick={()=>setDeductions((prevItems)=>prevItems.filter((_, i)=>i !== index))} />
+                                            </div>
                                         </div>
-                                        <Trash2Icon className='text-red-500 cursor-pointer' onClick={()=>handleDeleteDeduction(index)} />
                                     </div>
                                 ))}
                             </div>

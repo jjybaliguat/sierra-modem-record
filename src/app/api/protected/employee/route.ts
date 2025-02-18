@@ -60,7 +60,8 @@ export async function POST(req: Request){
         phone,
         position,
         dailyRate,
-        hireDate
+        hireDate,
+        deductions
     } = body
 
     if(!employerId || !fullName || !email || !position || !dailyRate){
@@ -71,7 +72,9 @@ export async function POST(req: Request){
         const empCode = await generateEmployeeCode(hireDate)
         // const fingerprintId = await getNextFingerPrintId(employerId)
         const employee = await prisma.employee.create({
-            data: {...body, empCode}
+            data: {...body, empCode, deductions: {
+                create: deductions
+            }}
         })
 
         return NextResponse.json(employee, {status: 201})
