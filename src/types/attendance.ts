@@ -20,3 +20,8 @@ export enum AttendanceStatus {
     LATE = "LATE",
     ABSENT = "ABSENT"
 }
+
+export enum AttendanceError {
+    SIGNED_IN_ALREADY = "SIGNED_IN_ALREADY",
+    SIGNED_OUT_ALREADY = "SIGNED_OUT_ALREADY",
+}

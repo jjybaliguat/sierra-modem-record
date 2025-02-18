@@ -1,3 +1,4 @@
+import { AttendanceError } from "@/types/attendance";
 import { AttendanceStatus, PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -83,12 +84,12 @@ export async function POST(req: Request){
         if (existingRecord) {
             // If timeOut is already recorded, prevent duplicate updates
             if (existingRecord.timeOut) {
-              return NextResponse.json({error: "SignedOutAlready"}, {status: 400})
+              return NextResponse.json({error: AttendanceError.SIGNED_OUT_ALREADY}, {status: 400})
             }
 
                     // Prevent duplicate login if already signed in before 12:00 PM
             if (now < noonTime) {
-                return NextResponse.json({ error: "SignedInAlready" }, { status: 400 });
+                return NextResponse.json({ error: AttendanceError.SIGNED_IN_ALREADY }, { status: 400 });
             }
         
             // Update timeOut with the exact time of API call
