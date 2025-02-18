@@ -25,11 +25,12 @@ async function getDevices(id: string){
 const BiometricEnroll = async({
     params
 } : {
-    params: Promise<{fingerprintId: string}>
+    params: Promise<{id: string, fingerId?: string}>
 }) => {0
     const session: any = await getServerSession(authOptions)
-    console.log(session)
-    const fingerprintId = (await params).fingerprintId
+    // console.log(session)
+    const id = (await params).id
+    const fingerId = (await params).fingerId
     const devices = await getDevices(session.user.id)
 
   return (
@@ -41,9 +42,9 @@ const BiometricEnroll = async({
             </CardHeader>
 
             <CardContent>
-                <h1>Enroll ID <span className='p-1 rounded-md dark:bg-primary bg-blue-400 px-4'>{fingerprintId}</span> to your biometric device</h1>
+                <h1>Enroll User ID: <span className='p-1 rounded-md dark:bg-primary bg-blue-400 px-4'>{id}</span> to your biometric device</h1>
                 <div className='mt-8'>
-                    <ToggleDeviceMode fingerprintId={Number(fingerprintId)} devices={devices} />
+                    <ToggleDeviceMode employeeId={id} devices={devices} fingerId={fingerId} />
                 </div>
             </CardContent>
         </Card>

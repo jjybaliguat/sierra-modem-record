@@ -24,16 +24,6 @@ async function generateEmployeeCode(hireDate: Date): Promise<string> {
     return `EMP-${year}${month}-${newNumber}`;
   }
 
-async function getNextFingerPrintId(employerId: string): Promise<number | null> {
-    const lastEmployee = await prisma.employee.findFirst({
-        where: { employerId }, // Filter by employer
-        orderBy: { fingerprintId: "desc" }, // Get the highest fingerprintId
-        select: { fingerprintId: true }, // Only retrieve fingerprintId
-      });
-
-      return (lastEmployee?.fingerprintId ?? 0) + 1;
-}
-
 export async function GET(req: Request){
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search) 
@@ -76,9 +66,9 @@ export async function POST(req: Request){
 
     try {
         const empCode = await generateEmployeeCode(hireDate)
-        const fingerprintId = await getNextFingerPrintId(employerId)
+        // const fingerprintId = await getNextFingerPrintId(employerId)
         const employee = await prisma.employee.create({
-            data: {...body, empCode, fingerprintId}
+            data: {...body, empCode}
         })
 
         return NextResponse.json(employee, {status: 201})
@@ -91,31 +81,20 @@ export async function POST(req: Request){
 export async function PATCH(req: Request){
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search) 
-    const deviceId = searchParams.get('deviceToken') as string
-    const fingerId = searchParams.get('fingerId') as string
+    const id = searchParams.get('id') as string
     const body = await req.json()
 
     // console.log(url)
 
-    if(!deviceId || !fingerId){
+    if(!id){
         return NextResponse.json({error: "Missing required fields"}, {status: 400})
     }
 
     try {
-        const employee = await prisma.employee.findFirst({
-            where: {
-                deviceId,
-                fingerprintId: Number(fingerId)
-            }
-        })
-
-        if(!employee){
-            return NextResponse.json({error: "Employee not found"}, {status: 404})
-        }
 
         const response = await prisma.employee.update({
             where: {
-                id: employee.id
+                id: id
             },
             data: body
         })

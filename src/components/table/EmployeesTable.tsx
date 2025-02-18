@@ -127,7 +127,7 @@ export const columns: ColumnDef<Employees>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {!employee.fingerEnrolled && <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.fingerprintId}`}>Enroll Biometric</Link></DropdownMenuItem>}
+            {<DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem>}
             <DropdownMenuItem>View Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

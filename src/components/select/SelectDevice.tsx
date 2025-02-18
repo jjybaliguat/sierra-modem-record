@@ -13,13 +13,15 @@ import { Device } from "@/types/device"
 
 export function SelectDevice({
     setDeviceId,
+    selected,
     devices
 }: {
     setDeviceId: any
+    selected?: string | null,
     devices: Device[]
 }) {
   return (
-    <Select onValueChange={setDeviceId}>
+    <Select defaultValue={selected || ""} onValueChange={setDeviceId}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select your device" />
       </SelectTrigger>

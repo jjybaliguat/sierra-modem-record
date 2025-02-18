@@ -82,7 +82,7 @@ model Employee {
   sssNumber     String?
 
   isActive      Boolean  @default(true)
-  fingerprintId Int      // Numeric fingerprint ID for sensor
+  fingerprintId Int?      // Numeric fingerprint ID for sensor
   fingerEnrolled  Boolean? @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

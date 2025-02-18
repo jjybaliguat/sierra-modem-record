@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 export async function GET(req: Request) {
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search) 
-    const deviceToken = searchParams.get('deviceToken') as string
+    const deviceToken = searchParams.get('deviceId') as string
     let filters: any = {};
     if(deviceToken){
         filters.deviceId = deviceToken
@@ -43,7 +43,7 @@ export async function PATCH(req: Request){
             },
             data: {
                 isEnrollmentMode,
-                toEnrollId: fingerId
+                toEnrollId: isEnrollmentMode? fingerId : 0
             }
         })
 

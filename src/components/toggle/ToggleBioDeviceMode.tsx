@@ -6,10 +6,12 @@ import { useEffect, useState } from "react"
 
 export function ToggleBioDeviceMode({
     onChange,
-    disabled
+    disabled,
+    checked
 } : {
     onChange: any,
     disabled?: boolean
+    checked?: boolean
 }) {
     const [enrollmentMode, setEnrollmentMode] = useState(false)
 
@@ -17,6 +19,7 @@ export function ToggleBioDeviceMode({
     <div className="flex items-center space-x-2">
       <Switch id="enroll-mode"
         disabled={disabled}
+        checked={checked}
         onCheckedChange={onChange}
       />
       <Label htmlFor="enroll-mode">Toggle Biometric Device To Enrollment Mode</Label>
