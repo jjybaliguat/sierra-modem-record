@@ -80,16 +80,107 @@ model Employee {
   hireDate      DateTime @default(now())
   tinNumber     String?
   sssNumber     String?
+  philHealthNumber String?
+  overtimeRate  Float?
 
   isActive      Boolean  @default(true)
   fingerprintId Int?      // Numeric fingerprint ID for sensor
   fingerEnrolled  Boolean? @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 
-  Attendance Attendance[]
+  payrolls          Payroll[]
+  deductions        EmployeeDeduction[]
+  bonuses           Bonus[]
+
+  attendance Attendance[]
   deviceId    String?
   device  Device? @relation(fields: [deviceId], references: [deviceId])
+
+  cashAdvance CashAdvance[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CashAdvance {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String @db.ObjectId
+  employee        Employee @relation(fields: [employeeId], references: [id])
+  amount          Float    // Total cash advance amount owed
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum RepaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+model Payroll {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId    String @db.ObjectId
+  employee      Employee @relation(fields: [employeeId], references: [id])
+  dailyRate    Float
+  allowances    Float
+  totalDeductions Float
+  taxDeduction  Float  @default(0)
+  sssDeduction  Float  @default(0)
+  philHealthDeduction Float @default(0)
+  pagIbigDeduction  Float @default(0)
+  loanDeduction Float @default(0)
+  insuranceDeduction Float @default(0)
+  otherDeductions Float @default(0)
+  bonuses       Float
+  netPay        Float
+  periodStart   DateTime
+  periodEnd     DateTime
+  totalHours     Float 
+  overtimeHours  Float 
+  overtimePay    Float
+  status        PayrollStatus @default(PENDING)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum PayrollStatus {
+  PENDING
+  PAID
+  CANCELED
+}
+
+model EmployeeDeduction {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId  String @db.ObjectId
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  type        DeductionType
+  amount      Float
+  status      DeductionStatus
+  createdAt   DateTime @default(now())
+}
+
+enum DeductionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+
+enum DeductionType {
+  TAX
+  LOAN
+  INSURANCE
+  SSS
+  PHILHEALTH
+  PAGIBIG
+  OTHER
+}
+
+model Bonus {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId  String @db.ObjectId
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
 }
 
 model Attendance {

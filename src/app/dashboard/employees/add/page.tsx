@@ -19,13 +19,15 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { format } from "date-fns"
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, DeleteIcon, PlusIcon, Trash2Icon, TrashIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import BackButton from '@/components/buttons/BackButton'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { DeductionStatus, DeductionType } from '@prisma/client'
+import { SelectDeductionType } from '@/components/select/SelectDeductionType'
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -43,10 +45,18 @@ const formSchema = z.object({
   sssNumber: z.string()
 })
 
+interface Deductions {
+    type: DeductionType | "",
+    amount: number,
+    status: DeductionStatus
+}
+
 
 const AddEmployee = () => {
     const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
+
+        const [deductions, setDeductions] = useState<Deductions[] | null>(null)
         const router = useRouter()
         const session = useSession()
         const user = session.data?.user
@@ -102,6 +112,27 @@ const AddEmployee = () => {
                 duration: 3000,
             })
         }
+      }
+
+      const handleAddDeduction = () => {
+        if(deductions){
+            setDeductions([...deductions, {
+                type: "",
+                amount: 0,
+                status: DeductionStatus.ACTIVE
+            }])
+        }else{
+            setDeductions([{
+                type: "",
+                amount: 0,
+                status: DeductionStatus.ACTIVE
+            }])
+        }
+      }
+
+      const handleDeleteDeduction = (index: number) => {
+        const newDeduc: any = deductions?.filter((_, i) => i !== index);
+        setDeductions(newDeduc)
       }
 
   return (
@@ -265,6 +296,20 @@ const AddEmployee = () => {
                             </FormItem>
                         )}
                         />
+                        <div className='mt-4'>
+                            <div className='mt-4 flex flex-col gap-2'>
+                                {deductions?.map((deduction, index)=>(
+                                    <div key={index} className='flex items-center gap-2'>
+                                        <div className='flex items-center gap-2'>
+                                            <SelectDeductionType onSelectChange={()=>{}} />
+                                            <Input type='number' placeholder='amount' className='w-[100px]' />
+                                        </div>
+                                        <Trash2Icon className='text-red-500 cursor-pointer' onClick={()=>handleDeleteDeduction(index)} />
+                                    </div>
+                                ))}
+                            </div>
+                            <Button className='mt-4' type='button' variant="outline" onClick={handleAddDeduction}><PlusIcon /> Deduction</Button>
+                        </div>
                     </div>
                     </div>
                     <div className='flex justify-end'>

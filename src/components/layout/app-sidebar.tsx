@@ -41,6 +41,11 @@ const data = {
       icon: Users,
     },
     {
+      title: "Payroll",
+      url: "/dashboard/payroll",
+      icon: HandCoins,
+    },
+    {
       title: "Devices",
       url: "/dashboard/devices",
       icon: Server,
