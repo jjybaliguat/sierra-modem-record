@@ -98,7 +98,7 @@ export async function POST(req: Request){
               data: { timeOut: now }, // Exact time when API is called
             });
         
-            return NextResponse.json({name: employee?.fullName, timeOut: updatedAttendance.timeOut});
+            return NextResponse.json({name: employee?.fullName?.split(" ")[0], timeOut: updatedAttendance.timeOut});
           }
 
         const device = await prisma.device.findUnique({
@@ -133,7 +133,7 @@ export async function POST(req: Request){
             }
         })
 
-        return NextResponse.json({name: attendance.employee.fullName, timeIn: attendance.timeIn}, {status: 201})
+        return NextResponse.json({name: attendance.employee.fullName?.split(" ")[0], timeIn: attendance.timeIn}, {status: 201})
     } catch (error) {
         console.log(error)
         return NextResponse.json({error: "Internal Server Error."})

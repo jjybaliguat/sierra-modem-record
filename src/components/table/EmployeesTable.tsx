@@ -111,6 +111,12 @@ export const columns: ColumnDef<Employees>[] = [
     ),
   },
   {
+    accessorKey: "device",
+    header: "Device",
+    accessorFn: (row) => row.device?.name,
+    cell: ({ row }) => <h1>{row.getValue("device")}</h1>
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {

@@ -1,3 +1,5 @@
+import { Device } from "./device"
+
 export interface Employees{
     id: string,
     employerId: string,
@@ -13,5 +15,7 @@ export interface Employees{
     sssNumber: string
     isActive: Boolean
     fingerprintId: Number,
-    fingerEnrolled: boolean
+    fingerEnrolled: boolean,
+    deviceId: string,
+    device: Device
 }

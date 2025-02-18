@@ -38,7 +38,10 @@ export async function GET(req: Request){
 
     try {
         const employees = await prisma.employee.findMany({
-            where: filters
+            where: filters,
+            include: {
+                device: true
+            }
         })
 
         return NextResponse.json(employees, {status: 200})

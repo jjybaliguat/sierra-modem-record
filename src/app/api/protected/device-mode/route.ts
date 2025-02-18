@@ -43,11 +43,11 @@ export async function PATCH(req: Request){
             },
             data: {
                 isEnrollmentMode,
-                toEnrollId: isEnrollmentMode? fingerId : 0
+                toEnrollId: isEnrollmentMode? Number(fingerId) : 0
             }
         })
 
-        console.log(device)
+        // console.log(device)
 
         return NextResponse.json(device, {status: 200})
     } catch (error) {
