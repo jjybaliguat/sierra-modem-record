@@ -27,8 +27,8 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 // import { DeductionStatus, DeductionType } from '@prisma/client'
-import { SelectDeductionType } from '@/components/select/SelectDeductionType'
-import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
+// import { SelectDeductionType } from '@/components/select/SelectDeductionType'
+// import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
