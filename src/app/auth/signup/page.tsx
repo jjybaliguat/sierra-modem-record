@@ -42,10 +42,10 @@ const formSchema = z.object({
   message: "Passwords must match",
 });
 
-export default function SignUpForm({
+const SignUpForm = ({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div">) => {
   const [errorMess, setErrorMess] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -237,3 +237,5 @@ export default function SignUpForm({
     </div>
   )
 }
+
+export default SignUpForm
