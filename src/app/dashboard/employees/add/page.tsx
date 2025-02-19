@@ -26,7 +26,7 @@ import BackButton from '@/components/buttons/BackButton'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { DeductionStatus, DeductionType } from '@prisma/client'
+// import { DeductionStatus, DeductionType } from '@prisma/client'
 import { SelectDeductionType } from '@/components/select/SelectDeductionType'
 import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
 
@@ -46,18 +46,18 @@ const formSchema = z.object({
   sssNumber: z.string()
 })
 
-interface Deductions {
-    type: DeductionType | "",
-    precentage: number | "",
-    status: DeductionStatus
-}
+// interface Deductions {
+//     type: DeductionType | "",
+//     precentage: number | "",
+//     status: DeductionStatus
+// }
 
 
 const AddEmployee = () => {
     const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
 
-        const [deductions, setDeductions] = useState<Deductions[]>([])
+        // const [deductions, setDeductions] = useState<Deductions[]>([])
         const router = useRouter()
         const session = useSession()
         const user = session.data?.user
@@ -85,7 +85,7 @@ const AddEmployee = () => {
             setIsSubmitting(true)
             const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`, {
                 method: "POST",
-                body: JSON.stringify({...values, employerId: user?.id, deductions})
+                body: JSON.stringify({...values, employerId: user?.id})
             })
             const data = await response.json()
             if(!data.error){
@@ -115,30 +115,30 @@ const AddEmployee = () => {
         }
       }
 
-      const handleAddDeduction = () => {
-        if(deductions){
-            setDeductions([...deductions, {
-                type: "",
-                precentage: "",
-                status: DeductionStatus.ACTIVE
-            }])
-        }else{
-            setDeductions([{
-                type: "",
-                precentage: "",
-                status: DeductionStatus.ACTIVE
-            }])
-        }
-      }
+    //   const handleAddDeduction = () => {
+    //     if(deductions){
+    //         setDeductions([...deductions, {
+    //             type: "",
+    //             precentage: "",
+    //             status: DeductionStatus.ACTIVE
+    //         }])
+    //     }else{
+    //         setDeductions([{
+    //             type: "",
+    //             precentage: "",
+    //             status: DeductionStatus.ACTIVE
+    //         }])
+    //     }
+    //   }
 
-      const updateItemDeduction = (index: number, updatedData: Partial<Deductions>) => {
-        setDeductions((prevItems: any) => {
-          const updatedItems = [...prevItems];
-          updatedItems[index] = { ...updatedItems[index], ...updatedData };
-            console.log(updatedItems)
-          return updatedItems;
-        });
-      };
+    //   const updateItemDeduction = (index: number, updatedData: Partial<Deductions>) => {
+    //     setDeductions((prevItems: any) => {
+    //       const updatedItems = [...prevItems];
+    //       updatedItems[index] = { ...updatedItems[index], ...updatedData };
+    //         console.log(updatedItems)
+    //       return updatedItems;
+    //     });
+    //   };
 
   return (
     <>
