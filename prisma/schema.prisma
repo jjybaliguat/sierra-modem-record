@@ -20,7 +20,7 @@ model User {
   password     String
   photo        String?
   companyId     String? @db.ObjectId
-  company      Company? @relation(fields: [companyId], references: [id])
+  company      Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   role         UserRole  @default(ADMIN)
 
   workStartTime String?

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import Link from "next/link"
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email({
@@ -60,7 +61,7 @@ export function LoginForm({
         setSubmitting(false)
       }
     } catch (error) {
-      
+      setSubmitting(false)
     }
   } 
   return (
@@ -108,9 +109,9 @@ export function LoginForm({
                 </Button>
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
-                  <a href="#" className="underline underline-offset-4">
+                  <Link href="/auth/signup" className="underline underline-offset-4">
                     Sign up
-                  </a>
+                  </Link>
                 </div>
               </div>
             </form>

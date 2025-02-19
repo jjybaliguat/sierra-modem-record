@@ -13,10 +13,10 @@ export async function GET(){
 }
 
 export async function POST(req: Request){
-    const {name, email, password} = await req.json()
+    const {name, email, password, companyName, address, contact} = await req.json()
 
-    if(!name || !email || !password){
-        return NextResponse.json({message: "Missing required fields"}, {status: 400})
+    if(!name || !email || !password || !companyName || !address || !contact){
+        return NextResponse.json({error: "Missing required fields"}, {status: 400})
     }
     try {
         const isEmailExist = await prisma.user.findUnique({
@@ -26,7 +26,7 @@ export async function POST(req: Request){
         })
 
         if(isEmailExist){
-            return NextResponse.json({message: "Email already registered."}, {status: 400})
+            return NextResponse.json({error: "Email already registered."}, {status: 400})
         }
         const hashedPass = await hashPassword(password) as string
         const user = await prisma.user.create({
@@ -34,12 +34,19 @@ export async function POST(req: Request){
                 name,
                 email,
                 password: hashedPass,
+                company: {
+                    create: {
+                        name: companyName,
+                        address: address,
+                        contact: contact
+                    }
+                }
             }
         })
 
         return NextResponse.json(user, {status: 201})
     } catch (error) {
         console.log(error)
-        NextResponse.json({message: "Internal Server Error."}, {status: 500})
+        NextResponse.json({error: "Internal Server Error."}, {status: 500})
     }
 }
