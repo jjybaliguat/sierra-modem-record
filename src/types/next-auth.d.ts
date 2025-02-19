@@ -12,6 +12,7 @@ declare module "next-auth" {
       email: string,
       photo: string,
       role: UserRole
+      company: Company
     } & DefaultSession["user"];
   }
 
@@ -21,6 +22,13 @@ declare module "next-auth" {
     email: string,
     photo: string,
     role: UserRole
+    company: Company
+  }
+
+  interface Company {
+    name: string,
+    address: string,
+    contact: string
   }
 
   export enum UserRole {

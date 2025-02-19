@@ -43,7 +43,9 @@ const formSchema = z.object({
   dailyRate: z.coerce.number(),
   hireDate: z.date(),
   tinNumber: z.string(),
-  sssNumber: z.string()
+  sssNumber: z.string(),
+  pagIbigNumber: z.string(),
+  philHealthNumber: z.string(),
 })
 
 // interface Deductions {
@@ -73,6 +75,8 @@ const AddEmployee = () => {
           hireDate: new Date(),
           tinNumber: "",
           sssNumber: "",
+          pagIbigNumber: "",
+          philHealthNumber: "",
         },
       })
      
@@ -254,6 +258,38 @@ const AddEmployee = () => {
                         render={({ field }) => (
                             <FormItem>
                             <FormLabel>SSS Number (optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                
+                            </FormDescription>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="pagIbigNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Pag-Ibig number (optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                
+                            </FormDescription>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="philHealthNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Philhealth number (optional)</FormLabel>
                             <FormControl>
                                 <Input placeholder="" {...field} />
                             </FormControl>

@@ -50,3 +50,38 @@ export async function POST(req: Request){
         NextResponse.json({error: "Internal Server Error."}, {status: 500})
     }
 }
+
+export async function PATCH(req: Request){
+    const body = await req.json()
+    const url = new URL(req.url)
+    const params = new URLSearchParams(url.search)
+    const id = params.get('id')
+    const {name, email, companyName, address, contact} = body
+
+    if(!id){
+        return NextResponse.json({message: "Missing id field"}, {status: 400})
+    }
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                name,
+                email,
+                company: {
+                    update: {
+                        name: companyName,
+                        address,
+                        contact
+                    }
+                }
+            }
+        })
+            
+        return NextResponse.json(user, {status: 200})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({message: 'Internal Server Error'}, {status: 500})
+    } 
+}

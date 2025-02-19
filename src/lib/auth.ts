@@ -26,6 +26,9 @@ export const authOptions : any = {
           const user = await prisma.user.findUnique({
             where: {
               email: credentials.email
+            },
+            include: {
+              company: true
             }
           })
 
@@ -53,7 +56,7 @@ export const authOptions : any = {
     updateAge: 15*60, // update every 15mins
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       // Add user id and role to the token object
       if (user) {
         token.id = user.id;
@@ -61,7 +64,17 @@ export const authOptions : any = {
         token.email = user.email;
         token.photo = user.photo
         token.role = user.role;
+        token.company = user.company;
       }
+
+      // ---> ADDITION <---
+      if (trigger == "update") {
+        if (session?.user?.name && session?.user?.email) {
+          token.email = session.user.email,
+          token.name = session.user.name
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
@@ -72,6 +85,7 @@ export const authOptions : any = {
         session.user.email = token.email;
         session.user.role = token.role;
         session.user.photo = token.photo;
+        session.user.company = token.company;
         session.expires = new Date(token.exp * 1000).toISOString();
       }
       return session;

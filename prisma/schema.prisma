@@ -19,14 +19,15 @@ model User {
   email        String    @unique
   password     String
   photo        String?
-  companyId     String? @db.ObjectId
-  company      Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId     String @db.ObjectId
+  company      Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   role         UserRole  @default(ADMIN)
 
   workStartTime String?
   workEndTime   String?
   gracePeriodInMinutes  Int?  @default(15)
   lateDeducInMinutes    Int?  @default(30)
+  overtimeRate  Float?
 
   devices      Device[]
   employees    Employee[]
@@ -82,8 +83,9 @@ model Employee {
   hireDate      DateTime @default(now())
   tinNumber     String?
   sssNumber     String?
+  pagIbigNumber       String?
   philHealthNumber String?
-  overtimeRate  Float?
+  // overtimeRate  Float?
 
   isActive      Boolean  @default(true)
   fingerprintId Int?      // Numeric fingerprint ID for sensor
