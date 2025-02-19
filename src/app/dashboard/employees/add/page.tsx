@@ -301,7 +301,7 @@ const AddEmployee = () => {
                             </FormItem>
                         )}
                         />
-                        <div className='mt-4'>
+                        {/* <div className='mt-4'>
                             <div className='mt-4 flex flex-col gap-2'>
                                 <h1>Deductions:</h1>
                                 {deductions?.map((deduction, index)=>(
@@ -318,7 +318,7 @@ const AddEmployee = () => {
                                 ))}
                             </div>
                             <Button className='mt-4' type='button' variant="outline" onClick={handleAddDeduction}><PlusIcon /> Deduction</Button>
-                        </div>
+                        </div> */}
                     </div>
                     </div>
                     <div className='flex justify-end'>

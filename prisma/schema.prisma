@@ -90,7 +90,7 @@ model Employee {
   fingerEnrolled  Boolean? @default(false)
 
   payrolls          Payroll[]
-  deductions        EmployeeDeduction[]
+  // deductions        EmployeeDeduction[]
   bonuses           Bonus[]
 
   attendance Attendance[]
@@ -150,15 +150,15 @@ enum PayrollStatus {
   CANCELED
 }
 
-model EmployeeDeduction {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId  String @db.ObjectId
-  employee    Employee @relation(fields: [employeeId], references: [id])
-  type        DeductionType
-  precentage      Float?
-  status      DeductionStatus
-  createdAt   DateTime @default(now())
-}
+// model EmployeeDeduction {
+//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+//   employeeId  String @db.ObjectId
+//   employee    Employee @relation(fields: [employeeId], references: [id])
+//   type        DeductionType
+//   precentage      Float?
+//   status      DeductionStatus
+//   createdAt   DateTime @default(now())
+// }
 
 enum DeductionStatus {
   ACTIVE
