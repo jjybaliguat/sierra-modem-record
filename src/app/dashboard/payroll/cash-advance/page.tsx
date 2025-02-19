@@ -1,20 +1,15 @@
-"use client"
-
-import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React from 'react'
 
-const PayrollPage = () => {
+const CashAdvancePage = () => {
   return (
     <Card>
       <CardHeader className='flex flex-row justify-between items-center'>
-        <CardTitle>Payroll</CardTitle>
+        <CardTitle>Cash Advance</CardTitle>
         <Button asChild>
-          <Link href="/dashboard/payroll/create">Create</Link>
+          <Link href="/dashboard/payroll/cash-advance/create">Create</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -23,4 +18,4 @@ const PayrollPage = () => {
   )
 }
 
-export default PayrollPage
+export default CashAdvancePage

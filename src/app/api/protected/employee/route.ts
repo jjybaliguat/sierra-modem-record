@@ -88,7 +88,7 @@ export async function PATCH(req: Request){
     const id = searchParams.get('id') as string
     const body = await req.json()
 
-    // console.log(url)
+    console.log(body)
 
     if(!id){
         return NextResponse.json({error: "Missing required fields"}, {status: 400})
@@ -102,6 +102,7 @@ export async function PATCH(req: Request){
             },
             data: body
         })
+        console.log(response)
 
         return NextResponse.json(response, {status: 200})
     } catch (error) {

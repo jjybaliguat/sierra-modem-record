@@ -26,6 +26,7 @@ import BackButton from '@/components/buttons/BackButton'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { Employees } from '@/types/employees'
 // import { DeductionStatus, DeductionType } from '@prisma/client'
 // import { SelectDeductionType } from '@/components/select/SelectDeductionType'
 // import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
@@ -55,8 +56,12 @@ const formSchema = z.object({
 // }
 
 
-const AddEmployee = () => {
-    const buttonRef = useRef<HTMLButtonElement>(null)
+const UpdateEmployeeForm = ({
+    employee
+} : {
+    employee: Employees
+}) => {
+        const buttonRef = useRef<HTMLButtonElement>(null)
         const [isSubmitting, setIsSubmitting] = useState(false)
 
         // const [deductions, setDeductions] = useState<Deductions[]>([])
@@ -67,41 +72,42 @@ const AddEmployee = () => {
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-          fullName: "",
-          email: "",
-          phone: "",
-          position: "",
-          dailyRate: 0,
-          hireDate: new Date(),
-          tinNumber: "",
-          sssNumber: "",
-          pagIbigNumber: "",
-          philHealthNumber: "",
+          fullName: employee.fullName,
+          email: employee.email,
+          phone: employee.phone,
+          position: employee.position,
+          dailyRate: employee.dailyRate,
+          hireDate: employee.hireDate,
+          tinNumber: employee.tinNumber? employee.tinNumber : "",
+          sssNumber: employee.sssNumber? employee.sssNumber : "",
+          pagIbigNumber: employee.pagIbigNumber? employee.pagIbigNumber : "",
+          philHealthNumber: employee.philHealthNumber? employee.philHealthNumber : "",
         },
       })
      
       // 2. Define a submit handler.
       async function onSubmit(values: z.infer<typeof formSchema>) {
+        // console.log(values)
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         // console.log(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`)
         try {
             setIsSubmitting(true)
-            const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`, {
-                method: "POST",
-                body: JSON.stringify({...values, employerId: user?.id})
+            const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${employee.id}`, {
+                method: "PATCH",
+                body: JSON.stringify({...values})
             })
             const data = await response.json()
             if(!data.error){
-                form.reset()
                 if(buttonRef.current){
                     buttonRef?.current.click()
                 }
-                toast("Employee has been added", {
-                    description: `You successfully added an employee`,
+                toast("Employee has been updated", {
+                    description: `You successfully updated an employee`,
                     duration: 3000,
                 })
-                router.back()
+                router.refresh()
+                // form.reset()
                 setIsSubmitting(false)
             }else{
                 setIsSubmitting(false)
@@ -149,9 +155,13 @@ const AddEmployee = () => {
     <BackButton />
         <Card className='mt-4'>
             <CardHeader>
-                <CardTitle>Add Employee</CardTitle>
+                <CardTitle>Employee Details</CardTitle>
             </CardHeader>
             <CardContent>
+            <div className='flex flex-col gap-2 py-4'>
+                <h1>Fingerprint Id: {employee.fingerEnrolled ? <span className='bg-primary rounded-lg px-2 py-1'>{employee.fingerprintId}</span> : "Not Enrolled"}</h1>
+                <h1>Biometric Device: {employee.deviceId? <span className='text-primary'>{employee.device.name}</span> : "Not Enrolled"}</h1>
+            </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                     <div className="space-y-2">
@@ -358,7 +368,7 @@ const AddEmployee = () => {
                     </div>
                     </div>
                     <div className='flex justify-end'>
-                        <Button disabled={isSubmitting} type="submit">{isSubmitting ? "Creating..." : "Create"}</Button>
+                        <Button disabled={isSubmitting} type="submit">{isSubmitting ? "Updating..." : "Update"}</Button>
                     </div>
                 </form>
             </Form>
@@ -368,4 +378,4 @@ const AddEmployee = () => {
   )
 }
 
-export default AddEmployee
+export default UpdateEmployeeForm

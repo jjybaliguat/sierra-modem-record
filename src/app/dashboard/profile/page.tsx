@@ -22,6 +22,7 @@ import { getSession, signOut, useSession } from 'next-auth/react'
 import { authOptions } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import { changePassword } from '@/app/actions'
+import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email({
@@ -137,6 +138,8 @@ const ProfilePage = (props: Props) => {
 
   return (
     <>
+    <div className="flex flex-1 flex-col gap-8 p-4 pt-0">
+        <HeaderBreadCrumb />
         <Card>
             <CardHeader>
                 <CardTitle className='text-2xl'>Profile</CardTitle>
@@ -310,6 +313,7 @@ const ProfilePage = (props: Props) => {
                 </div>
             </CardContent>
         </Card>
+    </div>
     </>
   )
 }

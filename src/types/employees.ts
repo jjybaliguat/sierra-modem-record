@@ -9,12 +9,14 @@ export interface Employees{
     phone?: string
     department?: string
     position: string
-    dailyRate: Number
+    dailyRate: number
     hireDate: Date
     tinNumber: string,
-    sssNumber: string
+    sssNumber: string,
+    pagIbigNumber: string,
+    philHealthNumber: string,
     isActive: Boolean
-    fingerprintId: Number,
+    fingerprintId: number,
     fingerEnrolled: boolean,
     deviceId: string,
     device: Device

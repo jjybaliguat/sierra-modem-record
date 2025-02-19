@@ -57,8 +57,8 @@ import { format } from "date-fns";
               <TableHead className="w-[100px]">FingerId</TableHead>
               <TableHead>Employee Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">TimeIn</TableHead>
-              <TableHead className="text-right">TimeOut</TableHead>
+              <TableHead>TimeIn</TableHead>
+              <TableHead>TimeOut</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -70,8 +70,8 @@ import { format } from "date-fns";
                 <TableCell className="font-medium">{att.fingerprintId}</TableCell>
                 <TableCell>{att.employee.fullName.split(" ")[0]}</TableCell>
                 <TableCell>{att.status}</TableCell>
-                <TableCell className="text-right">{format(att.timeIn, "PPpp")}</TableCell>
-                <TableCell className="text-right">{att.timeOut && format(att.timeOut, "PPpp")}</TableCell>
+                <TableCell>{format(att.timeIn, "PPpp")}</TableCell>
+                <TableCell>{att.timeOut && format(att.timeOut, "PPpp")}</TableCell>
               </TableRow>
             ))}
           </TableBody>

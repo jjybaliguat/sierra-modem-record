@@ -83,30 +83,30 @@ export const columns: ColumnDef<Device>[] = [
       <div>{row.getValue("user")? row.getValue("user") : "Not Assigned"}</div>
     ),
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const device = row.original
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     const device = row.original
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${device.id}`}>Enroll Biometric</Link></DropdownMenuItem>
-            <DropdownMenuItem>View Details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuSeparator />
+  //           <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${device.id}`}>Enroll Biometric</Link></DropdownMenuItem>
+  //           <DropdownMenuItem>View Details</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
 ]
 
 export function DevicesTable({

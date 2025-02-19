@@ -9,7 +9,7 @@ const BackButton = () => {
     const router = useRouter()
 
   return (
-    <Button variant="outline" onClick={()=>router.back()}><ArrowLeft /> Back</Button>
+    <Button variant="outline" className='w-fit' onClick={()=>router.back()}><ArrowLeft /> Back</Button>
   )
 }
 
