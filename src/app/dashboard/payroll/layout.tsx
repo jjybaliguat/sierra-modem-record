@@ -26,7 +26,7 @@ const PayrollLayout = ({children} : {children: ReactNode}) => {
     <HeaderBreadCrumb />
     <Card className='mt-2 rounded-[50px] w-full flex items-center gap-2'>
       {tabs.map((tab, index)=>(
-        <Link href={tab.path} className={cn({
+        <Link key={index} href={tab.path} className={cn({
           "text-[14px] md:text-[16px] p-6": true,
           "border-b-2 border-primary text-primary" : pathname === tab.path,
           "rounded-bl-[38px]": index == 0
