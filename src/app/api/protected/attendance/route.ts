@@ -24,7 +24,7 @@ export async function GET(req: Request){
                 employee: true
             },
             orderBy: {
-                updatedAt: "desc"
+                timeIn: "desc"
             }
         })
         prisma.$disconnect()

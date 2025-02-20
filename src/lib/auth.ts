@@ -72,6 +72,7 @@ export const authOptions : any = {
         if (session?.user?.name && session?.user?.email) {
           token.email = session.user.email,
           token.name = session.user.name
+          token.company = session.user.company
         }
       }
       

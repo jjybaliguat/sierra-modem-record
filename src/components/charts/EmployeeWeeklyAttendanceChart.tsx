@@ -24,6 +24,8 @@ import useSWR, { mutate } from "swr"
 import { useSession } from "next-auth/react"
 import { Employees } from "@/types/employees"
 import { getEmployeeAttendancePerWeek } from "@/app/actions"
+import { Skeleton } from "../ui/skeleton"
+import WeeklyAttendanceChartSkeleton from "../skeletons/WeeklyAttendanceChartSkeleton"
 
 const chartConfig = {
   hours: {
@@ -97,7 +99,7 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
       }
     }
     
-  if (!session || !session.user?.id || !employees) return null;
+  if (!session || !session.user?.id || !employees) return <WeeklyAttendanceChartSkeleton />
   return (
     <Card className={props.className}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">

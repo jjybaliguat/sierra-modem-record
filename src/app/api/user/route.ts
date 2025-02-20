@@ -76,6 +76,9 @@ export async function PATCH(req: Request){
                         contact
                     }
                 }
+            },
+            include: {
+                company: true
             }
         })
             

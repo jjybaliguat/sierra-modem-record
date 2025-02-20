@@ -97,7 +97,8 @@ const ProfilePage = (props: Props) => {
             user: {
                 ...user,
                 name: data.name,
-                email: data.email
+                email: data.email,
+                company: data.company
             }
         })
         if(buttonRef.current){
