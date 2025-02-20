@@ -43,7 +43,7 @@ export async function GET(req: Request){
                 device: true
             }
         })
-
+        prisma.$disconnect()
         return NextResponse.json(employees, {status: 200})
     } catch (error) {
         console.log(error)
@@ -74,7 +74,7 @@ export async function POST(req: Request){
         const employee = await prisma.employee.create({
             data: {...body, empCode}
         })
-
+        prisma.$disconnect()
         return NextResponse.json(employee, {status: 201})
     } catch (error) {
         console.log(error)
@@ -103,7 +103,7 @@ export async function PATCH(req: Request){
             data: body
         })
         console.log(response)
-
+        prisma.$disconnect()
         return NextResponse.json(response, {status: 200})
     } catch (error) {
         console.log(error)

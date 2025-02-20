@@ -19,7 +19,7 @@ export async function GET(req: Request){
         const count = await prisma.device.count({
             where: filters
         })
-
+        prisma.$disconnect()
         return NextResponse.json(count, {status: 200})
     } catch (error) {
         console.log(error)

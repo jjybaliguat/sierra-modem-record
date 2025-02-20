@@ -95,8 +95,10 @@ export async function PATCH(req: Request){
                 },
                 data: body
             })
+            prisma.$disconnect()
             return NextResponse.json(device, {status: 200})
         }else{
+            prisma.$disconnect()
             return NextResponse.json({error: `Device with id ${deviceId} not found!`}, {status: 400})
         }
 

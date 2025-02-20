@@ -23,7 +23,7 @@ export async function GET(req: Request) {
         if(!device){
             return NextResponse.json({error: `Device with id ${deviceToken} not found.`})
         }
-
+        prisma.$disconnect()
         return NextResponse.json({isEnrollment: device?.isEnrollmentMode, fingerId: device.toEnrollId}, {status: 200})
     } catch (error) {
         console.log(error)
@@ -48,7 +48,7 @@ export async function PATCH(req: Request){
         })
 
         // console.log(device)
-
+        prisma.$disconnect()
         return NextResponse.json(device, {status: 200})
     } catch (error) {
         console.log(error)

@@ -26,8 +26,8 @@ import { Employees } from "@/types/employees"
 import { getEmployeeAttendancePerWeek } from "@/app/actions"
 
 const chartConfig = {
-  sales: {
-    label: "Sales",
+  hours: {
+    label: "Hours",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
@@ -42,24 +42,46 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
     const [chartData, setChartData] = useState<any>(null)
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("")
     const [weekIndex, setWeekIndex] = useState('0')
+    const [totalHours, setTotalHours] = useState(0)
+    const [totalRegularHours, setTotalRegularHours] = useState(0)
+    const [overtimeHours, setOverTimeHours] = useState(0)
     
     async function getEmployeeWeeklyHours(){
       try {
-        const response = await getEmployeeAttendancePerWeek(selectedEmployeeId, Number(weekIndex))
+        const response = await getEmployeeAttendancePerWeek(session?.user.id, selectedEmployeeId, Number(weekIndex))
+        console.log(response)
+        
+        setChartData(response?.weeklyHours?.map((value: number, index: number)=>({
+          day: daysOfweeks[index],
+          hours: value
+        })))
+        let total = 0;
+        response?.weeklyHours?.map((value: number)=>{
+          total += value
+        })
+        setTotalHours(total)
+        setTotalRegularHours(response?.regularHours!)
+        setOverTimeHours(response?.overtimeHours!)
+
       } catch (error) {
         console.log(error)
+        return null
       }
     }
     
     const daysOfweeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
+    
     useEffect(()=>{
       mutate("getEmployees")
-      getEmployeeWeeklyHours()
     }, [session])
+
+    useEffect(()=> {
+      getEmployeeWeeklyHours()
+    }, [selectedEmployeeId, weekIndex])
     
     useEffect(()=> {
-      employees && setSelectedEmployeeId(employees[0].id)
+      employees && setSelectedEmployeeId(employees[0]?.id)
     }, [employees])
     
     async function getEmployees(){
@@ -75,7 +97,7 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
       }
     }
     
-  if (!session || !session.user?.id) return null;
+  if (!session || !session.user?.id || !employees) return null;
   return (
     <Card className={props.className}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
@@ -135,11 +157,18 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="sales" fill="var(--color-sales)" radius={8} />
+            <Bar dataKey="hours" fill="var(--color-hours)" radius={8} />
           </BarChart>
         </ChartContainer>
         <div className="mt-4">
-          <h1>Total Hours: </h1>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 ">
+            <h1><span className="text-neutral-500">Total Hours:</span> <span className="text-primary">{totalHours}</span></h1>
+            <h1><span className="text-neutral-500">Regular Hours:</span> <span className="text-primary">{totalRegularHours}</span></h1>
+            <h1><span className="text-neutral-500">Overtime Hours:</span> <span className="text-primary">{overtimeHours}</span></h1>
+          </div>
+          <div className="mt-4">
+            <p className="text-neutral-500">Regular hours is the computed hours worked including late deductions.</p>
+          </div>
         </div>
       </CardContent>
       {/* <CardFooter className="flex-col items-start gap-2 text-sm">

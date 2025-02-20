@@ -19,13 +19,15 @@ model User {
   email        String    @unique
   password     String
   photo        String?
-  companyId     String @db.ObjectId
-  company      Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId     String? @db.ObjectId
+  company      Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   role         UserRole  @default(ADMIN)
 
-  workStartTime String?
-  workEndTime   String?
+  workStartTime String? @default("8:00")
+  workEndTime   String? @default("5:00")
   gracePeriodInMinutes  Int?  @default(15)
+  minutesThresholdAfterLate Int? @default(40)
+  overtimeThresholdInMinutes Int? @default(60)
   lateDeducInMinutes    Int?  @default(30)
   overtimeRate  Float?
 

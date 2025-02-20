@@ -27,7 +27,7 @@ export async function GET(req: Request){
                 updatedAt: "desc"
             }
         })
-
+        prisma.$disconnect()
         return NextResponse.json(attendanceLogs, {status: 200})
     } catch (error) {
         console.log(error)
@@ -135,7 +135,7 @@ export async function POST(req: Request){
                 employee: true
             }
         })
-
+        prisma.$disconnect()
         return NextResponse.json({name: attendance.employee.fullName?.split(" ")[0], timeIn: attendance.timeIn}, {status: 201})
     } catch (error) {
         console.log(error)
