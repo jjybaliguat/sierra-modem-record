@@ -98,7 +98,7 @@ export async function changePassword(data: {id: string | undefined, oldPassword:
 }
 
 export async function getEmployeeAttendancePerWeek(employeerId: string | null | undefined, employeeId: string | null | undefined, week: number){
-    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+    const today = new Date();
     const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
     const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
 
@@ -164,9 +164,9 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
         attendance.forEach((record) => {
             if (!record.timeIn || !record.timeOut) return null; // Skip if incomplete data
 
-            let timeIn = new Date(new Date(record.timeIn).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+            let timeIn = new Date(record.timeIn);
             console.log(timeIn)
-            const timeOut = new Date(new Date(record.timeOut).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+            const timeOut = new Date(record.timeOut);
             console.log(timeOut)
             const dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
             let deductionHours = 0;
