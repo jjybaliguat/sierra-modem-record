@@ -124,23 +124,23 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
         const timeEndParts: number[] | undefined = employer?.workEndTime?.split(":").map(Number);
         if(!timeParts) return null
         if(!timeEndParts) return null
-        // Create a new Date object with the correct time, forcing 
+        // Create a new Date object with the correct time, forcing UTC
         const workStartTime: Date = today;
-        workStartTime.setHours(timeParts[0], timeParts[1], 0, 0); // Ensure it's in 
-        workStartTime.setSeconds(0)
+        workStartTime.setUTCHours(timeParts[0], timeParts[1], 0, 0); // Ensure it's in UTC
+        workStartTime.setUTCSeconds(0)
         const workEndTime: Date = new Date(today);
-        workEndTime.setHours(timeEndParts[0], timeEndParts[1], 0, 0); // Ensure it's in 
-        workEndTime.setSeconds(0)
+        workEndTime.setUTCHours(timeEndParts[0], timeEndParts[1], 0, 0); // Ensure it's in UTC
+        workEndTime.setUTCSeconds(0)
 
         const workGracePeriodTime = new Date(workStartTime)
         const workGracePeriodThresholdTime = new Date(workStartTime)
-        workGracePeriodTime.setMinutes(workGracePeriodTime.getMinutes() + employer?.gracePeriodInMinutes!)
-        workGracePeriodTime.setSeconds(0)
-        workGracePeriodThresholdTime.setMinutes(employer?.minutesThresholdAfterLate!)
-        workGracePeriodThresholdTime.setSeconds(0)
+        workGracePeriodTime.setUTCMinutes(workGracePeriodTime.getMinutes() + employer?.gracePeriodInMinutes!)
+        workGracePeriodTime.setUTCSeconds(0)
+        workGracePeriodThresholdTime.setUTCMinutes(employer?.minutesThresholdAfterLate!)
+        workGracePeriodThresholdTime.setUTCSeconds(0)
         const overTimeThresholdTime = new Date(workEndTime)
-        overTimeThresholdTime.setMinutes(overTimeThresholdTime.getMinutes() + employer?.overtimeThresholdInMinutes!)
-        overTimeThresholdTime.setSeconds(0)
+        overTimeThresholdTime.setUTCMinutes(overTimeThresholdTime.getMinutes() + employer?.overtimeThresholdInMinutes!)
+        overTimeThresholdTime.setUTCSeconds(0)
 
         const attendance = await prisma.attendance.findMany({
             where: {
@@ -165,21 +165,22 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             if (!record.timeIn || !record.timeOut) return null; // Skip if incomplete data
 
             let timeIn = new Date(new Date(record.timeIn).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+            console.log(timeIn)
             const timeOut = new Date(new Date(record.timeOut).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
-            // console.log(timeOut)
+            console.log(timeOut)
             const dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
             let deductionHours = 0;
             if (dayIndex >= 0) {
-                let timeInHours = timeIn.getHours() + (timeIn.getMinutes() / 60)
-                console.log(timeInHours)
-                let timeOutHours = timeOut.getHours() + (timeOut.getMinutes() / 60)
-                console.log(timeOutHours)
-                let workStartHours = workStartTime.getHours() + (workStartTime.getMinutes() / 60)
-                let workEndHours = workEndTime.getHours() + (workEndTime.getMinutes() / 60)
+                let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
+                // console.log(timeInHours)
+                let timeOutHours = timeOut.getUTCHours() + (timeOut.getUTCMinutes() / 60)
+                // console.log(timeOutHours)
+                let workStartHours = workStartTime.getUTCHours() + (workStartTime.getUTCMinutes() / 60)
+                let workEndHours = workEndTime.getUTCHours() + (workEndTime.getUTCMinutes() / 60)
                 const overtimeThresholdHours = workEndHours + (employer?.overtimeThresholdInMinutes! / 60)
-                let thresholdAfterLateTime = workGracePeriodThresholdTime.getHours() + (workGracePeriodThresholdTime.getMinutes() / 60)
-                let gracePeriodInMinutesTime = workGracePeriodTime.getHours() + (workGracePeriodTime.getMinutes() / 60)
-                let overtimeThresholdInHours = overTimeThresholdTime.getHours() + (overTimeThresholdTime.getMinutes() / 60)
+                let thresholdAfterLateTime = workGracePeriodThresholdTime.getUTCHours() + (workGracePeriodThresholdTime.getUTCMinutes() / 60)
+                let gracePeriodInMinutesTime = workGracePeriodTime.getUTCHours() + (workGracePeriodTime.getUTCMinutes() / 60)
+                let overtimeThresholdInHours = overTimeThresholdTime.getUTCHours() + (overTimeThresholdTime.getUTCMinutes() / 60)
 
                 
                 // console.log(overtimeThreshold)
@@ -198,11 +199,11 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 
                 // Define lunch break time (12:00 PM - 1:00 PM)
                 const lunchStart = new Date(timeIn);
-                lunchStart.setHours(12, 0, 0, 0);
-                const lunchStartHours = lunchStart.getHours() + (lunchStart.getMinutes() / 60)
+                lunchStart.setUTCHours(12, 0, 0, 0);
+                const lunchStartHours = lunchStart.getUTCHours() + (lunchStart.getUTCMinutes() / 60)
                 const lunchEnd = new Date(timeIn);
-                lunchEnd.setHours(13, 0, 0, 0);
-                const lunchEndHours = lunchEnd.getHours() + (lunchEnd.getMinutes() / 60)
+                lunchEnd.setUTCHours(13, 0, 0, 0);
+                const lunchEndHours = lunchEnd.getUTCHours() + (lunchEnd.getUTCMinutes() / 60)
           
                 // Deduct 1 hour if lunch is included in the work period
                 // console.log(timeOutHours)
