@@ -40,7 +40,8 @@ export async function GET(req: Request){
         const employees = await prisma.employee.findMany({
             where: filters,
             include: {
-                device: true
+                device: true,
+                cashAdvance: true
             }
         })
         prisma.$disconnect()

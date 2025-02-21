@@ -13,6 +13,13 @@ declare module "next-auth" {
       photo: string,
       role: UserRole
       company: Company
+      workStartTime: string,
+      workEndTime: string,
+      gracePeriodInMinutes: number,
+      minutesThresholdAfterLate: number,
+      overtimeThresholdInMinutes: number,
+      lateDeducInMinutes: number,
+      overtimeRate: number,
     } & DefaultSession["user"];
   }
 
@@ -21,7 +28,14 @@ declare module "next-auth" {
     name: string,
     email: string,
     photo: string,
-    role: UserRole
+    role: UserRole,
+    workStartTime: string,
+    workEndTime: string,
+    gracePeriodInMinutes: number,
+    minutesThresholdAfterLate: number,
+    overtimeThresholdInMinutes: number,
+    lateDeducInMinutes: number,
+    overtimeRate: number,
     company: Company
   }
 

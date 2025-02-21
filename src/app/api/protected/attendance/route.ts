@@ -27,6 +27,7 @@ export async function GET(req: Request){
                 timeIn: "desc"
             }
         })
+        console.log(attendanceLogs)
         prisma.$disconnect()
         return NextResponse.json(attendanceLogs, {status: 200})
     } catch (error) {

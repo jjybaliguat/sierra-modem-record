@@ -164,12 +164,13 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
         </ChartContainer>
         <div className="mt-4">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3 ">
-            <h1><span className="text-neutral-500">Total Hours:</span> <span className="text-primary">{totalHours}</span></h1>
-            <h1><span className="text-neutral-500">Regular Hours:</span> <span className="text-primary">{totalRegularHours}</span></h1>
+            <h1><span className="text-neutral-500">Hours Worked:</span> <span className="text-primary">{totalHours}</span></h1>
+            <h1><span className="text-neutral-500">Computed Hours:</span> <span className="text-primary">{totalRegularHours}</span></h1>
             <h1><span className="text-neutral-500">Overtime Hours:</span> <span className="text-primary">{overtimeHours}</span></h1>
           </div>
           <div className="mt-4">
-            <p className="text-neutral-500">Regular hours is the computed hours worked including late deductions.</p>
+            <p className="text-sm text-primary">Hours worked <span className="text-neutral-500">is the actual hours worked for an employee without deductions.</span></p>
+            <p className="text-sm text-primary">Computed hours <span className="text-neutral-500">is the computed hours worked including late deductions and time-in grace period.</span></p>
           </div>
         </div>
       </CardContent>

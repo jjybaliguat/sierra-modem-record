@@ -19,5 +19,9 @@ export interface Employees{
     fingerprintId: number,
     fingerEnrolled: boolean,
     deviceId: string,
-    device: Device
+    device: Device,
+    cashAdvance: {
+        id: string,
+        amount: number
+    }
 }

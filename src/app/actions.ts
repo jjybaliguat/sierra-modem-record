@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 
 import bcrypt from 'bcryptjs'
 import { startOfWeek, endOfWeek, subWeeks } from "date-fns";
+import { NextResponse } from "next/server";
 
 
 const prisma = new PrismaClient()
@@ -154,7 +155,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             }
         })
 
-        console.log(attendance)
+        // console.log(attendance)
 
         const weeklyHours = Array(7).fill(0);
         let regularHours = 0
@@ -165,9 +166,9 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             if (!record.timeIn || !record.timeOut) return null; // Skip if incomplete data
 
             let timeIn = new Date(record.timeIn);
-            console.log(timeIn)
+            // console.log(timeIn)
             const timeOut = new Date(record.timeOut);
-            console.log(timeOut)
+            // console.log(timeOut)
             const dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
             let deductionHours = 0;
             if (dayIndex >= 0) {
@@ -209,22 +210,22 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 // console.log(timeOutHours)
                 if(timeOutHours >= overtimeThresholdHours){
                     overtimeHours += 1;
-                    hoursWorked = (timeOutHours - workStartHours) - deductionHours
+                    hoursWorked = (timeOutHours - timeInHours)
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
                 }else if (timeOutHours < workEndHours){
                     regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
-                    hoursWorked = (timeOutHours - workStartHours) - deductionHours
+                    hoursWorked = (timeOutHours - timeInHours)
                 }else if(timeOutHours > workEndHours){
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
-                    hoursWorked = (workEndHours - workStartHours) - deductionHours
+                    hoursWorked = (workEndHours - timeInHours)
                 }
                 
                 if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
                 }
-                console.log(deductionHours)
-                console.log(hoursWorked)
+                // console.log(deductionHours)
+                // console.log(hoursWorked)
                 regularHours += Math.max(regularHoursWorked, 0)
                 weeklyHours[dayIndex] += Math.max(hoursWorked, 0); // Prevent negative values
               }
@@ -239,5 +240,146 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
     } catch (error) {
         console.log(error)
         return null
+    }
+}
+
+export async function getEmployeeAttendanceTotalHours(employerId: string, employeeId: string, startDate: Date, endDate: Date){
+    if(!employeeId || !startDate || !endDate || !employerId) return null
+    const today = new Date()
+
+    try {
+        const startofDayUTC = new Date(startDate)
+        startDate.setUTCHours(0,0,0,0)
+        const endOfDayUTC = new Date(endDate);
+        endOfDayUTC.setUTCHours(23, 59, 59, 999);
+
+        // console.log(startofDayUTC)
+        // console.log(endOfDayUTC)
+
+        const employer = await prisma.user.findUnique({
+            where: {
+                id: employerId
+            },
+            select: {
+                workStartTime: true,
+                workEndTime: true,
+                gracePeriodInMinutes: true,
+                lateDeducInMinutes: true,
+                minutesThresholdAfterLate: true,
+                overtimeThresholdInMinutes: true
+            }
+        })
+        // console.log(employer)
+        if(!employer) return null
+        const timeParts: number[] | undefined = employer?.workStartTime?.split(":").map(Number);
+        const timeEndParts: number[] | undefined = employer?.workEndTime?.split(":").map(Number);
+        if(!timeParts) return null
+        if(!timeEndParts) return null
+        // Create a new Date object with the correct time, forcing UTC
+        const workStartTime: Date = today;
+        workStartTime.setUTCHours(timeParts[0], timeParts[1], 0, 0); // Ensure it's in UTC
+        workStartTime.setUTCSeconds(0)
+        const workEndTime: Date = new Date(today);
+        workEndTime.setUTCHours(timeEndParts[0], timeEndParts[1], 0, 0); // Ensure it's in UTC
+        workEndTime.setUTCSeconds(0)
+
+        const workGracePeriodTime = new Date(workStartTime)
+        const workGracePeriodThresholdTime = new Date(workStartTime)
+        workGracePeriodTime.setUTCMinutes(workGracePeriodTime.getMinutes() + employer?.gracePeriodInMinutes!)
+        workGracePeriodTime.setUTCSeconds(0)
+        workGracePeriodThresholdTime.setUTCMinutes(employer?.minutesThresholdAfterLate!)
+        workGracePeriodThresholdTime.setUTCSeconds(0)
+        const overTimeThresholdTime = new Date(workEndTime)
+        overTimeThresholdTime.setUTCMinutes(overTimeThresholdTime.getMinutes() + employer?.overtimeThresholdInMinutes!)
+        overTimeThresholdTime.setUTCSeconds(0)
+
+        const attendanceRecords = await prisma.attendance.findMany({
+            where: {
+                employeeId,
+                timeIn: {gte: startofDayUTC},
+                timeOut: {lte: endOfDayUTC}
+            },
+            select: {
+                timeIn: true,
+                timeOut: true
+            }
+        })
+
+        let regularHours = 0;
+        let totalHours = 0;
+        let overtimeHours = 0;
+
+        attendanceRecords.forEach((record) => {
+            if(!record.timeIn || !record.timeOut) return null
+
+            let deductionHours = 0;
+            let timeIn = new Date(record.timeIn);
+            const timeOut = new Date(record.timeOut);
+
+            let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
+                // console.log(timeInHours)
+                let timeOutHours = timeOut.getUTCHours() + (timeOut.getUTCMinutes() / 60)
+                // console.log(timeOutHours)
+                let workStartHours = workStartTime.getUTCHours() + (workStartTime.getUTCMinutes() / 60)
+                let workEndHours = workEndTime.getUTCHours() + (workEndTime.getUTCMinutes() / 60)
+                const overtimeThresholdHours = workEndHours + (employer?.overtimeThresholdInMinutes! / 60)
+                let thresholdAfterLateTime = workGracePeriodThresholdTime.getUTCHours() + (workGracePeriodThresholdTime.getUTCMinutes() / 60)
+                let gracePeriodInMinutesTime = workGracePeriodTime.getUTCHours() + (workGracePeriodTime.getUTCMinutes() / 60)
+
+                
+                // console.log(overtimeThreshold)
+                if (timeInHours <= gracePeriodInMinutesTime) {
+                    deductionHours = 0
+                }else if(timeInHours > gracePeriodInMinutesTime && timeInHours <= thresholdAfterLateTime){
+                    deductionHours = Math.max(employer?.lateDeducInMinutes! / 60, 0);
+                }else if(timeInHours > thresholdAfterLateTime && timeInHours <= (workStartHours + 1)){
+                    deductionHours = 1;
+                }else{
+                    deductionHours = (timeInHours - workStartHours)
+                }
+
+                let hoursWorked = 0; // Convert ms → hours
+                let regularHoursWorked = 0; // Convert ms → hours
+                
+                // Define lunch break time (12:00 PM - 1:00 PM)
+                const lunchStart = new Date(timeIn);
+                lunchStart.setUTCHours(12, 0, 0, 0);
+                const lunchStartHours = lunchStart.getUTCHours() + (lunchStart.getUTCMinutes() / 60)
+                const lunchEnd = new Date(timeIn);
+                lunchEnd.setUTCHours(13, 0, 0, 0);
+                const lunchEndHours = lunchEnd.getUTCHours() + (lunchEnd.getUTCMinutes() / 60)
+          
+                // Deduct 1 hour if lunch is included in the work period
+                // console.log(timeOutHours)
+                if(timeOutHours >= overtimeThresholdHours){
+                    overtimeHours += 1;
+                    hoursWorked = (timeOutHours - timeInHours)
+                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                }else if (timeOutHours < workEndHours){
+                    regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
+                    hoursWorked = (timeOutHours - timeInHours)
+                }else if(timeOutHours > workEndHours){
+                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                    hoursWorked = (workEndHours - timeInHours)
+                }
+                
+                if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
+                  hoursWorked -= 1;
+                  regularHoursWorked -= 1;
+                }
+                regularHours += Math.max(regularHoursWorked, 0)
+                totalHours += hoursWorked
+        })
+
+        prisma.$disconnect()
+        return {
+            totalHours: parseFloat(totalHours.toFixed(1)),
+            regularHours: parseFloat(regularHours.toFixed(1)),
+            overtimeHours: parseFloat(overtimeHours.toFixed(1))
+        }
+
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error"}, {status: 500})
     }
 }

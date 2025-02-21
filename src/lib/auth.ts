@@ -65,6 +65,13 @@ export const authOptions : any = {
         token.photo = user.photo
         token.role = user.role;
         token.company = user.company;
+        token.workStartTime = user.workStartTime;
+        token.workEndTime = user.workEndTime;
+        token.gracePeriodInMinutes = user.gracePeriodInMinutes;
+        token.minutesThresholdAfterLate = user.minutesThresholdAfterLate;
+        token.overtimeThresholdInMinutes = user.overtimeThresholdInMinutes;
+        token.lateDeducInMinutes = user.lateDeducInMinutes;
+        token.overtimeRate = user.overtimeRate;
       }
 
       // ---> ADDITION <---
@@ -73,6 +80,13 @@ export const authOptions : any = {
           token.email = session.user.email,
           token.name = session.user.name
           token.company = session.user.company
+          token.workStartTime = user.workStartTime;
+          token.workEndTime = user.workEndTime;
+          token.gracePeriodInMinutes = user.gracePeriodInMinutes;
+          token.minutesThresholdAfterLate = user.minutesThresholdAfterLate;
+          token.overtimeThresholdInMinutes = user.overtimeThresholdInMinutes;
+          token.lateDeducInMinutes = user.lateDeducInMinutes;
+          token.overtimeRate = user.overtimeRate;
         }
       }
       
@@ -87,6 +101,13 @@ export const authOptions : any = {
         session.user.role = token.role;
         session.user.photo = token.photo;
         session.user.company = token.company;
+        session.user.workStartTime = token.workStartTime;
+        session.user.workEndTime = token.workEndTime;
+        session.user.gracePeriodInMinutes = token.gracePeriodInMinutes;
+        session.user.minutesThresholdAfterLate = token.minutesThresholdAfterLate;
+        session.user.overtimeThresholdInMinutes = token.overtimeThresholdInMinutes;
+        session.user.lateDeducInMinutes = token.lateDeducInMinutes;
+        session.user.overtimeRate = token.overtimeRate;
         session.expires = new Date(token.exp * 1000).toISOString();
       }
       return session;
