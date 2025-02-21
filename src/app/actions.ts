@@ -162,7 +162,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
 
                 // Process attendance data
         attendance.forEach((record) => {
-            if (!record.timeIn || !record.timeOut) return; // Skip if incomplete data
+            if (!record.timeIn || !record.timeOut) return null; // Skip if incomplete data
 
             let timeIn = new Date(new Date(record.timeIn).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
             const timeOut = new Date(new Date(record.timeOut).toLocaleString("en-US", { timeZone: "Asia/Manila" }));

@@ -61,7 +61,7 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
         response?.weeklyHours?.map((value: number)=>{
           total += value
         })
-        setTotalHours(total)
+        setTotalHours(parseFloat(total.toFixed(1)))
         setTotalRegularHours(response?.regularHours!)
         setOverTimeHours(response?.overtimeHours!)
 
