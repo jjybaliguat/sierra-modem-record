@@ -168,10 +168,12 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             const timeOut = new Date(new Date(record.timeOut).toLocaleString("en-US", { timeZone: "Asia/Manila" }));
             // console.log(timeOut)
             const dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
+            let deductionHours = 0;
             if (dayIndex >= 0) {
-                let deductionHours = 0;
                 let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
+                console.log(timeInHours)
                 let timeOutHours = timeOut.getUTCHours() + (timeOut.getUTCMinutes() / 60)
+                console.log(timeInHours)
                 let workStartHours = workStartTime.getUTCHours() + (workStartTime.getUTCMinutes() / 60)
                 let workEndHours = workEndTime.getUTCHours() + (workEndTime.getUTCMinutes() / 60)
                 const overtimeThresholdHours = workEndHours + (employer?.overtimeThresholdInMinutes! / 60)
