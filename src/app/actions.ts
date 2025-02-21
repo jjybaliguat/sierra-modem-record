@@ -220,7 +220,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
                 }
-                console.log(regularHoursWorked)
+                console.log(deductionHours)
                 regularHours += Math.max(regularHoursWorked, 0)
                 weeklyHours[dayIndex] += Math.max(hoursWorked, 0); // Prevent negative values
               }
