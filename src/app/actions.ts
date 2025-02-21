@@ -173,7 +173,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
                 console.log(timeInHours)
                 let timeOutHours = timeOut.getUTCHours() + (timeOut.getUTCMinutes() / 60)
-                console.log(timeInHours)
+                console.log(timeOutHours)
                 let workStartHours = workStartTime.getUTCHours() + (workStartTime.getUTCMinutes() / 60)
                 let workEndHours = workEndTime.getUTCHours() + (workEndTime.getUTCMinutes() / 60)
                 const overtimeThresholdHours = workEndHours + (employer?.overtimeThresholdInMinutes! / 60)
