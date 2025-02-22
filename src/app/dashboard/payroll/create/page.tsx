@@ -6,29 +6,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Employees } from '@/types/employees'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useSession } from 'next-auth/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { useReactToPrint } from "react-to-print";
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/DatePicker'
-import { getEmployeeAttendanceTotalHours } from '@/app/actions'
+import { getEmployeeAttendanceTotalHours, getEmployeeLatestPayslip } from '@/app/actions'
 import { Input } from '@/components/ui/input'
-import { Pencil } from 'lucide-react'
 import { formatDate } from '@/utils/formatDate'
 import { Label } from '@/components/ui/label'
 import { AttendanceLogsCollapsible } from '@/components/collapsible/AttendaceLogsCollapsible'
 import { Attendance } from '@/types/attendance'
+import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 const CreatePayroll = () => {
   const {data: session} = useSession()
   const {data: employees, isLoading} = useSWR(session?.user.id? "getEmployee" : null, getEmployees)
   const [selectedEmployee, setSelectedEmployee] = useState<Employees | null>(null)
   const [attendanceLogs, setAttendanceLogs] = useState<Attendance[]>([])
-  const contentRef = useRef<HTMLDivElement>(null); 
-  const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Payslip-${selectedEmployee?.fullName}`});
 
-  const [startDate, setStartDate] = useState<Date>(new Date())
-  const [endDate, setEndDate] = useState<Date>(new Date())
+  const [periodStart, setPeriodStart] = useState<Date>(new Date())
+  const [periodEnd, setPeriodEnd] = useState<Date>(new Date())
   const [totalHours, setTotalHours] = useState(0)
   const [regularHours, setRegularHours] = useState(0)
   const [otHours, setOtHours] = useState(0)
@@ -36,20 +34,27 @@ const CreatePayroll = () => {
   const [otPay, setOtPay] = useState(0)
   const [adjustments, setAdjustments] = useState({
     incentive: 0,
-    paidLeave: 0,
+    paidLeaves: 0,
     holidayPay: 0,
-    others: 0,
+    otherPay: 0,
   })
   const [grossPay, setGrossPay] = useState(0)
   const [netPay, setNetPay] = useState(0)
   const [deductions, setDeductions] = useState({
-    tax: 0,
-    sss: 0,
-    philHealth: 0,
-    pagIbig: 0,
-    others: 0
+    taxDeduction: 0,
+    sssDeduction: 0,
+    philHealthDeduction: 0,
+    pagIbigDeduction: 0,
+    caDeduction: 0,
+    otherDeduction: 0
   })
   const [totalDeduction, setTotalDeduction] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [lastPayslipPeriod, setLastPayslipPeriod] = useState({
+    periodStart: "",
+    periodEnd: ""
+  })
+  const router = useRouter()
 
   async function getEmployees(){
     try {
@@ -68,7 +73,7 @@ const CreatePayroll = () => {
     const getEmployeeTotalHours = async () => {
       try {
         if(!session) return null
-        const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, startDate, endDate)
+        const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, periodStart, periodEnd)
       setTotalHours(response.totalHours? response.totalHours : 0)
       setRegularHours(response.regularHours? response.regularHours : 0)
       setOtHours(response.overtimeHours? response.overtimeHours : 0)
@@ -77,8 +82,24 @@ const CreatePayroll = () => {
         console.log(error)
       }
     }
+    selectedEmployee && setDeductions({...deductions, caDeduction: selectedEmployee?.cashAdvance[0]?.amount? selectedEmployee?.cashAdvance[0]?.amount : 0})
+
+    async function getEmployeeLastPayslip(){
+      try {
+        const response = await getEmployeeLatestPayslip(selectedEmployee?.id!)
+
+        setLastPayslipPeriod({
+          periodEnd: response?.periodEnd? response.periodEnd : "",
+          periodStart: response?.periodStart? response.periodStart : ""
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    
     getEmployeeTotalHours()
-  }, [startDate, endDate, selectedEmployee])
+    getEmployeeLastPayslip()
+  }, [periodStart, periodEnd, selectedEmployee])
 
   useEffect(()=>{
     setBasicSalary(regularHours * (selectedEmployee? selectedEmployee?.dailyRate : 0 / 8))
@@ -100,10 +121,30 @@ const CreatePayroll = () => {
   }, [basicSalary, otPay, adjustments, deductions])
 
   async function GeneratePayslip(){
+    setSubmitting(true)
     try {
-      
+      const response: any = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/payroll`, {
+        method: "POST",
+        body: JSON.stringify({
+          employeeId: selectedEmployee?.id,
+          regularHours,
+          overtimeHours: otHours,
+          basicSalary,
+          overtimePay: otPay,
+          ...adjustments,
+          ...deductions,
+          totalDeduction,
+          grossPay,
+          netPay,
+          periodStart,
+          periodEnd
+        })
+      })
+      const data = await response.json()
+      setSubmitting(false)
+      router.push(`/dashboard/payroll/${data?.id}`)
     } catch (error) {
-      
+      console.log(error)
     }
   }
 
@@ -115,7 +156,7 @@ const CreatePayroll = () => {
                 <CardHeader>
                   <div className='flex items-center justify-between'>
                     <CardTitle>Create Payslip</CardTitle>
-                    <Button>Generate</Button>
+                    <Button disabled={!selectedEmployee || submitting} onClick={GeneratePayslip}>{submitting? "Generating..." : "Generate"}</Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -151,13 +192,16 @@ const CreatePayroll = () => {
                 {selectedEmployee && 
                 <div>
                 <div className='flex flex-col gap-2 mt-4'>
+                    <div>
+                    {lastPayslipPeriod.periodStart !== "" && <h1>Last Payslip Period: <span className='text-primary'>{formatDate(lastPayslipPeriod.periodStart)}</span> to <span className='text-primary'>{formatDate(lastPayslipPeriod.periodEnd)}</span></h1>}
+                    </div>
                     <div className='flex items-center gap-2'>
                       <h1>Period Start</h1>
-                      <DatePicker date={startDate} onSelect={setStartDate} />
+                      <DatePicker date={periodStart} onSelect={setPeriodStart} />
                     </div>
                     <div className='flex items-center gap-2'>
                       <h1>Period End</h1>
-                      <DatePicker date={endDate} onSelect={setEndDate} />
+                      <DatePicker date={periodEnd} onSelect={setPeriodEnd} />
                     </div>
                     <div className='mt-4'>
                       <div className='flex flex-wrap gap-4 md:items-center'>
@@ -170,7 +214,7 @@ const CreatePayroll = () => {
                         <div className='flex flex-wrap gap-4 md:items-center'>
                           {Object.entries(adjustments).map(([key, value])=>(
                             <div key={key} className='flex flex-col gap-2'>
-                              <Label htmlFor={`${key}`} className='uppercase'>{key}</Label>
+                              <Label htmlFor={`${key}`} className='capitalized'>{key}</Label>
                               <Input id={`${key}`} value={value} onChange={(e)=>setAdjustments({...adjustments, [key]: Number(e.target.value)})} className='w-[100px]' />
                             </div>
                           ))}
@@ -181,7 +225,7 @@ const CreatePayroll = () => {
                         <div className='flex flex-wrap gap-4 md:items-center'>
                           {Object.entries(deductions).map(([key, value])=>(
                             <div key={key} className='flex flex-col gap-2'>
-                              <Label htmlFor={`${key}`} className='uppercase'>{key}</Label>
+                              <Label htmlFor={`${key}`} className='capitalized'>{key}</Label>
                               <Input id={`${key}`} value={value} onChange={(e)=>setDeductions({...deductions, [key]: Number(e.target.value)})} className='w-[100px]' />
                             </div>
                           ))}
@@ -193,13 +237,18 @@ const CreatePayroll = () => {
                 <div className='mt-6 overflow-x-auto'>
                   <div className='flex items-center gap-2 mb-2'>
                     <h1 className='text-xl font-semibold'>Preview</h1>
-                    <Button onClick={()=>reactToPrintFn()} variant="outline">Print Payslip</Button>
                   </div>
-                  <div ref={contentRef} className="w-[950px] p-6 rounded-lg border-2 border-dashed border-gray-500 shadow-md print-top-left">
-                    <h1 className='text-xl md:text-2xl font-semibold'>{session?.user.company.name}</h1>
+                  <div className="w-[950px] p-6 rounded-lg border-2 border-dashed border-gray-500 shadow-md print-top-left bg-white text-black">
+                    <div className='flex justify-between'>
+                        <h1 className='text-2xl md:text-2xl font-semibold'>{session?.user.company.name}</h1>
+                        <div className="flex gap-2 items-centerfont-semibol text-lg">
+                            <span>Status: </span>
+                            <span className="text-yellow-500 font-semibold">PENDING</span>
+                        </div>
+                    </div>
                     <div className='flex justify-between w-full'>
                       <h4 className="text-[14px] font-semibold mb-4">Employee Payslip</h4>
-                      <h4 className="text-[14px] font-semibold mb-4">Period: {formatDate(startDate)} to {formatDate(endDate)}</h4>
+                      <h4 className="text-[14px] font-semibold mb-4">Period: {formatDate(periodStart)} to {formatDate(periodEnd)}</h4>
                     </div>
 
                     {/* Employee Information */}
@@ -244,7 +293,7 @@ const CreatePayroll = () => {
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Paid Leaves:</span>
-                          <span>{formatCurrency(adjustments.paidLeave)}</span>
+                          <span>{formatCurrency(adjustments.paidLeaves)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Holiday Pay:</span>
@@ -252,7 +301,7 @@ const CreatePayroll = () => {
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Others:</span>
-                          <span>{formatCurrency(adjustments.others)}</span>
+                          <span>{formatCurrency(adjustments.otherPay)}</span>
                         </div>
                       </div>
                     </div>
@@ -263,23 +312,27 @@ const CreatePayroll = () => {
                         <h3 className="text-lg font-semibold mb-2 text-red-500">Deductions</h3>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>SSS:</span>
-                          <span>{formatCurrency(deductions.sss)}</span>
+                          <span>{formatCurrency(deductions.sssDeduction)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>PhilHealth:</span>
-                          <span>{formatCurrency(deductions.philHealth)}</span>
+                          <span>{formatCurrency(deductions.philHealthDeduction)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Pag-IBIG:</span>
-                          <span>{formatCurrency(deductions.pagIbig)}</span>
+                          <span>{formatCurrency(deductions.pagIbigDeduction)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Tax:</span>
-                          <span>{formatCurrency(deductions.tax)}</span>
+                          <span>{formatCurrency(deductions.taxDeduction)}</span>
+                        </div>
+                        <div className="text-[14px] flex items-center gap-2">
+                          <span>CashAdvance:</span>
+                          <span>{formatCurrency(deductions.caDeduction)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Other Deductions:</span>
-                          <span>{formatCurrency(deductions.others)}</span>
+                          <span>{formatCurrency(deductions.otherDeduction)}</span>
                         </div>
                       </div>
 

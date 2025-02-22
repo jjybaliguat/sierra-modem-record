@@ -26,7 +26,7 @@ model User {
   workStartTime String? @default("8:00")
   workEndTime   String? @default("5:00")
   gracePeriodInMinutes  Int?  @default(15)
-  minutesThresholdAfterLate Int? @default(40)
+  minutesThresholdAfterLate Int?
   overtimeThresholdInMinutes Int? @default(60)
   lateDeducInMinutes    Int?  @default(30)
   overtimeRate  Float?
@@ -126,23 +126,25 @@ model Payroll {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   employeeId    String @db.ObjectId
   employee      Employee @relation(fields: [employeeId], references: [id])
-  dailyRate    Float
-  allowances    Float
-  totalDeductions Float
-  taxDeduction  Float  @default(0)
+  regularHours     Float 
+  overtimeHours  Float @default(0)
+  basicSalary    Float @default(0)
+  overtimePay    Float @default(0)
+  incentive      Float @default(0)
+  paidLeaves     Float @default(0)
+  holidayPay     Float @default(0)
+  otherPay       Float @default(0)
   sssDeduction  Float  @default(0)
   philHealthDeduction Float @default(0)
   pagIbigDeduction  Float @default(0)
-  loanDeduction Float @default(0)
-  insuranceDeduction Float @default(0)
-  caDeductions Float @default(0)
-  bonuses       Float
+  taxDeduction  Float  @default(0)
+  caDeduction Float @default(0)
+  otherDeduction  Float @default(0)
+  totalDeduction Float
+  grossPay        Float
   netPay        Float
   periodStart   DateTime
   periodEnd     DateTime
-  totalHours     Float 
-  overtimeHours  Float 
-  overtimePay    Float
   status        PayrollStatus @default(PENDING)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

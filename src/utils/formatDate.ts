@@ -1,6 +1,14 @@
-import { format } from "date-fns";
+export const formatDate = (utcString: Date | string, is24Hour: boolean = false) => {
+  const date = new Date(utcString);
+  
+  // Format options
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short", // e.g., February
+    day: "numeric",
+    hour12: !is24Hour, // Switch between 12-hour and 24-hour formats
+    timeZone: "UTC", // Ensures the input is treated as UTC
+  };
 
-export function formatDate(date: Date): string {
-  if(!date) return ""
-  return format(new Date(date), "MM-dd-yyyy"); // Format as desired
-}
+  return date.toLocaleString("en-US", options);
+};

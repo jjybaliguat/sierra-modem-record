@@ -1,5 +1,6 @@
 "use server"
 
+import { PayslipStatus } from "@/components/select/SelectPayslipStatus";
 import { Employees } from "@/types/employees";
 import { hashPassword } from "@/utils/hashPassword";
 import { PrismaClient } from "@prisma/client";
@@ -189,7 +190,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                     deductionHours = 0
                 }else if(timeInHours > gracePeriodInMinutesTime && timeInHours <= thresholdAfterLateTime){
                     deductionHours = Math.max(employer?.lateDeducInMinutes! / 60, 0);
-                }else if(timeInHours > thresholdAfterLateTime && timeInHours <= (workStartHours + 1)){
+                }else if(thresholdAfterLateTime && timeInHours > thresholdAfterLateTime && timeInHours <= (workStartHours + 1)){
                     deductionHours = 1;
                 }else{
                     deductionHours = (timeInHours - workStartHours)
@@ -391,5 +392,125 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
     } catch (error) {
         console.log(error)
         return NextResponse.json({error: "Internal Server Error"}, {status: 500})
+    }
+}
+
+export async function getEmployeeLatestPayslip(employeeId: string){
+    if(!employeeId) return null
+    try {
+        const payroll = await prisma.payroll.findFirst({
+            where: {
+                employeeId
+            },
+            orderBy: {
+                periodEnd: "desc"
+            },
+            select: {
+                periodStart: true,
+                periodEnd: true
+            }
+        })
+
+        return {
+            periodStart: payroll?.periodStart.toISOString(),
+            periodEnd: payroll?.periodEnd.toISOString()
+        }
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function getPayrollById(id: string){
+    try {
+        const payroll = await prisma.payroll.findUnique({
+            where: {
+                id
+            },
+            include: {
+                employee: true
+            }
+        })
+
+        return payroll
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function updatePayslipStatus(id: string, status: PayslipStatus){
+    try {
+        const payslip = await prisma.payroll.update({
+            where: {
+                id
+            },
+            data: {
+                status
+            }
+        })
+
+        return payslip
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function createEmployeeCashAdvance(employeeId: string, amount: number){
+    if(!employeeId) return null
+    try {
+        const hasCashAdvance = await prisma.cashAdvance.findFirst({
+            where: {
+                employeeId
+            }
+        })
+        if(hasCashAdvance){
+            const response = await prisma.cashAdvance.updateMany({
+                where: {
+                    employeeId
+                },
+                data: {
+                    amount: {
+                        increment: amount
+                    }
+                }
+            })
+
+            return response
+        }else{
+            const response = await prisma.cashAdvance.create({
+                data: {
+                    employeeId,
+                    amount
+                }
+            })
+
+            return response
+        }
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function getCashAdvance(employerId: string){
+    if(!employerId) return null
+    try {
+        const response = await prisma.cashAdvance.findMany({
+            where: {
+                employee: {
+                    employerId
+                }
+            },
+            include: {
+                employee: true
+            }
+        })
+
+        return response
+    } catch (error) {
+        console.log(error)
+        return null
     }
 }

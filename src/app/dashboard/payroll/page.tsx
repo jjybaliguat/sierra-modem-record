@@ -1,6 +1,7 @@
 "use client"
 
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
+import { PayrollTable } from '@/components/table/PayrollTable'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -18,6 +19,7 @@ const PayrollPage = () => {
         </Button>
       </CardHeader>
       <CardContent>
+        <PayrollTable />
       </CardContent>
     </Card>
   )

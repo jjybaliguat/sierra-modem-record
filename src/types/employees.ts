@@ -23,5 +23,5 @@ export interface Employees{
     cashAdvance: {
         id: string,
         amount: number
-    }
+    }[]
 }

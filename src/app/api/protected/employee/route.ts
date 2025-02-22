@@ -44,6 +44,7 @@ export async function GET(req: Request){
                 cashAdvance: true
             }
         })
+        console.log(employees)
         prisma.$disconnect()
         return NextResponse.json(employees, {status: 200})
     } catch (error) {

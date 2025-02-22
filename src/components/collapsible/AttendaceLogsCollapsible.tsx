@@ -28,7 +28,7 @@ export function AttendanceLogsCollapsible({
       className="max-w-lg space-y-2"
     >
         <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full flex items-center justify-between">
+          <div className="w-full flex items-center justify-between">
             <h4 className="text-sm font-semibold">
               View Attendance Logs
             </h4>
@@ -36,7 +36,7 @@ export function AttendanceLogsCollapsible({
               <ChevronsUpDown className="h-4 w-4" />
               <span className="sr-only">Toggle</span>
             </Button>
-          </Button>
+          </div>
         </CollapsibleTrigger>
       <CollapsibleContent className="space-y-2 max-h-[200px] overflow-y-auto">
         {attendanceLogs?.map((attendance, index)=>(
