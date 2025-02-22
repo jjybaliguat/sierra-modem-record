@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  @media print {
+    .print-top-center {
+      position: absolute;
+      top: 2%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+    }
+    .print-top-left {
+      position: absolute;
+      top: 2%;
+      left: 2%;
+      transform-origin: top left;
+      transform: scale(0.8);
+    }
+  }
+}
+
 
 @layer base {
   :root {
@@ -64,6 +83,19 @@
 @layer base {
   * {
     @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;

@@ -16,11 +16,14 @@ import { Input } from '@/components/ui/input'
 import { Pencil } from 'lucide-react'
 import { formatDate } from '@/utils/formatDate'
 import { Label } from '@/components/ui/label'
+import { AttendanceLogsCollapsible } from '@/components/collapsible/AttendaceLogsCollapsible'
+import { Attendance } from '@/types/attendance'
 
 const CreatePayroll = () => {
   const {data: session} = useSession()
   const {data: employees, isLoading} = useSWR(session?.user.id? "getEmployee" : null, getEmployees)
   const [selectedEmployee, setSelectedEmployee] = useState<Employees | null>(null)
+  const [attendanceLogs, setAttendanceLogs] = useState<Attendance[]>([])
   const contentRef = useRef<HTMLDivElement>(null); 
   const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Payslip-${selectedEmployee?.fullName}`});
 
@@ -66,10 +69,10 @@ const CreatePayroll = () => {
       try {
         if(!session) return null
         const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, startDate, endDate)
-
-      setTotalHours(response.totalHours)
-      setRegularHours(response.regularHours)
-      setOtHours(response.overtimeHours)
+      setTotalHours(response.totalHours? response.totalHours : 0)
+      setRegularHours(response.regularHours? response.regularHours : 0)
+      setOtHours(response.overtimeHours? response.overtimeHours : 0)
+      setAttendanceLogs(response.attendanceLogs)
       } catch (error) {
         console.log(error)
       }
@@ -78,8 +81,8 @@ const CreatePayroll = () => {
   }, [startDate, endDate, selectedEmployee])
 
   useEffect(()=>{
-    setBasicSalary(regularHours * (selectedEmployee?.dailyRate! / 8))
-    setOtPay(otHours * session?.user?.overtimeRate! * (selectedEmployee?.dailyRate! / 8))
+    setBasicSalary(regularHours * (selectedEmployee? selectedEmployee?.dailyRate : 0 / 8))
+    session && setOtPay(otHours * session?.user?.overtimeRate! * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0))
   }, [regularHours, otHours])
 
   useEffect(()=>{
@@ -102,7 +105,10 @@ const CreatePayroll = () => {
             <BackButton />
             <Card>
                 <CardHeader>
+                  <div className='flex items-center justify-between'>
                     <CardTitle>Create Payslip</CardTitle>
+                    <Button>Generate</Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                 {employees && <Select value={selectedEmployee?.id} onValueChange={(value)=>setSelectedEmployee(employees.find((employee: Employees)=>employee.id === value) || null)}>
@@ -145,35 +151,33 @@ const CreatePayroll = () => {
                       <h1>Period End</h1>
                       <DatePicker date={endDate} onSelect={setEndDate} />
                     </div>
-                    <div>
-                      <div className='grid grid-cols-2 md:flex md:flex-row gap-4 md:items-center'>
+                    <div className='mt-4'>
+                      <div className='flex flex-wrap gap-4 md:items-center'>
                         <h1 className='text-sm'>Hours Worked: <span><Input value={totalHours} type='number' className='w-[100px]' onChange={(e)=> setTotalHours(Number(e.target.value))}/></span></h1>
                         <h1 className='text-sm'>Computed Hours: <span><Input value={regularHours} className='w-[100px]' onChange={(e)=> setRegularHours(Number(e.target.value))}/></span></h1>
                         <h1 className='text-sm'>Overtime Hours: <span><Input value={otHours} className='w-[100px]' onChange={(e)=> setOtHours(Number(e.target.value))}/></span></h1>
                       </div>
                       <div className='mt-4'>
                         <h1 className='mb-2'>Adjustments</h1>
-                        <div className='grid grid-cols-2 md:flex md:flex-row gap-4 md:items-center'>
-                          <div className='flex flex-col gap-2'>
-                            <Label htmlFor='incentive'>Incentive</Label>
-                            <Input id="incentive" value={adjustments.incentive} onChange={(e)=>setAdjustments({...adjustments, incentive: Number(e.target.value)})} className='w-[100px]' />
-                          </div>
-                          <div className='flex flex-col gap-2'>
-                            <Label htmlFor='incentive'>Paid Leaves</Label>
-                            <Input id="incentive" value={adjustments.paidLeave} onChange={(e)=>setAdjustments({...adjustments, paidLeave: Number(e.target.value)})} className='w-[100px]' />
-                          </div>
-                          <div className='flex flex-col gap-2'>
-                            <Label htmlFor='incentive'>Holiday Pay</Label>
-                            <Input id="incentive" value={adjustments.holidayPay} onChange={(e)=>setAdjustments({...adjustments, holidayPay: Number(e.target.value)})} className='w-[100px]' />
-                          </div>
-                          <div className='flex flex-col gap-2'>
-                            <Label htmlFor='incentive'>Others</Label>
-                            <Input id="incentive" value={adjustments.others} onChange={(e)=>setAdjustments({...adjustments, others: Number(e.target.value)})} className='w-[100px]' />
-                          </div>
+                        <div className='flex flex-wrap gap-4 md:items-center'>
+                          {Object.entries(adjustments).map(([key, value])=>(
+                            <div key={key} className='flex flex-col gap-2'>
+                              <Label htmlFor={`${key}`} className='uppercase'>{key}</Label>
+                              <Input id={`${key}`} value={value} onChange={(e)=>setAdjustments({...adjustments, [key]: Number(e.target.value)})} className='w-[100px]' />
+                            </div>
+                          ))}
                         </div>
                       </div>
                       <div className='mt-4'>
-                        <h1>Deductions</h1>
+                        <h1 className='mb-2'>Deductions</h1>
+                        <div className='flex flex-wrap gap-4 md:items-center'>
+                          {Object.entries(deductions).map(([key, value])=>(
+                            <div key={key} className='flex flex-col gap-2'>
+                              <Label htmlFor={`${key}`} className='uppercase'>{key}</Label>
+                              <Input id={`${key}`} value={value} onChange={(e)=>setDeductions({...deductions, [key]: Number(e.target.value)})} className='w-[100px]' />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                         {/* <Button variant="outline" size="sm" className='w-[100px]' onClick={()=>setEditableHours(true)}><Pencil className='h-4 w-4' />Edit</Button> */}
                     </div>
@@ -183,7 +187,7 @@ const CreatePayroll = () => {
                     <h1 className='text-xl font-semibold'>Preview</h1>
                     <Button onClick={()=>reactToPrintFn()} variant="outline">Print Payslip</Button>
                   </div>
-                  <div ref={contentRef} className="w-[800px] p-6 rounded-lg border-2 border-dashed border-gray-500 shadow-md">
+                  <div ref={contentRef} className="w-[950px] p-6 rounded-lg border-2 border-dashed border-gray-500 shadow-md print-top-left">
                     <h1 className='text-xl md:text-2xl font-semibold'>{session?.user.company.name}</h1>
                     <div className='flex justify-between w-full'>
                       <h4 className="text-[14px] font-semibold mb-4">Employee Payslip</h4>
@@ -294,6 +298,10 @@ const CreatePayroll = () => {
 
 
                   </div>
+                </div>
+
+                <div className='mt-4'>
+                  <AttendanceLogsCollapsible attendanceLogs={attendanceLogs} />
                 </div>
                 </div>
                 } 
