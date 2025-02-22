@@ -12,6 +12,7 @@ import {
 import { Attendance } from "@/types/attendance"
 import { formatDate } from "@/utils/formatDate"
 import { format } from "date-fns";
+import { formatTime } from "@/utils/formatTime"
 
 export function AttendanceLogsCollapsible({
     attendanceLogs
@@ -38,11 +39,11 @@ export function AttendanceLogsCollapsible({
           </Button>
         </CollapsibleTrigger>
       <CollapsibleContent className="space-y-2 max-h-[200px] overflow-y-auto">
-        {attendanceLogs?.map((attendance)=>(
-          <div key={attendance.employee.id}>
-            <p className="text-[14px]">{formatDate(attendance.timeIn)}</p>
-            <p className="text-[14px">TimeIn: <span className="text-primary">{format(attendance.timeIn, "pp")}</span></p>
-            <p className="text-[14px">TimeOut: <span className="text-primary">{format(attendance.timeOut, "pp")}</span></p>
+        {attendanceLogs?.map((attendance, index)=>(
+          <div key={index}>
+            <p className="text-[14px]">{formatDate(new Date(attendance.timeIn))}</p>
+            <p className="text-[14px">TimeIn: <span className="text-primary">{formatTime(attendance.timeIn)}</span></p>
+            <p className="text-[14px">TimeOut: <span className="text-primary">{formatTime(attendance.timeOut)}</span></p>
           </div>
         ))}
       </CollapsibleContent>

@@ -10,6 +10,7 @@ import {
   } from "@/components/ui/table"
 import { cn } from "@/lib/utils";
 import { Attendance, AttendanceStatus } from "@/types/attendance"
+import { formatDateTime } from "@/utils/formatDateTime";
 import { format } from "date-fns";
 
   
@@ -42,8 +43,8 @@ import { format } from "date-fns";
               })}>{att.status}</p>
             </div>
             <div className="flex items-center gap-2">
-              <p className="text-[12px]">TimeIn: {format(att.timeIn, "PPpp")}</p>
-              <p className="text-[12px]">TimeOut: {att.timeOut && format(att.timeOut, "PPpp")}</p>
+              <p className="text-[12px]">TimeIn: {formatDateTime(att.timeIn)}</p>
+              <p className="text-[12px]">TimeOut: {att.timeOut && formatDateTime(att.timeOut)}</p>
             </div>
           </div>
         ))
@@ -70,8 +71,8 @@ import { format } from "date-fns";
                 <TableCell className="font-medium">{att.fingerprintId}</TableCell>
                 <TableCell>{att.employee.fullName.split(" ")[0]}</TableCell>
                 <TableCell>{att.status}</TableCell>
-                <TableCell>{format(att.timeIn, "PPpp")}</TableCell>
-                <TableCell>{att.timeOut && format(att.timeOut, "PPpp")}</TableCell>
+                <TableCell>{formatDateTime(att.timeIn)}</TableCell>
+                <TableCell>{att.timeOut && formatDateTime(att.timeOut)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

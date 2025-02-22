@@ -8,6 +8,7 @@ export async function GET(req: Request){
     const url = new URL(req.url)
     const searchParams = new URLSearchParams(url.search) 
     const id = searchParams.get('id') as string
+    const limit = searchParams.get('limit') as string
     const filters: any = {};
     if(!id){
         return NextResponse.json({message: "Unauthorized"}, {status: 401})
@@ -20,6 +21,7 @@ export async function GET(req: Request){
             where: {
                 employee: filters
             },
+            take: limit? Number(limit) : 100,
             include: {
                 employee: true
             },
@@ -27,9 +29,15 @@ export async function GET(req: Request){
                 timeIn: "desc"
             }
         })
-        console.log(attendanceLogs)
+        // console.log(attendanceLogs)
         prisma.$disconnect()
-        return NextResponse.json(attendanceLogs, {status: 200})
+        return NextResponse.json(attendanceLogs.map((attendance)=>{
+            return {
+                ...attendance,
+                timeIn: attendance.timeIn.toISOString(),
+                timeOut: attendance.timeOut?.toISOString()
+            }
+        }), {status: 200})
     } catch (error) {
         console.log(error)
         return NextResponse.json({message: "Internal Server Error"}, {status: 500})

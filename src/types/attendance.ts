@@ -3,8 +3,8 @@ export interface Attendance {
     employeeId: string,
     employee: Employee,
     fingerprintId: string,
-    timeIn: Date,
-    timeOut: Date,
+    timeIn: string,
+    timeOut: string,
     status: AttendanceStatus,
     verifiedBy: string
 }

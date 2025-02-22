@@ -99,6 +99,14 @@ const CreatePayroll = () => {
     setNetPay((basicSalary+otPay+totalAdjustments) - totalDeductions)
   }, [basicSalary, otPay, adjustments, deductions])
 
+  async function GeneratePayslip(){
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
+
   return (
     <>
         <div className='flex flex-col gap-2'>

@@ -300,7 +300,6 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 timeOut: {lte: endOfDayUTC}
             },
             select: {
-                employee: true,
                 timeIn: true,
                 timeOut: true,
             }
@@ -309,6 +308,8 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
         let regularHours = 0;
         let totalHours = 0;
         let overtimeHours = 0;
+
+        console.log(attendanceRecords)
 
         attendanceRecords.forEach((record) => {
             if(!record.timeIn || !record.timeOut) return null
@@ -377,7 +378,14 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
             totalHours: parseFloat(totalHours.toFixed(1)),
             regularHours: parseFloat(regularHours.toFixed(1)),
             overtimeHours: parseFloat(overtimeHours.toFixed(1)),
-            attendanceLogs: attendanceRecords
+            attendanceLogs: attendanceRecords.map((attendance)=>{
+                if(attendance.timeOut){
+                    return {
+                        timeIn: attendance.timeIn.toISOString(),
+                        timeOut: attendance.timeOut.toISOString()
+                    }
+                }
+            })
         }
 
     } catch (error) {
