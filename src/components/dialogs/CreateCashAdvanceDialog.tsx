@@ -137,7 +137,7 @@ export function CreateCashAdvanceDialog() {
                 <Input id="amount" type="number" value={amount} onChange={(e)=>setAmount(Number(e.target.value))} />
             </div>
             <div>
-                <p className="text-sm">After submitting, the amount will be added to employee's existing cash advance balance.</p>
+                <p className="text-sm">After submitting, the amount will be added to employee&apos;s existing cash advance balance.</p>
             </div>
 
             <DialogFooter>

@@ -110,7 +110,7 @@ model Employee {
 model CashAdvance {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   employeeId      String @db.ObjectId
-  employee        Employee @relation(fields: [employeeId], references: [id])
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   amount          Float    // Total cash advance amount owed
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -125,7 +125,7 @@ enum RepaymentStatus {
 model Payroll {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   employeeId    String @db.ObjectId
-  employee      Employee @relation(fields: [employeeId], references: [id])
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   regularHours     Float 
   overtimeHours  Float @default(0)
   basicSalary    Float @default(0)
