@@ -73,9 +73,21 @@ const ToggleDeviceMode = ({
        }
     }
 
+    async function toggleDeviceModeToAttendanceMode(){
+        await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/device-mode?deviceId=${deviceId}`, {
+            method: "PATCH",
+            body: JSON.stringify({fingerId: 0, isEnrollmentMode: false})
+        })
+    }
+
     useEffect(()=> {
-        if(deviceId){
-            handleToggleEnrollmentMode()
+        if(!enrollmentMode){
+            setSendingEnrollmentRequest(false)
+            toggleDeviceModeToAttendanceMode()
+        }else{
+            if(deviceId){
+                handleToggleEnrollmentMode()
+            }
         }
     }, [enrollmentMode])
 
