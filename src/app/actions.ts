@@ -13,14 +13,23 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient()
 
 export async function getNextFingerPrintId(employerId: string, deviceId: string): Promise<number | null> {
-    const lastEmployee = await prisma.employee.findFirst({
-        where: { employerId, deviceId }, // Filter by employer
-        orderBy: { fingerprintId: "desc" }, // Get the highest fingerprintId
-        select: { fingerprintId: true }, // Only retrieve fingerprintId
+    const lastFingerPrint = await prisma.fingerPrintID.findFirst({
+        where: { employee: {
+            employerId,
+            deviceId
+        } }, // Filter by employer
+        orderBy: { fingerId: "desc" }, // Get the highest fingerprintId
+        select: { fingerId: true }, // Only retrieve fingerprintId
       });
+    // const lastEmployee = await prisma.employee.findFirst({
+    //     where: { employerId, deviceId }, // Filter by employer
+    //     orderBy: { fingerprintId: "desc" }, // Get the highest fingerprintId
+    //     select: { fingerprintId: true }, // Only retrieve fingerprintId
+    //   });
       prisma.$disconnect()
 
-      return (lastEmployee?.fingerprintId ?? 0) + 1;
+      return (lastFingerPrint?.fingerId ?? 0) + 1;
+    //   return (lastEmployee?.fingerprintId ?? 0) + 1;
 }
 
 export async function getSingleEmployee(id: string){
@@ -46,20 +55,48 @@ export async function getSingleEmployee(id: string){
 
 export async function enrollEmployeeFinger(employeeId: string, fingerId: string, deviceId: string){
     try {
-        await prisma.employee.update({
+        const isFingerIdExist = await prisma.fingerPrintID.findFirst({
             where: {
-                id: employeeId
-            },
-            data: {
-                fingerprintId: Number(fingerId),
-                deviceId: deviceId,
-                fingerEnrolled: true
+                fingerId: Number(fingerId),
+                employeeId: employeeId
             }
         })
+        if(!isFingerIdExist){
+            await prisma.employee.update({
+                where: {
+                    id: employeeId
+                },
+                data: {
+                    fingerPrints: {
+                        create: {
+                            fingerId: Number(fingerId),
+                        }
+                    },
+                    deviceId: deviceId,
+                    fingerEnrolled: true
+                }
+            })
+        }
     } catch (error) {
         console.log(error)
     }
 }
+// export async function enrollEmployeeFinger(employeeId: string, fingerId: string, deviceId: string){
+//     try {
+//         await prisma.employee.update({
+//             where: {
+//                 id: employeeId
+//             },
+//             data: {
+//                 fingerprintId: Number(fingerId),
+//                 deviceId: deviceId,
+//                 fingerEnrolled: true
+//             }
+//         })
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
 
 export async function changePassword(data: {id: string | undefined, oldPassword: string, password: string}) {
     try {

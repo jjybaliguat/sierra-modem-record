@@ -41,7 +41,8 @@ export async function GET(req: Request){
             where: filters,
             include: {
                 device: true,
-                cashAdvance: true
+                cashAdvance: true,
+                fingerPrints: true
             }
         })
         console.log(employees)

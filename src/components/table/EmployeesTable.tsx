@@ -64,11 +64,16 @@ export const columns: ColumnDef<Employees>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "fingerprintId",
-    header: "FingerprintId",
-    cell: ({ row }) => (
-      <div>{row.getValue("fingerprintId")}</div>
-    ),
+    accessorKey: "fingerPrints",
+    header: "FingerprintId's",
+    cell: ({ row }) => {
+      let fingerPrintIds: number[] = []
+      row.original.fingerPrints.map((fingerprint)=>{
+        fingerPrintIds.push(fingerprint.fingerId)
+      })
+
+      return <div>{fingerPrintIds.join(",")}</div>
+    },
   },
   {
     accessorKey: "fullName",
@@ -153,7 +158,7 @@ export function EmployeesTable() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${userId}`)
 
       const data = await response.json()
-
+      // console.log(data)
       return data
     } catch (error) {
       console.log(error)

@@ -70,11 +70,28 @@ export async function POST(req: Request){
     }
 
     try {
+        // const employee = await prisma.employee.findFirst({
+        //     where: {
+        //         deviceId: deviceToken,
+        //         fingerprintId: fingerId,
+        //         fingerEnrolled: true
+        //     }
+        // })
         const employee = await prisma.employee.findFirst({
             where: {
-                deviceId: deviceToken,
-                fingerprintId: fingerId,
-                fingerEnrolled: true
+                fingerPrints: {
+                    some: {
+                        fingerId: Number(fingerId),
+                    }
+                },
+                fingerEnrolled: true,
+                isActive: true,
+                deviceId: deviceToken
+            },
+            select: {
+                id: true, // Get employee ID
+                fingerPrints: { select: { fingerId: true } }, // Get all their fingerIds,
+                fullName: true
             }
         })
 
@@ -85,7 +102,7 @@ export async function POST(req: Request){
         const existingRecord = await prisma.attendance.findFirst({
             where: {
             deviceId: deviceToken,
-            fingerprintId: fingerId,
+            fingerprintId: { in: employee.fingerPrints.map(fp => fp.fingerId) }, // Check all fingerIds
             timeIn: { gte: startOfDay, lte: endOfDay }, // Check today's records
             },
         });
@@ -134,7 +151,7 @@ export async function POST(req: Request){
 
         const attendance = await prisma.attendance.create({
             data: {
-                fingerprintId: fingerId,
+                fingerprintId: Number(fingerId),
                 employeeId: employee?.id as string,
                 timeIn: timeIn? timeIn : now,
                 status,
