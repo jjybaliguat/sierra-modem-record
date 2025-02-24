@@ -102,9 +102,9 @@ const CreatePayroll = () => {
   }, [periodStart, periodEnd, selectedEmployee])
 
   useEffect(()=>{
-    setBasicSalary(regularHours * (selectedEmployee? selectedEmployee?.dailyRate : 0 / 8))
+    setBasicSalary(regularHours * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0 / 8))
     session && setOtPay(otHours * session?.user?.overtimeRate! * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0))
-  }, [regularHours, otHours])
+  }, [regularHours, otHours, selectedEmployee])
 
   useEffect(()=>{
     let totalAdjustments = 0

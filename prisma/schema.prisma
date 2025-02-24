@@ -24,7 +24,7 @@ model User {
   role         UserRole  @default(ADMIN)
 
   workStartTime String? @default("8:00")
-  workEndTime   String? @default("5:00")
+  workEndTime   String? @default("17:00")
   gracePeriodInMinutes  Int?  @default(15)
   minutesThresholdAfterLate Int?
   overtimeThresholdInMinutes Int? @default(60)

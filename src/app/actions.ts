@@ -219,7 +219,6 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
                 // console.log(timeInHours)
                 let timeOutHours = timeOut.getUTCHours() + (timeOut.getUTCMinutes() / 60)
-                // console.log(timeOutHours)
                 let workStartHours = workStartTime.getUTCHours() + (workStartTime.getUTCMinutes() / 60)
                 let workEndHours = workEndTime.getUTCHours() + (workEndTime.getUTCMinutes() / 60)
                 const overtimeThresholdHours = workEndHours + (employer?.overtimeThresholdInMinutes! / 60)
@@ -252,6 +251,8 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
           
                 // Deduct 1 hour if lunch is included in the work period
                 // console.log(timeOutHours)
+                // console.log(timeOutHours)
+                // console.log(overtimeThresholdHours)
                 if(timeOutHours >= overtimeThresholdHours){
                     overtimeHours += 1;
                     hoursWorked = (timeOutHours - timeInHours)
@@ -259,7 +260,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 }else if (timeOutHours < workEndHours){
                     regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
                     hoursWorked = (timeOutHours - timeInHours)
-                }else if(timeOutHours > workEndHours){
+                }else if(timeOutHours >= workEndHours){
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
                     hoursWorked = (workEndHours - timeInHours)
                 }

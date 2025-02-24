@@ -40,7 +40,8 @@ type Props = {
 
 export function EmployeeWeeklyAttendanceChart(props: Props) {
   const {data: session} = useSession()
-  const {data: employees, isLoading} = useSWR("getEmployees", getEmployees)
+  const userId = session?.user.id
+  const {data: employees, isLoading} = useSWR(userId? "getEmployees" : null, getEmployees)
     const [chartData, setChartData] = useState<any>(null)
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("")
     const [weekIndex, setWeekIndex] = useState('0')
@@ -49,9 +50,10 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
     const [overtimeHours, setOverTimeHours] = useState(0)
     
     async function getEmployeeWeeklyHours(){
+      if(!userId) return null
       try {
-        const response = await getEmployeeAttendancePerWeek(session?.user.id, selectedEmployeeId, Number(weekIndex))
-        console.log(response)
+        const response = await getEmployeeAttendancePerWeek(userId, selectedEmployeeId, Number(weekIndex))
+        // console.log(response)
         
         setChartData(response?.weeklyHours?.map((value: number, index: number)=>({
           day: daysOfweeks[index],
@@ -74,9 +76,9 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
     const daysOfweeks = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
     
-    useEffect(()=>{
-      mutate("getEmployees")
-    }, [session])
+    // useEffect(()=>{
+    //   mutate("getEmployees")
+    // }, [session])
 
     useEffect(()=> {
       getEmployeeWeeklyHours()
@@ -87,11 +89,12 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
     }, [employees])
     
     async function getEmployees(){
+      if(!userId)  return null
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${session?.user.id? session.user.id : ""}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${userId}`)
         
         const data = await response.json()
-        console.log(data)
+        
         return data
       } catch (error) {
         console.log(error)
@@ -99,7 +102,7 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
       }
     }
     
-  if (!session || !session.user?.id || !employees) return <WeeklyAttendanceChartSkeleton />
+  if (!session || !userId || !employees) return <WeeklyAttendanceChartSkeleton />
   return (
     <Card className={props.className}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
