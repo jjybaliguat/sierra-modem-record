@@ -40,7 +40,13 @@ export async function getSingleEmployee(id: string){
                 id
             },
             include: {
-                device: true
+                device: true,
+                fingerPrints: true,
+                attendance: {
+                    orderBy: {
+                        timeIn: "desc"
+                    }
+                }
             }
         })
 

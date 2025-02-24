@@ -123,7 +123,7 @@ export function MydevicesTable() {
   const session = useSession()
   const userId = session?.data?.user?.id;
 
-  const {data, isLoading} = useSWR("getDevices", getDevices)
+  const {data, isLoading} = useSWR(userId ? "getDevices" : null, getDevices)
 
   async function getDevices(){
     try {
@@ -137,11 +137,11 @@ export function MydevicesTable() {
     }
   }
 
-  React.useEffect(()=>{
-    if(session.data?.user){
-      mutate("getDevices")
-    }
-  }, [session])
+  // React.useEffect(()=>{
+  //   if(session.data?.user){
+  //     mutate("getDevices")
+  //   }
+  // }, [session])
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -170,10 +170,7 @@ export function MydevicesTable() {
     },
   })
 
-  if(isLoading) return <p>Loading...</p>
-  if(!data){
-    return <h1>Something went wrong. Try refreshing the page</h1>
-  }
+  if(isLoading || !data) return <p>Loading...</p>
 
   return (
     <div className="w-full">

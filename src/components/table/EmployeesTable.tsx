@@ -39,6 +39,7 @@ import { Employees } from "@/types/employees"
 import useSWR, { mutate } from "swr"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 export const columns: ColumnDef<Employees>[] = [
   {
@@ -101,7 +102,12 @@ export const columns: ColumnDef<Employees>[] = [
     accessorKey: "isActive",
     header: "Status",
     cell: ({ row }) => (
-      <div>{row.getValue("isActive")? "Active" : "Inactive"}</div>
+      <div
+      className={cn({
+        "text-green-500" : row.getValue("isActive"),
+        "text-red-500" : !row.getValue("isActive")
+      })}
+      >{row.getValue("isActive")? "Active" : "Inactive"}</div>
     ),
   },
   {
@@ -138,7 +144,10 @@ export const columns: ColumnDef<Employees>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/null`}>{employee.fingerPrints.length > 0? "Add Fingerprint" : "Enroll Fingerprint"}</Link></DropdownMenuItem>
+            {/* {employee.fingerPrints.map((finger)=>(
+              <DropdownMenuItem key={finger.id}><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${finger.fingerId}`}>Re-enroll finger {finger.fingerId}</Link></DropdownMenuItem>
+            ))} */}
             <DropdownMenuItem><Link href={`/dashboard/employees/${employee.id}`}>View Details</Link></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -151,9 +160,10 @@ export function EmployeesTable() {
   const session = useSession()
   const userId = session?.data?.user?.id;
 
-  const {data, isLoading} = useSWR("getEmployees", getEmployees)
+  const {data, isLoading} = useSWR(userId ? "getEmployees" : null, getEmployees)
 
   async function getEmployees(){
+    if(!userId) return null
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${userId}`)
 
@@ -165,11 +175,11 @@ export function EmployeesTable() {
     }
   }
 
-  React.useEffect(()=>{
-    if(session.data?.user){
-      mutate("getEmployees")
-    }
-  }, [session])
+  // React.useEffect(()=>{
+  //   if(session.data?.user){
+  //     mutate("getEmployees")
+  //   }
+  // }, [session])
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -198,7 +208,7 @@ export function EmployeesTable() {
     },
   })
 
-  if(isLoading) return <p>Loading...</p>
+  if(isLoading || !data) return <p>Loading...</p>
 
   return (
     <div className="w-full">

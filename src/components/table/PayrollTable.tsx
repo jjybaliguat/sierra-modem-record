@@ -155,11 +155,11 @@ export function PayrollTable() {
     }
   }
 
-  React.useEffect(()=>{
-    if(session.data?.user){
-      mutate("getEmployees")
-    }
-  }, [session])
+  // React.useEffect(()=>{
+  //   if(session.data?.user){
+  //     mutate("getEmployees")
+  //   }
+  // }, [session])
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

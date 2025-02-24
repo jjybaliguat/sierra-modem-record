@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -27,6 +27,7 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Employees } from '@/types/employees'
+import { EmployeeStatus, SelectEmployeeStatus } from '../select/SelectEmployeeStatus'
 // import { DeductionStatus, DeductionType } from '@prisma/client'
 // import { SelectDeductionType } from '@/components/select/SelectDeductionType'
 // import { SelectDeductionStatus } from '@/components/select/SelectDeductionStatus'
@@ -47,6 +48,7 @@ const formSchema = z.object({
   sssNumber: z.string().optional(),
   pagIbigNumber: z.string().optional(),
   philHealthNumber: z.string().optional(),
+  isActive: z.boolean()
 })
 
 // interface Deductions {
@@ -82,6 +84,7 @@ const UpdateEmployeeForm = ({
           sssNumber: employee.sssNumber? employee.sssNumber : "",
           pagIbigNumber: employee.pagIbigNumber? employee.pagIbigNumber : "",
           philHealthNumber: employee.philHealthNumber? employee.philHealthNumber : "",
+          isActive: employee.isActive? true : false
         },
       })
      
@@ -91,6 +94,7 @@ const UpdateEmployeeForm = ({
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         // console.log(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`)
+        // console.log(values)
         try {
             setIsSubmitting(true)
             const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${employee.id}`, {
@@ -149,6 +153,17 @@ const UpdateEmployeeForm = ({
     //       return updatedItems;
     //     });
     //   };
+    const [fingerprints, setFingerPrints] = useState<number[]>([])
+
+    useEffect(()=>{
+        if(employee.fingerEnrolled){
+            let fingerId: number[] = []
+            employee.fingerPrints.map((finger)=>{
+                fingerId.push(finger.fingerId)
+            })
+            setFingerPrints(fingerId)
+        }
+    }, [employee])
 
   return (
     <>
@@ -159,7 +174,7 @@ const UpdateEmployeeForm = ({
             </CardHeader>
             <CardContent>
             <div className='flex flex-col gap-2 py-4'>
-                <h1>Fingerprint Id: {employee.fingerEnrolled ? <span className='bg-primary rounded-lg px-2 py-1'>{employee.fingerprintId}</span> : "Not Enrolled"}</h1>
+                <h1>Fingerprint Id: {employee.fingerEnrolled ? <span className='bg-primary rounded-lg px-2 py-1'>{fingerprints.join(",")}</span> : "Not Enrolled"}</h1>
                 <h1>Biometric Device: {employee.deviceId? <span className='text-primary'>{employee.device.name}</span> : "Not Enrolled"}</h1>
             </div>
             <Form {...form}>
@@ -339,6 +354,22 @@ const UpdateEmployeeForm = ({
                                     />
                                 </PopoverContent>
                                 </Popover>
+                            </FormControl>
+                            <FormDescription>
+                                
+                            </FormDescription>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="isActive"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Status</FormLabel><br />
+                            <FormControl>
+                                <SelectEmployeeStatus selected={field.value? EmployeeStatus.ACTIVE : EmployeeStatus.INACTIVE} onSelectChange={field.onChange} />
                             </FormControl>
                             <FormDescription>
                                 

@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from 'react'
+"use client"
+
+import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Users } from 'lucide-react'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
-export const revalidate = 0;
+const TotalEmployeeCard = () => {
+  const {data: session} = useSession()
+  const userId = session?.user.id
+  const {data: count, isLoading} = useSWR(userId? "getEmployeeCount" : null, GetTotalEmployees) 
 
-async function GetTotalEmployees(session: any) {
+  async function GetTotalEmployees() {
+    if(!userId) return null
     try {
-      if(session.user){
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee/count?id=${session.user.id}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee/count?id=${userId}`)
         const data = await response.json()
         return data
-      }
     } catch (error) {
       console.log(error)
       return null
     }
   }
-
-const TotalEmployeeCard = async() => {
-  const session = await getServerSession(authOptions)
-  const count = await GetTotalEmployees(session)
 
   return (
     <Card className="rounded-xl">
@@ -33,7 +31,7 @@ const TotalEmployeeCard = async() => {
         <CardContent>
           <div className='flex items-center gap-4'>
             <Users className='h-9 w-9 text-emerald-300' />
-            <h1 className='text-2xl font-bold'>{count}</h1>
+            <h1 className='text-2xl font-bold'>{(isLoading || !count) ? "..." : count}</h1>
           </div>
         </CardContent>
     </Card>

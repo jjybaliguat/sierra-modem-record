@@ -8,6 +8,7 @@ import {
   HandCoins,
   House,
   Server,
+  Settings,
   Settings2,
   TrendingUpDown,
   User,
@@ -59,7 +60,12 @@ const data = {
       title: "Profile",
       url: "/dashboard/profile",
       icon: User,
-    }
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: Settings,
+    },
   ]
 }
 
