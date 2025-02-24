@@ -404,7 +404,7 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 }else if (timeOutHours < workEndHours){
                     regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
                     hoursWorked = (timeOutHours - timeInHours)
-                }else if(timeOutHours > workEndHours){
+                }else if(timeOutHours >= workEndHours){
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
                     hoursWorked = (workEndHours - timeInHours)
                 }
