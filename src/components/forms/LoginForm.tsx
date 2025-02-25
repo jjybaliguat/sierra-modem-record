@@ -53,6 +53,7 @@ export function LoginForm({
       });
       console.log(response)
       if(response?.error){
+        setSubmitting(false)
         console.log(response.error)
         setErrorMess(response.error)
       }else{

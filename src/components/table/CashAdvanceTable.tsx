@@ -41,6 +41,7 @@ import { formatCurrency } from "@/utils/formatCurrency"
 import { CashAdvance } from "@/types/cash-advance"
 import { getCashAdvance } from "@/app/actions"
 import { formatDate } from "@/utils/formatDate"
+import { DeleteConfirmationDialog } from "../dialogs/DeleteConfirmationDialog"
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -95,7 +96,30 @@ export const columns: ColumnDef<any>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payroll = row.original
+      const cashAdvance = row.original
+      const [deleting, setDeleting] = React.useState(false)
+            const btnRef = React.useRef<any | null>(null)
+            
+            const onClose = () => {
+              if(btnRef){
+                btnRef.current.click()
+              }
+            }
+      
+            async function onDelete(){
+              setDeleting(true)
+              try {
+                await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/cash-advance?id=${cashAdvance.id}`, {
+                  method: "DELETE"
+                })
+                setDeleting(false)
+                onClose()
+                mutate("getCashAdvance")
+              } catch (error) {
+                console.log(error)
+                setDeleting(false)
+              }
+            }
 
       return (
         <DropdownMenu>
@@ -109,7 +133,7 @@ export const columns: ColumnDef<any>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {/* <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem> */}
-            {/* <DropdownMenuItem><Link href={`/dashboard/payroll/${payroll.id}`}>View Details</Link></DropdownMenuItem> */}
+            <DeleteConfirmationDialog onConfirm={onDelete} title="Cash Advance" deleting={deleting} closeRef={btnRef}/>
           </DropdownMenuContent>
         </DropdownMenu>
       )

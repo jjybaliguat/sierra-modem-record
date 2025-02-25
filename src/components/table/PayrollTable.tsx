@@ -44,6 +44,7 @@ import { formatDate } from "@/utils/formatDate"
 import { cn } from "@/lib/utils"
 import { PayslipStatus } from "../select/SelectPayslipStatus"
 import { formatCurrency } from "@/utils/formatCurrency"
+import { DeleteConfirmationDialog } from "../dialogs/DeleteConfirmationDialog"
 
 export const columns: ColumnDef<Payroll>[] = [
   {
@@ -115,6 +116,29 @@ export const columns: ColumnDef<Payroll>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const payroll = row.original
+      const [deleting, setDeleting] = React.useState(false)
+      const btnRef = React.useRef<any | null>(null)
+      
+      const onClose = () => {
+        if(btnRef){
+          btnRef.current.click()
+        }
+      }
+
+      async function onDelete(){
+        setDeleting(true)
+        try {
+          await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/payroll?id=${payroll.id}`, {
+            method: "DELETE"
+          })
+          setDeleting(false)
+          onClose()
+          mutate("getPayroll")
+        } catch (error) {
+          console.log(error)
+          setDeleting(false)
+        }
+      }
 
       return (
         <DropdownMenu>
@@ -129,6 +153,8 @@ export const columns: ColumnDef<Payroll>[] = [
             <DropdownMenuSeparator />
             {/* <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem> */}
             <DropdownMenuItem><Link href={`/dashboard/payroll/${payroll.id}`}>View Details</Link></DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DeleteConfirmationDialog onConfirm={onDelete} title="Payroll" deleting={deleting} closeRef={btnRef}/>
           </DropdownMenuContent>
         </DropdownMenu>
       )
