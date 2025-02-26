@@ -44,7 +44,7 @@ import { formatDate } from "@/utils/formatDate"
 import { cn } from "@/lib/utils"
 import { PayslipStatus } from "../select/SelectPayslipStatus"
 import { formatCurrency } from "@/utils/formatCurrency"
-import { DeleteConfirmationDialog } from "../dialogs/DeleteConfirmationDialog"
+import { DeletePayrollDialog } from "../dialogs/DeletePayrollDialog"
 
 export const columns: ColumnDef<Payroll>[] = [
   {
@@ -154,7 +154,7 @@ export const columns: ColumnDef<Payroll>[] = [
             {/* <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem> */}
             <DropdownMenuItem><Link href={`/dashboard/payroll/${payroll.id}`}>View Details</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DeleteConfirmationDialog onConfirm={onDelete} title="Payroll" deleting={deleting} closeRef={btnRef}/>
+            <DeletePayrollDialog id={payroll.id}/>
           </DropdownMenuContent>
         </DropdownMenu>
       )
