@@ -288,13 +288,13 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
     }
 }
 
-export async function getEmployeeAttendanceTotalHours(employerId: string, employeeId: string, startDate: Date, endDate: Date){
+export async function getEmployeeAttendanceTotalHours(employerId: string, employeeId: string, startDate: string, endDate: string){
     if(!employeeId || !startDate || !endDate || !employerId) return null
     const today = new Date()
 
     try {
         const startofDayUTC = new Date(startDate)
-        startDate.setUTCHours(0,0,0,0)
+        startofDayUTC.setUTCHours(0,0,0,0)
         const endOfDayUTC = new Date(endDate);
         endOfDayUTC.setUTCHours(23, 59, 59, 999);
 
@@ -501,8 +501,11 @@ export async function updatePayslipStatus(id: string, status: PayslipStatus){
     }
 }
 
-export async function createEmployeeCashAdvance(employeeId: string, amount: number){
+export async function createEmployeeCashAdvance(employeeId: string, amount: number, date: string){
     if(!employeeId) return null
+    console.log(date)
+    const createdDate = new Date(date);
+    console.log(createdDate)
     try {
         const hasCashAdvance = await prisma.cashAdvance.findFirst({
             where: {
@@ -520,13 +523,26 @@ export async function createEmployeeCashAdvance(employeeId: string, amount: numb
                     }
                 }
             })
+            await prisma.cashAdvanceLogs.create({
+                data: {
+                    cashAdvanceId: hasCashAdvance.id,
+                    amount: amount,
+                    date: createdDate
+                }
+            })
 
             return response
         }else{
             const response = await prisma.cashAdvance.create({
                 data: {
                     employeeId,
-                    amount
+                    amount,
+                    logs: {
+                        create: {
+                            amount,
+                            date: createdDate
+                        }
+                    }
                 }
             })
 
@@ -541,14 +557,23 @@ export async function createEmployeeCashAdvance(employeeId: string, amount: numb
 export async function getCashAdvance(employerId: string){
     if(!employerId) return null
     try {
-        const response = await prisma.cashAdvance.findMany({
+        const response = await prisma.cashAdvanceLogs.findMany({
             where: {
-                employee: {
-                    employerId
+                cashAdvance: {
+                    employee : {
+                        employerId
+                    }
                 }
             },
             include: {
-                employee: true
+                cashAdvance: {
+                    include: {
+                        employee: true
+                    }
+                }
+            },
+            orderBy: {
+                date: "desc"
             }
         })
 

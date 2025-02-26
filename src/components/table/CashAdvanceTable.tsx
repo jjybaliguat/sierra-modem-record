@@ -68,7 +68,7 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "employee",
-    accessorFn: (row) => row.employee.fullName,
+    accessorFn: (row) => row.cashAdvance.employee.fullName,
     header: ({ column }) => {
       return (
         <Button
@@ -84,13 +84,13 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "amount",
-    header: "CA Balance",
+    header: "Amount",
     cell: ({ row }) => formatCurrency(row.getValue('amount')),
   },
   {
-    accessorKey: "updatedAt",
-    header: "Last Updated",
-    cell: ({ row }) => formatDate(row.getValue('updatedAt')),
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => formatDate(row.getValue('date')),
   },
   {
     id: "actions",

@@ -13,10 +13,29 @@ export async function DELETE(req: Request){
     }
 
     try {
-        await prisma.cashAdvance.delete({
+        const cashAdvanceLogs = await prisma.cashAdvanceLogs.findUnique({
+            where: {
+                id
+            },
+            include: {
+                cashAdvance: true
+            }
+        })
+        await prisma.cashAdvanceLogs.delete({
             where: {
                 id
             }
+        })
+
+        await prisma.cashAdvance.update({
+            where: {
+                id: cashAdvanceLogs?.cashAdvanceId
+            },
+            data: {
+                amount: {
+                    decrement: cashAdvanceLogs?.amount
+                }
+            },
         })
 
         return NextResponse.json({message: "Cash Advance record deleted"}, {status: 200})

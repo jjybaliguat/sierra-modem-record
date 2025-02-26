@@ -35,6 +35,8 @@ import { useRouter } from "next/navigation"
 import { Employees } from "@/types/employees"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { createEmployeeCashAdvance } from "@/app/actions"
+import { DatePicker } from "../DatePicker"
+import { format } from 'date-fns'
 
 export function CreateCashAdvanceDialog() {
     const [selectedEmployee, setSelectedEmployee] = useState<Employees | null>(null)
@@ -43,7 +45,9 @@ export function CreateCashAdvanceDialog() {
     const router = useRouter()
     const {data: employees, isLoading} = useSWR(session?.data?.user.id? "getEmployee" : null, getEmployees)
     const [amount, setAmount] = useState(0)
+    const [date, setDate] = useState<Date>(new Date())
     const buttonRef = useRef<HTMLButtonElement>(null)
+    console.log(date)
 
     async function getEmployees(){
         try {
@@ -62,7 +66,7 @@ export function CreateCashAdvanceDialog() {
       e.preventDefault()
       setCreating(true)
         try {
-            const response: any = await createEmployeeCashAdvance(selectedEmployee?.id!, amount)
+            const response: any = await createEmployeeCashAdvance(selectedEmployee?.id!, amount, format(date, "yyyy-MM-dd"))
 
             console.log(response)
 
@@ -104,7 +108,7 @@ export function CreateCashAdvanceDialog() {
   }
      
   return (
-    <Dialog>
+    <Dialog modal={false}>
       <DialogTrigger asChild>
         <Button>Create</Button>
       </DialogTrigger>
@@ -135,6 +139,12 @@ export function CreateCashAdvanceDialog() {
             <div>
                 <Label htmlFor="amount">Amount</Label>
                 <Input id="amount" type="number" value={amount} onChange={(e)=>setAmount(Number(e.target.value))} />
+            </div>
+            <div>
+                <Label htmlFor="date">Date</Label>
+                <div id="date" className="w-full">
+                  <DatePicker date={date} onSelect={setDate} />
+                </div>
             </div>
             <div>
                 <p className="text-sm">After submitting, the amount will be added to employee&apos;s existing cash advance balance.</p>

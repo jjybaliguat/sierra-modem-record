@@ -33,11 +33,16 @@ export async function GET(req: Request){
 
 export async function POST(req: Request){
     const body = await req.json()
+    const {periodStart, periodEnd} = body
     const {employeeId, caDeduction} = body
 
     try {
         const payroll = await prisma.payroll.create({
-            data: body
+            data: {
+                ...body,
+                periodStart: new Date(periodStart),
+                periodEnd: new Date(periodEnd),
+            }
         })
 
         await prisma.cashAdvance.updateMany({

@@ -121,8 +121,17 @@ model CashAdvance {
   employeeId      String @db.ObjectId
   employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   amount          Float    // Total cash advance amount owed
+  logs            CashAdvanceLogs[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model CashAdvanceLogs {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  cashAdvanceId   String @db.ObjectId
+  cashAdvance     CashAdvance @relation(fields: [cashAdvanceId], references: [id], onDelete: Cascade)
+  amount   Int
+  date    DateTime
 }
 
 enum RepaymentStatus {

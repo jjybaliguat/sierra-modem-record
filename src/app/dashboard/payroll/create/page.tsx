@@ -18,6 +18,7 @@ import { AttendanceLogsCollapsible } from '@/components/collapsible/AttendaceLog
 import { Attendance } from '@/types/attendance'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
 
 const CreatePayroll = () => {
   const {data: session} = useSession()
@@ -73,7 +74,7 @@ const CreatePayroll = () => {
     const getEmployeeTotalHours = async () => {
       try {
         if(!session) return null
-        const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, periodStart, periodEnd)
+        const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, format(periodStart, "yyyy-MM-dd"), format(periodEnd, "yyyy-MM-dd"))
       setTotalHours(response.totalHours? response.totalHours : 0)
       setRegularHours(response.regularHours? response.regularHours : 0)
       setOtHours(response.overtimeHours? response.overtimeHours : 0)
@@ -136,8 +137,8 @@ const CreatePayroll = () => {
           totalDeduction,
           grossPay,
           netPay,
-          periodStart,
-          periodEnd
+          periodStart: format(periodStart, "yyyy-MM-dd"),
+          periodEnd: format(periodEnd, "yyyy-MM-dd")
         })
       })
       const data = await response.json()
