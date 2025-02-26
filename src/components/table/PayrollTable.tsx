@@ -116,29 +116,6 @@ export const columns: ColumnDef<Payroll>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const payroll = row.original
-      const [deleting, setDeleting] = React.useState(false)
-      const btnRef = React.useRef<any | null>(null)
-      
-      const onClose = () => {
-        if(btnRef){
-          btnRef.current.click()
-        }
-      }
-
-      async function onDelete(){
-        setDeleting(true)
-        try {
-          await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/payroll?id=${payroll.id}`, {
-            method: "DELETE"
-          })
-          setDeleting(false)
-          onClose()
-          mutate("getPayroll")
-        } catch (error) {
-          console.log(error)
-          setDeleting(false)
-        }
-      }
 
       return (
         <DropdownMenu>
