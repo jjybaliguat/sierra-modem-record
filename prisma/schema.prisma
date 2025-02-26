@@ -131,7 +131,7 @@ model CashAdvanceLogs {
   cashAdvanceId   String @db.ObjectId
   cashAdvance     CashAdvance @relation(fields: [cashAdvanceId], references: [id], onDelete: Cascade)
   amount   Int
-  date    DateTime
+  date    DateTime  @default(now())
 }
 
 enum RepaymentStatus {
