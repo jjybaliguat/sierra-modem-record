@@ -14,6 +14,7 @@ import {
   } from "@/components/ui/select"
 import { useSession } from 'next-auth/react'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 const hoursStart = [5, 6, 7, 8, 9, 10];
 const hoursEnd = [3, 4, 5, 6, 7, 8];
@@ -31,6 +32,7 @@ const SettingsPage = () => {
     const [gracePeriod, setGracePeriod] = useState(0)
     const [lateDeduction, setLateDeduction] = useState(0)
     const [minutesThresholdAfterLate, setMinutesThresholdAfterLate] = useState(0)
+    const [overtimeRate, setOvertimeRate] = useState("")
 
     useEffect(()=>{
         if(session){
@@ -39,6 +41,7 @@ const SettingsPage = () => {
             setGracePeriod(session.user.gracePeriodInMinutes)
             setMinutesThresholdAfterLate(session.user.minutesThresholdAfterLate)
             setLateDeduction(session.user.lateDeducInMinutes)
+            setOvertimeRate((session.user.overtimeRate).toString())
             workStart = session.user.workStartTime.split(":").map(Number)
             workEnd = session.user.workEndTime.split(":").map(Number)
             setWorkStartTime({...workStartTime, hour: workStart[0], minutes: workStart[1]})
@@ -46,13 +49,24 @@ const SettingsPage = () => {
         }
     }, [])
 
+    const handleSubmit = async() => {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }
+
     if(!session) return null
   return (
     <div className="flex flex-1 flex-col gap-8 p-4 pt-0">
         <HeaderBreadCrumb />
         <Card>
             <CardHeader>
-                <CardTitle>Settings</CardTitle>
+                <div className='flex items-center justify-between'>
+                    <CardTitle>Settings</CardTitle>
+                    <Button>Update</Button>
+                </div>
             </CardHeader>
             <CardContent>
                 <div className='flex flex-col gap-6'>
@@ -156,6 +170,13 @@ const SettingsPage = () => {
                             <div className='flex items-center gap-2'>
                                 <Input className='w-[75px]' type='number' value={minutesThresholdAfterLate} onChange={(e)=>setMinutesThresholdAfterLate(Number(e.target.value))} />
                                 <h1>Minutes</h1>
+                            </div>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                            <h1>Overtime Rate</h1>
+                            <div className='flex items-center gap-2'>
+                                <Input className='w-[75px]' type='text' value={overtimeRate} onChange={(e)=>setOvertimeRate(e.target.value)} />
+                                <h1>Percent</h1>
                             </div>
                     </div>
                 </div>

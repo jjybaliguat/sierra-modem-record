@@ -28,8 +28,9 @@ model User {
   gracePeriodInMinutes  Int?  @default(15)
   minutesThresholdAfterLate Int?
   overtimeThresholdInMinutes Int? @default(60)
-  lateDeducInMinutes    Int?  @default(30)
-  overtimeRate  Float?
+  lateDeducInMinutes    Int  @default(30)
+  overtimeRate  Float @default(1.2)
+  rdotRate      Float @default(1.3)
 
   devices      Device[]
   employees    Employee[]

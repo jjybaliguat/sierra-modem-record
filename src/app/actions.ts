@@ -144,8 +144,8 @@ export async function changePassword(data: {id: string | undefined, oldPassword:
 
 export async function getEmployeeAttendancePerWeek(employeerId: string | null | undefined, employeeId: string | null | undefined, week: number){
     const today = new Date();
-    const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
-    const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
+    const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 0 });
+    const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 0 });
 
     if(!employeeId || !employeerId) return null
 
@@ -199,11 +199,10 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             }
         })
 
-        // console.log(attendance)
-
         const weeklyHours = Array(7).fill(0);
         let regularHours = 0
         let overtimeHours = 0;
+        let rdotHours = 0;
 
                 // Process attendance data
         attendance.forEach((record) => {
@@ -212,8 +211,9 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             let timeIn = new Date(record.timeIn);
             // console.log(timeIn)
             const timeOut = new Date(record.timeOut);
-            // console.log(timeOut)
-            const dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
+            let dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
+
+            if (dayIndex === -1) dayIndex = 6; // Convert Sunday from -1 to 6
             let deductionHours = 0;
             if (dayIndex >= 0) {
                 let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
@@ -271,7 +271,11 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 }
                 // console.log(deductionHours)
                 // console.log(hoursWorked)
-                regularHours += Math.max(regularHoursWorked, 0)
+                if(dayIndex == 6){
+                    rdotHours += hoursWorked
+                }else{
+                    regularHours += Math.max(regularHoursWorked, 0)
+                }
                 weeklyHours[dayIndex] += Math.max(hoursWorked, 0); // Prevent negative values
               }
             });
@@ -280,7 +284,8 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 return {
                     weeklyHours: weeklyHours.map((hours) => parseFloat(hours.toFixed(1))),
                     regularHours: parseFloat(regularHours.toFixed(1)),
-                    overtimeHours: overtimeHours
+                    overtimeHours: overtimeHours,
+                    rdotHours
                 }
     } catch (error) {
         console.log(error)
@@ -354,7 +359,7 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
         let totalHours = 0;
         let overtimeHours = 0;
 
-        console.log(attendanceRecords)
+        // console.log(attendanceRecords)
 
         attendanceRecords.forEach((record) => {
             if(!record.timeIn || !record.timeOut) return null

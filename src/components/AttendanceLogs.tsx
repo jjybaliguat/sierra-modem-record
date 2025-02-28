@@ -16,7 +16,7 @@ const AttendanceLogs = () => {
   async function GetAttendanceLogs(){
       if(!userId) return null
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/attendance?id=${userId}&limit=20`) 
+        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/attendance?id=${userId}&limit=50`) 
         const data = await response.json()
         
         // console.log(data)

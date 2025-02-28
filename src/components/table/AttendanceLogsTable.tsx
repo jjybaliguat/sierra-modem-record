@@ -51,38 +51,36 @@ import { format } from "date-fns";
         }
         </div>
         <div className="hidden md:block">
-          <Table>
-          {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">FingerId</TableHead>
-              <TableHead>Employee Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>TimeIn</TableHead>
-              <TableHead>TimeOut</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {attLogs?.map((att: Attendance) => (
-              <TableRow key={att.id} className={cn({
-                "bg-amber-300 dark:bg-amber-600": !att.timeOut,
-                "bg-green-500 dark:bg-green-800": att.timeOut
-              })}>
-                <TableCell className="font-medium">{att.fingerprintId}</TableCell>
-                <TableCell>{att.employee.fullName.split(" ")[0]}</TableCell>
-                <TableCell>{att.status}</TableCell>
-                <TableCell>{formatDateTime(att.timeIn)}</TableCell>
-                <TableCell>{att.timeOut && formatDateTime(att.timeOut)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            {/* <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
-            </TableRow> */}
-          </TableFooter>
-        </Table>
+          <div className="w-full border rounded-lg overflow-hidden">
+            {/* Table Container */}
+            <div className="w-full">
+              {/* Table Header - Sticky */}
+              <div className="grid grid-cols-5 font-semibold sticky top-0 border-b p-2">
+                <div className="p-1 text-[14px]">FingerId</div>
+                <div className="p-1 text-[14px]">Employee Name</div>
+                <div className="p-1 text-[14px]">Status</div>
+                <div className="p-1 text-[14px]">TimeIn</div>
+                <div className="p-1 text-[14px]">TimeOut</div>
+              </div>
+
+              {/* Table Body - Scrollable */}
+              <div className="max-h-[500px] overflow-y-auto">
+                {attLogs?.map((att: Attendance) => (
+                  <div key={att.id} className={cn({
+                    "grid grid-cols-5 border-b items-center": true,
+                    "bg-amber-300 dark:bg-amber-600": !att.timeOut,
+                    "bg-green-500 dark:bg-green-800": att.timeOut
+                  })}>
+                    <div className="p-1 text-[14px]">{att.fingerprintId}</div>
+                    <div className="p-1 text-[14px]">{att.employee.fullName.split(" ")[0]}</div>
+                    <div className="p-1 text-[14px]">{att.status}</div>
+                    <div className="p-1 text-[14px]">{formatDateTime(att.timeIn)}</div>
+                    <div className="p-1 text-[14px]">{att.timeOut && formatDateTime(att.timeOut)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </>
        : 
