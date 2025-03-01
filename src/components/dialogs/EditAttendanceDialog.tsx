@@ -130,12 +130,12 @@ export function EditAttendanceDialog({
                         </div>
                     </div>
                 </div>
-              <DialogFooter>
-                <DialogClose ref={buttonRef}>
-                  Cancel
-                </DialogClose>
-                <Button type="submit" disabled={submitting}>{submitting? "Updating..." : "Update"}</Button>
-              </DialogFooter>
+                <div className="flex justify-end items-center gap-4 mt-8">
+                    <DialogClose ref={buttonRef}>
+                    Cancel
+                    </DialogClose>
+                    <Button type="submit" disabled={submitting}>{submitting? "Updating..." : "Update"}</Button>
+                </div>
             </form>
       </DialogContent>
     </Dialog>

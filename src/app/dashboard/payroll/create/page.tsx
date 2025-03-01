@@ -31,6 +31,7 @@ const CreatePayroll = () => {
   const [totalHours, setTotalHours] = useState(0)
   const [regularHours, setRegularHours] = useState(0)
   const [otHours, setOtHours] = useState(0)
+  const [rdotHours, setRdotHours] = useState(0)
   const [basicSalary, setBasicSalary] = useState(0)
   const [otPay, setOtPay] = useState(0)
   const [adjustments, setAdjustments] = useState({
@@ -78,7 +79,9 @@ const CreatePayroll = () => {
       setTotalHours(response.totalHours? response.totalHours : 0)
       setRegularHours(response.regularHours? response.regularHours : 0)
       setOtHours(response.overtimeHours? response.overtimeHours : 0)
+      setRdotHours(response.rdotHours? response.rdotHours : 0)
       setAttendanceLogs(response.attendanceLogs)
+      console.log(response)
       } catch (error) {
         console.log(error)
       }
@@ -209,6 +212,7 @@ const CreatePayroll = () => {
                         <h1 className='text-sm'>Hours Worked: <span><Input value={totalHours} type='number' step="any" className='w-[100px]' onChange={(e)=> setTotalHours(Number(e.target.value))}/></span></h1>
                         <h1 className='text-sm'>Computed Hours: <span><Input type='number' step="any" value={regularHours} className='w-[100px]' onChange={(e)=> setRegularHours(Number(e.target.value))}/></span></h1>
                         <h1 className='text-sm'>Overtime Hours: <span><Input type='number' step="any" value={otHours} className='w-[100px]' onChange={(e)=> setOtHours(Number(e.target.value))}/></span></h1>
+                        <h1 className='text-sm'>RDOT Hours: <span><Input type='number' step="any" value={rdotHours} className='w-[100px]' onChange={(e)=> setRdotHours(Number(e.target.value))}/></span></h1>
                       </div>
                       <div className='mt-4'>
                         <h1 className='mb-2'>Adjustments</h1>

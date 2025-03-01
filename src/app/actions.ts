@@ -144,8 +144,8 @@ export async function changePassword(data: {id: string | undefined, oldPassword:
 
 export async function getEmployeeAttendancePerWeek(employeerId: string | null | undefined, employeeId: string | null | undefined, week: number){
     const today = new Date();
-    const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 0 });
-    const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 0 });
+    const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
+    const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
 
     if(!employeeId || !employeerId) return null
 
@@ -286,13 +286,14 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                     weeklyHours: weeklyHours.map((hours) => parseFloat(hours.toFixed(1))),
                     regularHours: parseFloat(regularHours.toFixed(1)),
                     overtimeHours: parseFloat(overtimeHours.toFixed(1)),
-                    rdotHours
+                    rdotHours: parseFloat(rdotHours.toFixed(1))
                 }
     } catch (error) {
         console.log(error)
         return null
     }
 }
+
 
 export async function getEmployeeAttendanceTotalHours(employerId: string, employeeId: string, startDate: string, endDate: string){
     if(!employeeId || !startDate || !endDate || !employerId) return null
@@ -303,9 +304,6 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
         startofDayUTC.setUTCHours(0,0,0,0)
         const endOfDayUTC = new Date(endDate);
         endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
-        // console.log(startofDayUTC)
-        // console.log(endOfDayUTC)
 
         const employer = await prisma.user.findUnique({
             where: {
@@ -359,16 +357,19 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
         let regularHours = 0;
         let totalHours = 0;
         let overtimeHours = 0;
+        let rdotHours = 0;
 
-        // console.log(attendanceRecords)
-
+        
         attendanceRecords.forEach((record) => {
             if(!record.timeIn || !record.timeOut) return null
-
+            
             let deductionHours = 0;
             let timeIn = new Date(record.timeIn);
             timeIn.setUTCSeconds(0);
             const timeOut = new Date(record.timeOut);
+            let dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
+
+            if (dayIndex === -1) dayIndex = 6; // Convert Sunday from -1 to 6
 
             let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
                 // console.log(timeInHours)
@@ -405,24 +406,29 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
           
                 // Deduct 1 hour if lunch is included in the work period
                 // console.log(timeOutHours)
-                if(timeOutHours >= overtimeThresholdHours){
-                    overtimeHours += (timeOutHours - workEndHours);
-                    hoursWorked = (timeOutHours - timeInHours)
-                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
-                }else if (timeOutHours < workEndHours){
-                    regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
-                    hoursWorked = (timeOutHours - timeInHours)
-                }else if(timeOutHours >= workEndHours){
-                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
-                    hoursWorked = (workEndHours - timeInHours)
-                }
                 
                 if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
+                  rdotHours -= 1
                 }
-                regularHours += Math.max(regularHoursWorked, 0)
-                totalHours += hoursWorked
+                if(dayIndex == 6){
+                    rdotHours += (timeOutHours - timeInHours)
+                }else{
+                    if(timeOutHours >= overtimeThresholdHours){
+                        overtimeHours += (timeOutHours - workEndHours);
+                        hoursWorked = (timeOutHours - timeInHours)
+                        regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                    }else if (timeOutHours < workEndHours){
+                        regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
+                        hoursWorked = (timeOutHours - timeInHours)
+                    }else if(timeOutHours >= workEndHours){
+                        regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                        hoursWorked = (workEndHours - timeInHours)
+                    }
+                    regularHours += Math.max(regularHoursWorked, 0)
+                    totalHours += hoursWorked
+                }
         })
 
         prisma.$disconnect()
@@ -430,6 +436,7 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
             totalHours: parseFloat(totalHours.toFixed(1)),
             regularHours: parseFloat(regularHours.toFixed(1)),
             overtimeHours: parseFloat(overtimeHours.toFixed(1)),
+            rdotHours: parseFloat(rdotHours.toFixed(1)),
             attendanceLogs: attendanceRecords.map((attendance)=>{
                 if(attendance.timeOut){
                     return {
