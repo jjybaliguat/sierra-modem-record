@@ -274,6 +274,9 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 // console.log(hoursWorked)
                 if(dayIndex == 6){
                     rdotHours += (timeOutHours - timeInHours)
+                    if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
+                        rdotHours -= 1
+                    }
                 }else{
                     regularHours += Math.max(regularHoursWorked, 0)
                 }
@@ -413,6 +416,9 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 }
                 if(dayIndex == 6){
                     rdotHours += (timeOutHours - timeInHours)
+                    if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
+                        rdotHours -= 1
+                    }
                 }else{
                     if(timeOutHours >= overtimeThresholdHours){
                         overtimeHours += (timeOutHours - workEndHours);
