@@ -34,6 +34,7 @@ const CreatePayroll = () => {
   const [rdotHours, setRdotHours] = useState(0)
   const [basicSalary, setBasicSalary] = useState(0)
   const [otPay, setOtPay] = useState(0)
+  const [rdotPay, setRdotPay] = useState(0)
   const [adjustments, setAdjustments] = useState({
     incentive: 0,
     paidLeaves: 0,
@@ -107,8 +108,11 @@ const CreatePayroll = () => {
 
   useEffect(()=>{
     setBasicSalary(regularHours * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0 / 8))
-    session && setOtPay(otHours * session?.user?.overtimeRate! * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0))
-  }, [regularHours, otHours, selectedEmployee])
+    if(session){
+      setOtPay(otHours * session?.user?.overtimeRate! * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0))
+      setRdotPay(rdotHours * session.user?.rdotRate! * (selectedEmployee? selectedEmployee?.dailyRate / 8 : 0))
+    }
+  }, [regularHours, otHours, selectedEmployee, rdotHours])
 
   useEffect(()=>{
     let totalAdjustments = 0
@@ -120,9 +124,9 @@ const CreatePayroll = () => {
       totalDeductions += deduction
     })
     setTotalDeduction(totalDeduction)
-    setGrossPay((basicSalary+otPay+totalAdjustments))
-    setNetPay((basicSalary+otPay+totalAdjustments) - totalDeductions)
-  }, [basicSalary, otPay, adjustments, deductions])
+    setGrossPay((basicSalary+otPay+totalAdjustments+rdotPay))
+    setNetPay((basicSalary+otPay+totalAdjustments+rdotPay) - totalDeductions)
+  }, [basicSalary, otPay, adjustments, deductions, rdotPay])
 
   async function GeneratePayslip(){
     setSubmitting(true)
@@ -275,6 +279,10 @@ const CreatePayroll = () => {
                           <span>Overtime Hours: </span>
                           <span> {otHours}</span>
                         </div>
+                        <div className="text-[14px] flex items-center gap-2">
+                          <span>RDOT Hours: </span>
+                          <span> {rdotHours}</span>
+                        </div>
                       </div>
 
                       {/* Salary Breakdown */}
@@ -287,6 +295,10 @@ const CreatePayroll = () => {
                         <div className="text-[14px] flex items-center gap-2">
                           <span>Overtime Pay:</span>
                           <span>{formatCurrency(otPay? otPay : 0)}</span>
+                        </div>
+                        <div className="text-[14px] flex items-center gap-2">
+                          <span>RDOT Pay:</span>
+                          <span>{formatCurrency(rdotPay? rdotPay : 0)}</span>
                         </div>
                       </div>
                       {/* Adjustments */}

@@ -20,6 +20,7 @@ declare module "next-auth" {
       overtimeThresholdInMinutes: number,
       lateDeducInMinutes: number,
       overtimeRate: number,
+      rdotRate: number
     } & DefaultSession["user"];
   }
 
@@ -36,6 +37,7 @@ declare module "next-auth" {
     overtimeThresholdInMinutes: number,
     lateDeducInMinutes: number,
     overtimeRate: number,
+    rdotRate: number,
     company: Company
   }
 

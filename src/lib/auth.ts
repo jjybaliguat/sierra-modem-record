@@ -87,6 +87,7 @@ export const authOptions : any = {
           token.overtimeThresholdInMinutes = user.overtimeThresholdInMinutes;
           token.lateDeducInMinutes = user.lateDeducInMinutes;
           token.overtimeRate = user.overtimeRate;
+          token.rdotRate = user.rdotRate;
         }
       }
       
@@ -108,6 +109,7 @@ export const authOptions : any = {
         session.user.overtimeThresholdInMinutes = token.overtimeThresholdInMinutes;
         session.user.lateDeducInMinutes = token.lateDeducInMinutes;
         session.user.overtimeRate = token.overtimeRate;
+        session.user.rdotRate = token.rdotRate;
         session.expires = new Date(token.exp * 1000).toISOString();
       }
       return session;
