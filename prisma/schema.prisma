@@ -114,7 +114,7 @@ model FingerPrintID {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   fingerId        Int
   employeeId      String @db.ObjectId
-  employee        Employee @relation(fields: [employeeId], references: [id])
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model CashAdvance {
