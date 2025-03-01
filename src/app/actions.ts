@@ -269,7 +269,6 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
-                  rdotHours -= 1
                 }
                 // console.log(deductionHours)
                 // console.log(hoursWorked)
@@ -411,7 +410,6 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
-                  rdotHours -= 1
                 }
                 if(dayIndex == 6){
                     rdotHours += (timeOutHours - timeInHours)
