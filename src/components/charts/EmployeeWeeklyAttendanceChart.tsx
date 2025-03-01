@@ -175,7 +175,7 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
             <h1><span className="text-neutral-500">RDOT Hours:</span> <span className="text-primary">{rdOtHours}</span></h1>
           </div>
           <div className="mt-4">
-            <p className="text-sm text-primary">Total worked <span className="text-neutral-500">is the actual hours worked for an employee without deductions.</span></p>
+            <p className="text-sm text-primary">Total hours <span className="text-neutral-500">is the toal hours worked for an employee without deductions.</span></p>
             <p className="text-sm text-primary">Regular Hours <span className="text-neutral-500">is the computed hours worked including late deductions and time-in grace period.</span></p>
           </div>
         </div>
