@@ -217,7 +217,7 @@ model Attendance {
   fingerprintId Int      // Numeric fingerprint ID for tracking
   timeIn       DateTime @default(now()) // Check-in timestamp
   timeOut      DateTime? // Nullable check-out timestamp
-  status        AttendanceStatus   @default(PRESENT) // PRESENT, LATE, ABSENT
+  status        AttendanceStatus   @default(ONTIME) // PRESENT, LATE, ABSENT
   verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
   deviceId      String
   device        Device  @relation(fields: [deviceId], references: [deviceId])
@@ -228,6 +228,7 @@ model Attendance {
 
 enum AttendanceStatus {
   PRESENT
+  ONTIME
   LATE
   ABSENT
 }

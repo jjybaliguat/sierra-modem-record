@@ -6,7 +6,7 @@ export interface Attendance {
     timeIn: string,
     timeOut: string,
     status: AttendanceStatus,
-    verifiedBy: string
+    verifiedBy: string,
 }
 
 export interface Employee {
@@ -16,7 +16,7 @@ export interface Employee {
 }
 
 export enum AttendanceStatus {
-    PRESENT = "PRESENT",
+    ONTIME = "ONTIME",
     LATE = "LATE",
     ABSENT = "ABSENT"
 }

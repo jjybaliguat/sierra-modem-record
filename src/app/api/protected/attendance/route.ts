@@ -23,7 +23,11 @@ export async function GET(req: Request){
             },
             take: limit? Number(limit) : 100,
             include: {
-                employee: true
+                employee: {
+                    include: {
+                        fingerPrints: true
+                    }
+                }
             },
             orderBy: {
                 timeIn: "desc"
@@ -144,10 +148,18 @@ export async function POST(req: Request){
         }
 
         const cutoffTime = new Date(timeIn);
-        cutoffTime.setHours(8, Number(device.user?.gracePeriodInMinutes), 0, 0); // Set to 08:30 AM
+        cutoffTime.setHours(8, Number(device.user?.gracePeriodInMinutes), 0, 0); // set time-in grace period time
 
         // Determine status
-        const status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.PRESENT;
+        now.setUTCSeconds(0);
+        let status
+        if(!timeIn){
+            status = now > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
+        }else{
+            timeIn.setUTCSeconds(0)
+            status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
+        }
+        // const status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME;
 
         const attendance = await prisma.attendance.create({
             data: {

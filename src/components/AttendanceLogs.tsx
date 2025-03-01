@@ -7,6 +7,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
+import Link from 'next/link'
 
 const AttendanceLogs = () => {
   const {data: session} = useSession()
@@ -30,7 +31,10 @@ const AttendanceLogs = () => {
   return (
     <Card>
         <CardHeader>
-            <CardTitle className='text-xl'>Attendance Logs</CardTitle>
+            <div className='flex items-center justify-between'>
+              <CardTitle className='text-xl'>Attendance Logs</CardTitle>
+              <Link href="/dashboard/attendance">View All</Link>
+            </div>
             <CardDescription></CardDescription>
         </CardHeader>
         <CardContent>
