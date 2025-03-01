@@ -147,13 +147,13 @@ export async function POST(req: Request){
             return NextResponse.json({error: `No device found with deviceId ${deviceToken}`})
         }
 
-        const cutoffTime = new Date(timeIn);
+        const cutoffTime = new Date(now);
         cutoffTime.setHours(8, Number(device.user?.gracePeriodInMinutes), 0, 0); // set time-in grace period time
 
         // Determine status
         now.setUTCSeconds(0);
-        console.log(now)
-        console.log(cutoffTime)
+        console.log(now.toISOString())
+        console.log(cutoffTime.toISOString())
         let status
         if(!timeIn){
             status = now > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
