@@ -7,6 +7,7 @@ import {
   ChevronsUpDown,
   HandCoins,
   House,
+  Logs,
   Server,
   Settings,
   Settings2,
@@ -40,6 +41,11 @@ const data = {
       title: "Employees",
       url: "/dashboard/employees",
       icon: Users,
+    },
+    {
+      title: "Attendance",
+      url: "/dashboard/attendance",
+      icon: Logs,
     },
     {
       title: "Payroll",

@@ -12,7 +12,7 @@ const AttendancePage = () => {
         <Card>
             <CardHeader className='flex flex-row justify-between items-center'>
                 <CardTitle>Attendance</CardTitle>
-                <Button asChild>
+                <Button disabled={true}>
                 <Link href="/dashboard/attendance/create">Create</Link>
                 </Button>
             </CardHeader>
