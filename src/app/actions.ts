@@ -410,30 +410,31 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 // Deduct 1 hour if lunch is included in the work period
                 // console.log(timeOutHours)
                 
+                if(timeOutHours >= overtimeThresholdHours){
+                    overtimeHours += (timeOutHours - workEndHours);
+                    hoursWorked = (timeOutHours - timeInHours)
+                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                }else if (timeOutHours < workEndHours){
+                    regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
+                    hoursWorked = (timeOutHours - timeInHours)
+                }else if(timeOutHours >= workEndHours){
+                    regularHoursWorked = (workEndHours - workStartHours) - deductionHours
+                    hoursWorked = (workEndHours - timeInHours)
+                }
+
                 if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
                   hoursWorked -= 1;
                   regularHoursWorked -= 1;
                 }
-                if(dayIndex == 6){
-                    rdotHours += (timeOutHours - timeInHours)
-                    if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
-                        rdotHours -= 1
-                    }
-                }else{
-                    if(timeOutHours >= overtimeThresholdHours){
-                        overtimeHours += (timeOutHours - workEndHours);
-                        hoursWorked = (timeOutHours - timeInHours)
-                        regularHoursWorked = (workEndHours - workStartHours) - deductionHours
-                    }else if (timeOutHours < workEndHours){
-                        regularHoursWorked = (timeOutHours - workStartHours) - deductionHours
-                        hoursWorked = (timeOutHours - timeInHours)
-                    }else if(timeOutHours >= workEndHours){
-                        regularHoursWorked = (workEndHours - workStartHours) - deductionHours
-                        hoursWorked = (workEndHours - timeInHours)
-                    }
-                    regularHours += Math.max(regularHoursWorked, 0)
-                    totalHours += hoursWorked
-                }
+                // if(dayIndex == 6){
+                //     rdotHours += (timeOutHours - timeInHours)
+                //     if (timeInHours < lunchStartHours && timeOutHours > lunchEndHours) {
+                //         rdotHours -= 1
+                //     }
+                // }else{
+                    // }
+                regularHours += Math.max(regularHoursWorked, 0)
+                totalHours += hoursWorked
         })
 
         prisma.$disconnect()
