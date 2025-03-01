@@ -158,8 +158,9 @@ export async function POST(req: Request){
         if(!timeIn){
             status = now > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
         }else{
-            timeIn.setUTCSeconds(0)
-            status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
+            const timeInTime = new Date(timeIn)
+            timeInTime.setUTCSeconds(0)
+            status = timeInTime > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
         }
         // const status = timeIn > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME;
 
