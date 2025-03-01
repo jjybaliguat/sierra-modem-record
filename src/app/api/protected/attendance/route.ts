@@ -152,6 +152,8 @@ export async function POST(req: Request){
 
         // Determine status
         now.setUTCSeconds(0);
+        console.log(now.toISOString())
+        console.log(cutoffTime.toISOString())
         let status
         if(!timeIn){
             status = now > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
