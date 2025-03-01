@@ -209,6 +209,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
             if (!record.timeIn || !record.timeOut) return null; // Skip if incomplete data
 
             let timeIn = new Date(record.timeIn);
+            timeIn.setUTCSeconds(0);
             // console.log(timeIn)
             const timeOut = new Date(record.timeOut);
             let dayIndex = timeIn.getDay() - 1; // Convert Monday(1) → 0, Sunday(0) → -1
@@ -366,6 +367,7 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
 
             let deductionHours = 0;
             let timeIn = new Date(record.timeIn);
+            timeIn.setUTCSeconds(0);
             const timeOut = new Date(record.timeOut);
 
             let timeInHours = timeIn.getUTCHours() + (timeIn.getUTCMinutes() / 60)
