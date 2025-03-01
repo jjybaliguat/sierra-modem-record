@@ -206,9 +206,9 @@ const CreatePayroll = () => {
                     </div>
                     <div className='mt-4'>
                       <div className='flex flex-wrap gap-4 md:items-center'>
-                        <h1 className='text-sm'>Hours Worked: <span><Input value={totalHours} type='number' className='w-[100px]' onChange={(e)=> setTotalHours(Number(e.target.value))}/></span></h1>
-                        <h1 className='text-sm'>Computed Hours: <span><Input value={regularHours} className='w-[100px]' onChange={(e)=> setRegularHours(Number(e.target.value))}/></span></h1>
-                        <h1 className='text-sm'>Overtime Hours: <span><Input value={otHours} className='w-[100px]' onChange={(e)=> setOtHours(Number(e.target.value))}/></span></h1>
+                        <h1 className='text-sm'>Hours Worked: <span><Input value={totalHours} type='number' step="any" className='w-[100px]' onChange={(e)=> setTotalHours(Number(e.target.value))}/></span></h1>
+                        <h1 className='text-sm'>Computed Hours: <span><Input type='number' step="any" value={regularHours} className='w-[100px]' onChange={(e)=> setRegularHours(Number(e.target.value))}/></span></h1>
+                        <h1 className='text-sm'>Overtime Hours: <span><Input type='number' step="any" value={otHours} className='w-[100px]' onChange={(e)=> setOtHours(Number(e.target.value))}/></span></h1>
                       </div>
                       <div className='mt-4'>
                         <h1 className='mb-2'>Adjustments</h1>

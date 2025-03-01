@@ -183,3 +183,27 @@ export async function POST(req: Request){
         return NextResponse.json({error: "Internal Server Error."})
     }
 }
+
+export async function PATCH(req: Request) {
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search) 
+    const id = searchParams.get('id') as string
+    const {timeIn, timeOut} = await req.json()
+
+    try {
+        const attendance = await prisma.attendance.update({
+            where: {
+                id
+            },
+            data: {
+                timeIn,
+                timeOut
+            }
+        })
+
+        return NextResponse.json(attendance, {status: 200})
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({error: "Internal Server Error."})
+    }
+}

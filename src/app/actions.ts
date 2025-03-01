@@ -255,7 +255,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 // console.log(timeOutHours)
                 // console.log(overtimeThresholdHours)
                 if(timeOutHours >= overtimeThresholdHours){
-                    overtimeHours += 1;
+                    overtimeHours += (timeOutHours - workEndHours);
                     hoursWorked = (timeOutHours - timeInHours)
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
                 }else if (timeOutHours < workEndHours){
@@ -285,7 +285,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 return {
                     weeklyHours: weeklyHours.map((hours) => parseFloat(hours.toFixed(1))),
                     regularHours: parseFloat(regularHours.toFixed(1)),
-                    overtimeHours: overtimeHours,
+                    overtimeHours: parseFloat(overtimeHours.toFixed(1)),
                     rdotHours
                 }
     } catch (error) {
@@ -406,7 +406,7 @@ export async function getEmployeeAttendanceTotalHours(employerId: string, employ
                 // Deduct 1 hour if lunch is included in the work period
                 // console.log(timeOutHours)
                 if(timeOutHours >= overtimeThresholdHours){
-                    overtimeHours += 1;
+                    overtimeHours += (timeOutHours - workEndHours);
                     hoursWorked = (timeOutHours - timeInHours)
                     regularHoursWorked = (workEndHours - workStartHours) - deductionHours
                 }else if (timeOutHours < workEndHours){

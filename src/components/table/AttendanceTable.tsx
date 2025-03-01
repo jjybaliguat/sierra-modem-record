@@ -47,6 +47,7 @@ import { formatCurrency } from "@/utils/formatCurrency"
 import { DeletePayrollDialog } from "../dialogs/DeletePayrollDialog"
 import { Attendance, AttendanceStatus } from "@/types/attendance"
 import { formatDateTime } from "@/utils/formatDateTime"
+import { EditAttendanceDialog } from "../dialogs/EditAttendanceDialog"
 
 export const columns: ColumnDef<Attendance>[] = [
   {
@@ -117,7 +118,7 @@ export const columns: ColumnDef<Attendance>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payroll = row.original
+      const attendance = row.original
 
       return (
         <DropdownMenu>
@@ -131,9 +132,9 @@ export const columns: ColumnDef<Attendance>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {/* <DropdownMenuItem><Link href={`/dashboard/employees/bio-enroll/${employee.id}/${employee.fingerprintId && employee.fingerprintId}`}>{!employee.fingerEnrolled? "Enroll" : "Re-Enroll"} Biometric</Link></DropdownMenuItem> */}
-            <DropdownMenuItem><Link href={`/dashboard/payroll/${payroll.id}`}>View Details</Link></DropdownMenuItem>
+            <EditAttendanceDialog attendance={attendance} />
             <DropdownMenuSeparator />
-            <DeletePayrollDialog id={payroll.id}/>
+            {/* <DeletePayrollDialog id={payroll.id}/> */}
           </DropdownMenuContent>
         </DropdownMenu>
       )
