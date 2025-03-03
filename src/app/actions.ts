@@ -607,3 +607,29 @@ export async function getCashAdvance(employerId: string){
         return null
     }
 }
+
+export async function getCashAdvancebalance(employerId: string){
+    if(!employerId) return null
+    try {
+        const response = await prisma.cashAdvance.findMany({
+            where: {
+                employee: {
+                    employerId
+                }
+            },
+            include: {
+                employee: true
+            },
+            orderBy: {
+                employee: {
+                    fullName: "desc"
+                }
+            }
+        })
+
+        return response
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
