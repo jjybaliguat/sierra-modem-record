@@ -253,7 +253,7 @@ const CreatePayroll = () => {
                     </div>
                     <div className='flex justify-between w-full'>
                       <h4 className="text-[14px] font-semibold mb-4">Employee Payslip</h4>
-                      <h4 className="text-[14px] font-semibold mb-4">Period: {formatDate(periodStart)} to {formatDate(periodEnd)}</h4>
+                      <h4 className="text-[14px] font-semibold mb-4">Period: {format(periodStart? periodStart : new Date(), "MMM-dd-yyyy")} to {format(periodEnd? periodEnd : new Date(), "MMM-dd-yyyy")}</h4>
                     </div>
 
                     {/* Employee Information */}

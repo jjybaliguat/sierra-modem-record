@@ -146,6 +146,8 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
     const today = new Date();
     const startOfRequestedWeek = startOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
     const endOfRequestedWeek = endOfWeek(subWeeks(today, week), { weekStartsOn: 1 });
+    // console.log(startOfRequestedWeek)
+    // console.log(startOfRequestedWeek)
 
     if(!employeeId || !employeerId) return null
 
@@ -198,6 +200,8 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
                 timeOut: true
             }
         })
+
+        // console.log(attendance)
 
         const weeklyHours = Array(7).fill(0);
         let regularHours = 0

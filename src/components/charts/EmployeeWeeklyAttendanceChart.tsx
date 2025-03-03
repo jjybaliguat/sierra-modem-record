@@ -140,10 +140,10 @@ export function EmployeeWeeklyAttendanceChart(props: Props) {
             <SelectItem value='0' className="rounded-lg">
               This week
             </SelectItem>
-            <SelectItem value='7' className="rounded-lg">
+            <SelectItem value='1' className="rounded-lg">
               Last Week
             </SelectItem>
-            <SelectItem value='14' className="rounded-lg">
+            <SelectItem value='2' className="rounded-lg">
               Last 2 Weeks
             </SelectItem>
           </SelectContent>
