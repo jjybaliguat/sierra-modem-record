@@ -151,12 +151,11 @@ export async function POST(req: Request){
         cutoffTime.setHours(8, Number(device.user?.gracePeriodInMinutes), 0, 0); // set time-in grace period time
 
         // Determine status
-        now.setUTCSeconds(0);
-        console.log(now.toISOString())
-        console.log(cutoffTime.toISOString())
+        const timeNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }))
+        timeNow.setUTCSeconds(0);
         let status
         if(!timeIn){
-            status = now > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
+            status = timeNow > cutoffTime ? AttendanceStatus.LATE : AttendanceStatus.ONTIME
         }else{
             const timeInTime = new Date(timeIn)
             timeInTime.setUTCSeconds(0)
