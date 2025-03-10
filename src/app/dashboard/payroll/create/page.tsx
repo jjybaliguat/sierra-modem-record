@@ -119,7 +119,7 @@ const CreatePayroll = () => {
     Object.values(deductions).map((deduction)=> {
       totalDeductions += deduction
     })
-    setTotalDeduction(totalDeduction)
+    setTotalDeduction(totalDeductions)
     setGrossPay((basicSalary+otPay+totalAdjustments))
     setNetPay((basicSalary+otPay+totalAdjustments) - totalDeductions)
   }, [basicSalary, otPay, adjustments, deductions])
