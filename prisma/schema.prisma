@@ -82,7 +82,7 @@ model Employee {
   phone         String?
   department    String?
   position      String
-  dailyRate     Int
+  dailyRate     Float
   hireDate      DateTime @default(now())
   tinNumber     String?
   sssNumber     String?

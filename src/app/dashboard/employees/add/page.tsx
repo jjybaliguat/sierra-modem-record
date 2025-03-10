@@ -71,7 +71,7 @@ const AddEmployee = () => {
           email: "",
           phone: "",
           position: "",
-          dailyRate: 0,
+          dailyRate: 0.00,
           hireDate: new Date(),
           tinNumber: "",
           sssNumber: "",
@@ -227,7 +227,7 @@ const AddEmployee = () => {
                             <FormItem>
                             <FormLabel>Daily Rate <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <Input type="number" placeholder="" {...field} />
+                                <Input type="number" step="any" placeholder="" {...field} />
                             </FormControl>
                             <FormDescription>
                                 
