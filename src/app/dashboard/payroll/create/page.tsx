@@ -306,6 +306,10 @@ const CreatePayroll = () => {
                           <span>{formatCurrency(adjustments.holidayPay)}</span>
                         </div>
                         <div className="text-[14px] flex items-center gap-2">
+                          <span>Food Allowance:</span>
+                          <span>{formatCurrency(adjustments.foodAllowance)}</span>
+                        </div>
+                        <div className="text-[14px] flex items-center gap-2">
                           <span>Others:</span>
                           <span>{formatCurrency(adjustments.otherPay)}</span>
                         </div>
