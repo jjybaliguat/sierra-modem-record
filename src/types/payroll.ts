@@ -12,6 +12,7 @@ export interface Payroll {
     incentive:      number,
     paidLeaves:     number,
     holidayPay:     number,
+    foodAllowance:     number,
     otherPay:       number,
     sssDeduction: number,  
     philHealthDeduction: number, 

@@ -152,6 +152,7 @@ model Payroll {
   incentive      Float @default(0)
   paidLeaves     Float @default(0)
   holidayPay     Float @default(0)
+  foodAllowance  Float? @default(0)
   otherPay       Float @default(0)
   sssDeduction  Float  @default(0)
   philHealthDeduction Float @default(0)

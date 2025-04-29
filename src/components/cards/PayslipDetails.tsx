@@ -41,7 +41,7 @@ const PayslipDetailsCard = ({
         // Create a link element for downloading
         const link = document.createElement("a");
         link.href = image;
-        link.download = `payroll-${payroll.employee.fullName}`;
+        link.download = `payroll-${payroll.employee.fullName.split(" ")[0]}`;
         link.click();
       };
       
@@ -147,6 +147,10 @@ const PayslipDetailsCard = ({
             <div className="text-[14px] flex items-center gap-2">
                 <span>Holiday Pay:</span>
                 <span>{formatCurrency(payroll?.holidayPay)}</span>
+            </div>
+            <div className="text-[14px] flex items-center gap-2">
+                <span>Food Allowance:</span>
+                <span>{formatCurrency(payroll?.foodAllowance)}</span>
             </div>
             <div className="text-[14px] flex items-center gap-2">
                 <span>Others:</span>

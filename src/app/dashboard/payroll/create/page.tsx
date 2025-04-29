@@ -38,6 +38,7 @@ const CreatePayroll = () => {
     incentive: 0,
     paidLeaves: 0,
     holidayPay: 0,
+    foodAllowance: 0,
     otherPay: 0,
   })
   const [grossPay, setGrossPay] = useState(0)
@@ -219,8 +220,8 @@ const CreatePayroll = () => {
                         <div className='flex flex-wrap gap-4 md:items-center'>
                           {Object.entries(adjustments).map(([key, value])=>(
                             <div key={key} className='flex flex-col gap-2'>
-                              <Label htmlFor={`${key}`} className='capitalized'>{key}</Label>
-                              <Input id={`${key}`} value={value} onChange={(e)=>setAdjustments({...adjustments, [key]: Number(e.target.value)})} className='w-[100px]' />
+                              <Label htmlFor={`${key}`} className='capitalize'>{key}</Label>
+                              <Input type='number' step="any" id={`${key}`} value={value} onChange={(e)=>setAdjustments({...adjustments, [key]: Number(e.target.value)})} className='w-[100px]' />
                             </div>
                           ))}
                         </div>
@@ -230,8 +231,8 @@ const CreatePayroll = () => {
                         <div className='flex flex-wrap gap-4 md:items-center'>
                           {Object.entries(deductions).map(([key, value])=>(
                             <div key={key} className='flex flex-col gap-2'>
-                              <Label htmlFor={`${key}`} className='capitalized'>{key}</Label>
-                              <Input id={`${key}`} value={value} onChange={(e)=>setDeductions({...deductions, [key]: Number(e.target.value)})} className='w-[100px]' />
+                              <Label htmlFor={`${key}`} className='capitalize'>{key}</Label>
+                              <Input type='number' step="any" id={`${key}`} value={value} onChange={(e)=>setDeductions({...deductions, [key]: Number(e.target.value)})} className='w-[100px]' />
                             </div>
                           ))}
                         </div>
