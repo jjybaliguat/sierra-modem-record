@@ -7,6 +7,7 @@ export interface Attendance {
     timeOut: string,
     status: AttendanceStatus,
     verifiedBy: string,
+    createdAt: Date
 }
 
 export interface Employee {
