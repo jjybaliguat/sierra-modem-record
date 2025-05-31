@@ -22,6 +22,7 @@ export default function AttendancePage() {
     try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/check-attendance?id=${employeeCode}`);
     const attendance = await response.json();
+    console.log(attendance)
 
     if (!response.ok) {
         setError(attendance.message)
