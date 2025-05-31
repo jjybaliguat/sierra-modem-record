@@ -14,22 +14,32 @@ export default function AttendancePage() {
   const [employeeCode, setEmployeeCode] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [data, setData] = useState<Attendance[] | null>(null)
+  const [error, setError] = useState("")
 
   const handleCheck = async(e: React.FormEvent) => {
     e.preventDefault()
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/check-attendance?id=${employeeCode}`)
-        const attendance = await response.json()
-         // Remove Sunday records
-        const filtered = attendance.filter((record: Attendance) => {
-        const day = new Date(record.createdAt).getDay()
-        return day !== 0 // 0 = Sunday
-        })
+    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/check-attendance?id=${employeeCode}`);
+    const attendance = await response.json();
 
-        setData(filtered)
-    } catch (error) {
-        console.log(error)
+    if (!response.ok) {
+        setError(attendance.message)
+        setData(null)
+    }else{
+        setError("")
+    // Remove Sunday records
+    const filtered = attendance.filter((record: Attendance) => {
+        const day = new Date(record.createdAt).getDay();
+        return day !== 0; // 0 = Sunday
+    });
+
+    setData(filtered);
     }
+
+    } catch (error) {
+    console.error('Error checking attendance:', error);
+    }
+
     setSubmitted(true)
   }
 
@@ -47,7 +57,7 @@ export default function AttendancePage() {
           <CardContent>
             <form onSubmit={handleCheck} className="flex flex-col sm:flex-row items-center gap-4">
               <Input
-                placeholder="e.g., EMP20231001"
+                placeholder="e.g., EMP-24-000"
                 value={employeeCode}
                 onChange={(e) => setEmployeeCode(e.target.value)}
                 className="flex-1"
@@ -57,7 +67,9 @@ export default function AttendancePage() {
             </form>
           </CardContent>
         </Card>
-
+        <div className='mt-8'>
+            <h1 className='text-red-500 font-medium text-center text-2xl'>{error}</h1>
+        </div>
         {data && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-zinc-100">Attendance Records (last 7 days)</h2>

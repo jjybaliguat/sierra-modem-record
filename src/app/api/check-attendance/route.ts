@@ -20,43 +20,49 @@ export async function GET(req: Request) {
         // return new Date(date.getFullYear(), date.getMonth(), date.getDate()); // drops time part, keeps local
         });
 
-    console.log(dateList)
-
-
   try {
-    // Define range: oldest to today
-    const startDate = new Date(dateList[6]);
-    const endDate = new Date(dateList[0]);
-    endDate.setHours(23, 59, 59, 999);
+     const employee = await prisma.employee.findUnique({
+        where: {
+            empCode
+        }
+    })
+    if(employee){
+            // Define range: oldest to today
+        const startDate = new Date(dateList[6]);
+        const endDate = new Date(dateList[0]);
+        endDate.setHours(23, 59, 59, 999);
 
-    // Get attendance records in that date range
-    const attendanceRecords = await prisma.attendance.findMany({
-      where: {
-        employee: { empCode },
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
+        // Get attendance records in that date range
+        const attendanceRecords = await prisma.attendance.findMany({
+        where: {
+            employee: { empCode },
+            createdAt: {
+            gte: startDate,
+            lte: endDate,
+            },
         },
-      },
-    });
+        });
 
-    const results = dateList.map((date) => {
-      const localDateStr = getLocalDateStr(date);
+        const results = dateList.map((date) => {
+        const localDateStr = getLocalDateStr(date);
 
-      const record = attendanceRecords.find((r) => {
-        const recordDateStr = getLocalDateStr(new Date(r.createdAt));
-        return recordDateStr === localDateStr;
-      });
+        const record = attendanceRecords.find((r) => {
+            const recordDateStr = getLocalDateStr(new Date(r.createdAt));
+            return recordDateStr === localDateStr;
+        });
 
-      return {
-        timeIn: record?.timeIn ?? null,
-        timeOut: record?.timeOut ?? null,
-        status: record?.status ?? null,
-        createdAt: date,
-      };
-    });
+        return {
+            timeIn: record?.timeIn ?? null,
+            timeOut: record?.timeOut ?? null,
+            status: record?.status ?? null,
+            createdAt: date,
+        };
+        });
 
-    return NextResponse.json(results, { status: 200 });
+        return NextResponse.json(results, { status: 200 });
+    }else{
+        return NextResponse.json({message: "Employee Code Not Found"}, {status: 400})
+    }
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
