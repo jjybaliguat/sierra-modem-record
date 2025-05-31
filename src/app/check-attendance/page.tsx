@@ -73,7 +73,7 @@ export default function AttendancePage() {
         </div>
         {data && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-zinc-100">Attendance Records (last 7 days)</h2>
+            <h2 className="text-xl font-semibold mb-4 text-zinc-800 dark:text-zinc-100">Attendance Records (6 days)</h2>
             <Table>
               <TableHeader>
                 <TableRow>
