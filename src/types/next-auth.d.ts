@@ -8,6 +8,7 @@ declare module "next-auth" {
     user: {
       /** The user's postal address. */
       id: string,
+      parentId?: string,
       name: string,
       email: string,
       photo: string,
@@ -26,6 +27,7 @@ declare module "next-auth" {
 
   interface User {
     id: string,
+    parentId?: string,
     name: string,
     email: string,
     photo: string,
@@ -49,6 +51,7 @@ declare module "next-auth" {
 
   export enum UserRole {
     ADMIN = "ADMIN",
+    EDITOR = "EDITOR",
     DEVELOPER = "DEVELOPER",
   }
 }

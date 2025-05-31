@@ -87,12 +87,23 @@ const ProfilePage = (props: Props) => {
     // ✅ This will be type-safe and validated.
     try {
         setIsSubmitting(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/user?id=${user?.id}`, {
+        const isSubUser = user?.parentId
+        const url = isSubUser? `${process.env.NEXT_PUBLIC_FRONTEND_URL}/sub-user?id=${user?.id}` : `${process.env.NEXT_PUBLIC_FRONTEND_URL}/user?id=${user?.id}`
+        const response = await fetch(url, {
             method: "PATCH",
             body: JSON.stringify({...values})
         })
         const data = await response.json()
+        console.log(user)
         setIsSubmitting(false)
+        user?.parentId? 
+        update({
+            user: {
+                ...user,
+                name: data.name,
+                email: data.email
+            }
+        }) :
         update({
             user: {
                 ...user,
@@ -116,7 +127,7 @@ const ProfilePage = (props: Props) => {
   async function handleChangePass(values: z.infer<typeof passwordSchema>){
     try {
         setIsSubmitting2(true)
-        const response: any = await changePassword({id: user?.id, oldPassword: values.oldPassword, password: values.password})
+        const response: any = await changePassword({user: user, oldPassword: values.oldPassword, password: values.password})
         
         if(response.error){
             setError(response.error)
@@ -198,7 +209,7 @@ const ProfilePage = (props: Props) => {
                                         <FormItem>
                                         <FormLabel>Company Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="" {...field} />
+                                            <Input placeholder="" {...field} readOnly={user?.parentId? true : false} />
                                         </FormControl>
                                         <FormDescription>
                                             
@@ -215,7 +226,7 @@ const ProfilePage = (props: Props) => {
                                         <FormItem>
                                         <FormLabel>Company Address</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="" {...field} />
+                                            <Input placeholder="" {...field} readOnly={user?.parentId? true : false} />
                                         </FormControl>
                                         <FormDescription>
                                             
@@ -232,7 +243,7 @@ const ProfilePage = (props: Props) => {
                                         <FormItem>
                                         <FormLabel>Company Contact</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="" {...field} />
+                                            <Input placeholder="" {...field} readOnly={user?.parentId? true : false} />
                                         </FormControl>
                                         <FormDescription>
                                             

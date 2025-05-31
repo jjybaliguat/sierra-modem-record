@@ -143,8 +143,8 @@ export const columns: ColumnDef<Attendance>[] = [
 ]
 
 export function AttendanceTable() {
-  const session = useSession()
-  const userId = session?.data?.user?.id;
+  const {data: session} = useSession()
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
 
   const {data, isLoading} = useSWR(userId? "getAttendance" : null, getAttendance)
 

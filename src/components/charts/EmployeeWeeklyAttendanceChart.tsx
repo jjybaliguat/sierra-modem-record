@@ -40,7 +40,7 @@ type Props = {
 
 export function EmployeeWeeklyAttendanceChart(props: Props) {
   const {data: session} = useSession()
-  const userId = session?.user.id
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
   const {data: employees, isLoading} = useSWR(userId? "getEmployees" : null, getEmployees)
     const [chartData, setChartData] = useState<any>(null)
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("")

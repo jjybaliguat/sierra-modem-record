@@ -11,7 +11,7 @@ import Link from 'next/link'
 
 const AttendanceLogs = () => {
   const {data: session} = useSession()
-  const userId = session?.user.id
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
   const {data: attLogs, isLoading} = useSWR(userId? "getAttendanceLogs" : null, GetAttendanceLogs)
 
   async function GetAttendanceLogs(){

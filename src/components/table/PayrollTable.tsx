@@ -140,8 +140,8 @@ export const columns: ColumnDef<Payroll>[] = [
 ]
 
 export function PayrollTable() {
-  const session = useSession()
-  const userId = session?.data?.user?.id;
+  const {data: session} = useSession()
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
 
   const {data, isLoading} = useSWR(userId? "getPayroll" : null, getPayroll)
 

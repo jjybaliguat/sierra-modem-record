@@ -28,10 +28,11 @@ const BiometricEnroll = async({
     params: Promise<{id: string, fingerId?: string}>
 }) => {0
     const session: any = await getServerSession(authOptions)
+    const userId = session?.user.parentId? session?.user.parentId : session?.user.id
     // console.log(session)
     const id = (await params).id
     const fingerId = (await params).fingerId
-    const devices = await getDevices(session.user.id)
+    const devices = await getDevices(userId)
 
   return (
     <>

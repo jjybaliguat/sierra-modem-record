@@ -22,7 +22,8 @@ import { format } from 'date-fns'
 
 const CreatePayroll = () => {
   const {data: session} = useSession()
-  const {data: employees, isLoading} = useSWR(session?.user.id? "getEmployee" : null, getEmployees)
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
+  const {data: employees, isLoading} = useSWR(userId? "getEmployee" : null, getEmployees)
   const [selectedEmployee, setSelectedEmployee] = useState<Employees | null>(null)
   const [attendanceLogs, setAttendanceLogs] = useState<Attendance[]>([])
 
@@ -61,7 +62,7 @@ const CreatePayroll = () => {
 
   async function getEmployees(){
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${session?.user.id? session.user.id : ""}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee?id=${userId? userId : ""}`)
       
       const data = await response.json()
       // console.log(data)
@@ -76,7 +77,7 @@ const CreatePayroll = () => {
     const getEmployeeTotalHours = async () => {
       try {
         if(!session) return null
-        const response: any = await getEmployeeAttendanceTotalHours(session?.user.id, selectedEmployee?.id!, format(periodStart, "yyyy-MM-dd"), format(periodEnd, "yyyy-MM-dd"))
+        const response: any = await getEmployeeAttendanceTotalHours(userId, selectedEmployee?.id!, format(periodStart, "yyyy-MM-dd"), format(periodEnd, "yyyy-MM-dd"))
       setTotalHours(response.totalHours? response.totalHours : 0)
       setRegularHours(response.regularHours? response.regularHours : 0)
       setOtHours(response.overtimeHours? response.overtimeHours : 0)

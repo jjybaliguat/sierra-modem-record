@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react'
 
 const TotalEmployeeCard = () => {
   const {data: session} = useSession()
-  const userId = session?.user.id
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
   const {data: count, isLoading} = useSWR(userId? "getEmployeeCount" : null, GetTotalEmployees) 
 
   async function GetTotalEmployees() {

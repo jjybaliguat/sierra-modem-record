@@ -34,12 +34,32 @@ model User {
 
   devices      Device[]
   employees    Employee[]
+  SubUser SubUser[]
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([name, email])
 }
+
+model SubUser {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  parentId    String @db.ObjectId
+  parent      User @relation(fields: [parentId], references: [id])
+  name  String
+  email String @unique
+  password  String
+  role  SubUserRole
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum SubUserRole {
+  ADMIN
+  EDITOR
+}
+
 
 enum UserRole {
   ADMIN

@@ -61,8 +61,8 @@ const AddEmployee = () => {
 
         // const [deductions, setDeductions] = useState<Deductions[]>([])
         const router = useRouter()
-        const session = useSession()
-        const user = session.data?.user
+        const {data: session} = useSession()
+        const userId = session?.user.parentId? session?.user.parentId : session?.user.id
         // 1. Define your form.
       const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -89,7 +89,7 @@ const AddEmployee = () => {
             setIsSubmitting(true)
             const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/protected/employee`, {
                 method: "POST",
-                body: JSON.stringify({...values, employerId: user?.id})
+                body: JSON.stringify({...values, employerId: userId})
             })
             const data = await response.json()
             if(!data.error){

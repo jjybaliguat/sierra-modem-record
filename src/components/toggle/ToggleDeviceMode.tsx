@@ -25,7 +25,8 @@ const ToggleDeviceMode = ({
     const [enrollmentMode, setEnrollmentMode] = useState(false)
     const [isSuccessEnrollment, setIsSuccessEnrollment] = useState(false)
     const [sendingEnrollmentRequest, setSendingEnrollmentRequest] = useState(false)
-    const session: any = useSession()
+    const {data: session} = useSession()
+    const userId = session?.user.parentId? session?.user.parentId : session?.user.id
     const router = useRouter()
     // console.log(fingerprintId)
 
@@ -96,7 +97,7 @@ const ToggleDeviceMode = ({
         setFetchingNextFingerId(true)
         const fetchAvailableNextFingerId = async () => {
             try {
-                const id: any = await getNextFingerPrintId(session?.data?.user?.id, deviceId)
+                const id: any = await getNextFingerPrintId(userId, deviceId)
                 setFingerPrintId(id)
                 setFetchingNextFingerId(false)
             } catch (error) {

@@ -12,6 +12,7 @@ import { CashAdvanceBalanceTable } from '@/components/table/CashAdvanceBalanceTa
 
 const CashAdvancePage = async() => {
   const session: any = await getServerSession(authOptions)
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
   return (
     <div className='grid grid-cols-1 md:grid-cols-12 gap-4'>
       <Card className='col-span-12 md:col-span-8'>
@@ -20,7 +21,7 @@ const CashAdvancePage = async() => {
           <CreateCashAdvanceDialog />
         </CardHeader>
         <CardContent>
-          <CashAdvanceTable userId={session.user.id} />
+          <CashAdvanceTable userId={userId} />
         </CardContent>
       </Card>
       <Card className='col-span-12 md:col-span-4'>
@@ -29,7 +30,7 @@ const CashAdvancePage = async() => {
           {/* <CreateCashAdvanceDialog /> */}
         </CardHeader>
         <CardContent>
-          <CashAdvanceBalanceTable userId={session.user.id} />
+          <CashAdvanceBalanceTable userId={userId} />
         </CardContent>
       </Card>
     </div>

@@ -3,7 +3,7 @@
 import { PayslipStatus } from "@/components/select/SelectPayslipStatus";
 import { Employees } from "@/types/employees";
 import { hashPassword } from "@/utils/hashPassword";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
 import bcrypt from 'bcryptjs'
 import { startOfWeek, endOfWeek, subWeeks } from "date-fns";
@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient()
 
-export async function getNextFingerPrintId(employerId: string, deviceId: string): Promise<number | null> {
+export async function getNextFingerPrintId(employerId: string | undefined, deviceId: string): Promise<number | null> {
     const lastFingerPrint = await prisma.fingerPrintID.findFirst({
         where: { employee: {
             employerId,
@@ -104,36 +104,67 @@ export async function enrollEmployeeFinger(employeeId: string, fingerId: string,
 //     }
 // }
 
-export async function changePassword(data: {id: string | undefined, oldPassword: string, password: string}) {
+export async function changePassword(data: {user: any | undefined, oldPassword: string, password: string}) {
     try {
-        const user: any = await prisma.user.findUnique({
-            where: {
-                id: data.id
-            },
-            select: {
-                password: true
+        if(data.user.parentId){
+            const user: any = await prisma.subUser.findUnique({
+                where: {
+                    id: data.user.id
+                },
+                select: {
+                    password: true
+                }
+            })
+    
+            if(!user){
+                return {error: `User with id ${data.user.id}  not found.`}
             }
-        })
-
-        if(!user){
-            return {error: `User with id ${data.id}  not found.`}
-        }
-        
-        const isPasswordMatched = await bcrypt.compare(data.oldPassword, user.password)
-
-        if(!isPasswordMatched){
-            return {error: "Old Password not matched."}
-        }
-
-        const hashedPass: any = await hashPassword(data.password)
-        await prisma.user.update({
-            where: {
-                id: data.id
-            },
-            data: {
-                password: hashedPass
+            
+            const isPasswordMatched = await bcrypt.compare(data.oldPassword, user.password)
+    
+            if(!isPasswordMatched){
+                return {error: "Old Password not matched."}
             }
-        })
+    
+            const hashedPass: any = await hashPassword(data.password)
+            await prisma.subUser.update({
+                where: {
+                    id: data.user.id
+                },
+                data: {
+                    password: hashedPass
+                }
+            })
+        }else{
+            const user: any = await prisma.user.findUnique({
+                where: {
+                    id: data.user.id
+                },
+                select: {
+                    password: true
+                }
+            })
+    
+            if(!user){
+                return {error: `User with id ${data.user.id}  not found.`}
+            }
+            
+            const isPasswordMatched = await bcrypt.compare(data.oldPassword, user.password)
+    
+            if(!isPasswordMatched){
+                return {error: "Old Password not matched."}
+            }
+    
+            const hashedPass: any = await hashPassword(data.password)
+            await prisma.user.update({
+                where: {
+                    id: data.user.id
+                },
+                data: {
+                    password: hashedPass
+                }
+            })
+        }
 
         return {message: "Password Updated Successfully."}
     } catch (error) {
@@ -302,7 +333,7 @@ export async function getEmployeeAttendancePerWeek(employeerId: string | null | 
 }
 
 
-export async function getEmployeeAttendanceTotalHours(employerId: string, employeeId: string, startDate: string, endDate: string){
+export async function getEmployeeAttendanceTotalHours(employerId: string | undefined, employeeId: string, startDate: string, endDate: string){
     if(!employeeId || !startDate || !endDate || !employerId) return null
     const today = new Date()
 

@@ -157,8 +157,8 @@ export const columns: ColumnDef<Employees>[] = [
 ]
 
 export function EmployeesTable() {
-  const session = useSession()
-  const userId = session?.data?.user?.id;
+  const {data: session} = useSession()
+  const userId = session?.user.parentId? session?.user.parentId : session?.user.id
 
   const {data, isLoading} = useSWR(userId ? "getEmployees" : null, getEmployees)
 
