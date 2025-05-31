@@ -12,12 +12,13 @@ import { cn } from '@/lib/utils'
 
 export default function AttendancePage() {
   const [employeeCode, setEmployeeCode] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState<Attendance[] | null>(null)
   const [error, setError] = useState("")
 
   const handleCheck = async(e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/check-attendance?id=${employeeCode}`);
     const attendance = await response.json();
@@ -25,6 +26,7 @@ export default function AttendancePage() {
     if (!response.ok) {
         setError(attendance.message)
         setData(null)
+        setIsLoading(false)
     }else{
         setError("")
     // Remove Sunday records
@@ -32,15 +34,14 @@ export default function AttendancePage() {
         const day = new Date(record.createdAt).getDay();
         return day !== 0; // 0 = Sunday
     });
-
+    setIsLoading(false)
     setData(filtered);
     }
 
     } catch (error) {
+    setIsLoading(false)
     console.error('Error checking attendance:', error);
     }
-
-    setSubmitted(true)
   }
 
   return (
@@ -63,7 +64,7 @@ export default function AttendancePage() {
                 className="flex-1"
                 required
               />
-              <Button type="submit">Check</Button>
+              <Button type="submit" disabled={isLoading}>{isLoading? "Checking..." : "Check"}</Button>
             </form>
           </CardContent>
         </Card>
