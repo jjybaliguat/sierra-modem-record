@@ -31,12 +31,12 @@ export default function AttendancePage() {
     }else{
         setError("")
     // Remove Sunday records
-    const filtered = attendance.filter((record: Attendance) => {
-        const day = new Date(record.createdAt).getDay();
-        return day !== 0; // 0 = Sunday
-    });
+    // const filtered = attendance.filter((record: Attendance) => {
+    //     const day = new Date(record.createdAt).getDay();
+    //     return day !== 0; // 0 = Sunday
+    // });
     setIsLoading(false)
-    setData(filtered);
+    setData(attendance);
     }
 
     } catch (error) {

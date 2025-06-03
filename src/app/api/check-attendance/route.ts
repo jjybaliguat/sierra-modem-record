@@ -27,41 +27,46 @@ export async function GET(req: Request) {
     })
     if(employee){
             // Define range: oldest to today
-        const startDate = new Date(dateList[6]);
-        startDate.setHours(9, 0, 0, 0);
-        const endDate = new Date(dateList[0]);
-        endDate.setHours(20, 59, 59, 999);
+        // const startDate = new Date(dateList[6]);
+        // startDate.setHours(9, 0, 0, 0);
+        // const endDate = new Date(dateList[0]);
+        // endDate.setHours(20, 59, 59, 999);
 
-        // Get attendance records in that date range
+        // const today = new Date();
+        // const endDate = new Date(today); // today
+        // endDate.setHours(23, 59, 59, 999);
+        // const startDate = new Date(today);
+        // startDate.setDate(today.getDate() - 9); // 6 days range including today
+
         const attendanceRecords = await prisma.attendance.findMany({
         where: {
             employee: { empCode },
-            timeIn: {
-            gte: startDate,
-            lte: endDate,
-            },
+        },
+        take: 10,
+        orderBy: {
+            timeIn: "desc",
         },
         });
 
-        const results = dateList.map((date) => {
-        const localDateStr = getLocalDateStr(date);
+        // const results = dateList.map((date) => {
+        // const localDateStr = getLocalDateStr(date);
 
-        const record = attendanceRecords.find((r) => {
-            const recordDateStr = getLocalDateStr(new Date(r.timeIn));
-            return recordDateStr === localDateStr;
-        });
+        // const record = attendanceRecords.find((r) => {
+        //     const recordDateStr = getLocalDateStr(new Date(r.timeIn));
+        //     return recordDateStr === localDateStr;
+        // });
 
-        console.log(record)
+        // console.log(record)
 
-        return {
-            timeIn: record?.timeIn ?? null,
-            timeOut: record?.timeOut ?? null,
-            status: record?.status ?? null,
-            createdAt: date,
-        };
-        });
+        // return {
+        //     timeIn: record?.timeIn ?? null,
+        //     timeOut: record?.timeOut ?? null,
+        //     status: record?.status ?? null,
+        //     createdAt: date,
+        // };
+        // });
 
-        return NextResponse.json(results, { status: 200 });
+        return NextResponse.json(attendanceRecords, { status: 200 });
     }else{
         return NextResponse.json({message: "Employee Code Not Found"}, {status: 400})
     }
