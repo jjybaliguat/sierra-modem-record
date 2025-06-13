@@ -73,7 +73,7 @@ export function LoginForm({
             <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">Sierra Modem's Record</h1>
+                  <h1 className="text-2xl font-bold">Sierra Modem&apos;s Record</h1>
                   <p className="text-balance text-muted-foreground">
                     Login to your account
                   </p>
