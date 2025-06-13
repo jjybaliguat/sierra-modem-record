@@ -41,7 +41,7 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           !item.items ? (
-            <SidebarMenuItem className={`${item.url === "/dashboard/user-devices" && session.data?.user.role !== "DEVELOPER" ? "hidden" : "block"}`} key={item.title}>
+            <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild disabled={item.disabled}
               className={cn({
                 "bg-sidebar-accent hover:text-sidebar-accent-foreground": pathname == item.url

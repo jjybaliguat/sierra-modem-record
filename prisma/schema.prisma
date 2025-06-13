@@ -14,244 +14,57 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  email        String    @unique
-  password     String
-  photo        String?
-  companyId     String? @db.ObjectId
-  company      Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  role         UserRole  @default(ADMIN)
-
-  workStartTime String? @default("8:00")
-  workEndTime   String? @default("17:00")
-  gracePeriodInMinutes  Int?  @default(15)
-  minutesThresholdAfterLate Int?
-  overtimeThresholdInMinutes Int? @default(60)
-  lateDeducInMinutes    Int  @default(30)
-  overtimeRate  Float @default(1.2)
-  rdotRate      Float @default(1.3)
-
-  devices      Device[]
-  employees    Employee[]
-  SubUser SubUser[]
-
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@index([name, email])
-}
-
-model SubUser {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  parentId    String @db.ObjectId
-  parent      User @relation(fields: [parentId], references: [id])
-  name  String
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
   email String @unique
-  password  String
-  role  SubUserRole
+  password  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-enum SubUserRole {
-  ADMIN
-  EDITOR
+model Modem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  type  ModemType
+  condition ModemCondition @default(SECOND_HAND)
+  serial String?
+  client Client?
+  status ModemStatus @default(AVAILABLE)
+  dispatchedTo String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-
-enum UserRole {
-  ADMIN
-  DEVELOPER
-}
-
-model Company {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+model Client {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   name  String
-  logo  String?
   address String
-  contact String
-
-  User User[]
-}
-
-model Device {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  name  String?
-  deviceId  String @unique
-  isEnrollmentMode  Boolean @default(false)
-  userId  String? @db.ObjectId
-  user  User? @relation(fields: [userId], references: [id])
-  employees Employee[]
-  toEnrollId  Int @default(0)
+  pppoeAcc String
+  modemId String @db.ObjectId @unique
+  Modem Modem @relation(fields: [modemId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  Attendance Attendance[]
 }
 
-model Employee {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  employerId    String @db.ObjectId
-  employer      User @relation(fields: [employerId], references: [id], onDelete: Cascade)
-  empCode       String   @unique // Unique employee code
-  fullName      String?
-  email         String   @unique
-  phone         String?
-  department    String?
-  position      String
-  dailyRate     Float
-  hireDate      DateTime @default(now())
-  tinNumber     String?
-  sssNumber     String?
-  pagIbigNumber       String?
-  philHealthNumber String?
-  // overtimeRate  Float?
-
-  isActive      Boolean  @default(true)
-  fingerprintId Int?      // Numeric fingerprint ID for sensor
-  fingerEnrolled  Boolean? @default(false)
-
-  payrolls          Payroll[]
-  // deductions        EmployeeDeduction[]
-  bonuses           Bonus[]
-
-  attendance Attendance[]
-  deviceId    String?
-  device  Device? @relation(fields: [deviceId], references: [deviceId])
-
-  cashAdvance CashAdvance[]
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  fingerPrints FingerPrintID[]
+enum ModemStatus {
+  AVAILABLE
+  DISPATCHED
+  ASSIGNED
 }
 
-model FingerPrintID {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  fingerId        Int
-  employeeId      String @db.ObjectId
-  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+enum ModemCondition {
+  BRAND_NEW
+  SECOND_HAND
 }
 
-model CashAdvance {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId      String @db.ObjectId
-  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  amount          Float    // Total cash advance amount owed
-  logs            CashAdvanceLogs[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+enum ModemType {
+  IOT
+  HUAWEI_5V5
+  CHINA_MOBILE
+  VSOL
+  ZTE
+  TOWER
+  KING_CRAB
 }
-
-model CashAdvanceLogs {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  cashAdvanceId   String @db.ObjectId
-  cashAdvance     CashAdvance @relation(fields: [cashAdvanceId], references: [id], onDelete: Cascade)
-  amount   Int
-  date    DateTime  @default(now())
-}
-
-enum RepaymentStatus {
-  UNPAID
-  PARTIALLY_PAID
-  PAID
-}
-
-model Payroll {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId    String @db.ObjectId
-  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  regularHours     Float 
-  overtimeHours  Float @default(0)
-  basicSalary    Float @default(0)
-  overtimePay    Float @default(0)
-  incentive      Float @default(0)
-  paidLeaves     Float @default(0)
-  holidayPay     Float @default(0)
-  foodAllowance  Float? @default(0)
-  otherPay       Float @default(0)
-  sssDeduction  Float  @default(0)
-  philHealthDeduction Float @default(0)
-  pagIbigDeduction  Float @default(0)
-  taxDeduction  Float  @default(0)
-  caDeduction Float @default(0)
-  otherDeduction  Float @default(0)
-  totalDeduction Float
-  grossPay        Float
-  netPay        Float
-  periodStart   DateTime
-  periodEnd     DateTime
-  status        PayrollStatus @default(PENDING)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-enum PayrollStatus {
-  PENDING
-  PAID
-  CANCELED
-}
-
-// model EmployeeDeduction {
-//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-//   employeeId  String @db.ObjectId
-//   employee    Employee @relation(fields: [employeeId], references: [id])
-//   type        DeductionType
-//   precentage      Float?
-//   status      DeductionStatus
-//   createdAt   DateTime @default(now())
-// }
-
-enum DeductionStatus {
-  ACTIVE
-  INACTIVE
-}
-
-
-enum DeductionType {
-  TAX
-  LOAN
-  INSURANCE
-  SSS
-  PHILHEALTH
-  PAGIBIG
-  OTHER
-}
-
-model Bonus {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId  String @db.ObjectId
-  employee    Employee @relation(fields: [employeeId], references: [id])
-  amount      Float
-  description String?
-  createdAt   DateTime @default(now())
-}
-
-model Attendance {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId    String @db.ObjectId
-  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  fingerprintId Int      // Numeric fingerprint ID for tracking
-  timeIn       DateTime @default(now()) // Check-in timestamp
-  timeOut      DateTime? // Nullable check-out timestamp
-  status        AttendanceStatus   @default(ONTIME) // PRESENT, LATE, ABSENT
-  verifiedBy    String   @default("FINGERPRINT") // Always "FINGERPRINT"
-  deviceId      String
-  device        Device  @relation(fields: [deviceId], references: [deviceId])
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime? @updatedAt
-}
-
-enum AttendanceStatus {
-  PRESENT
-  ONTIME
-  LATE
-  ABSENT
-}
-
-

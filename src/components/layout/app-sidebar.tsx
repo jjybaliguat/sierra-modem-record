@@ -38,39 +38,9 @@ const data = {
       icon: House,
     },
     {
-      title: "Employees",
-      url: "/dashboard/employees",
-      icon: Users,
-    },
-    {
-      title: "Attendance",
-      url: "/dashboard/attendance",
-      icon: Logs,
-    },
-    {
-      title: "Payroll",
-      url: "/dashboard/payroll",
-      icon: HandCoins,
-    },
-    {
-      title: "Devices",
-      url: "/dashboard/devices",
-      icon: Server,
-    },
-    {
-      title: "User Devices",
-      url: "/dashboard/user-devices",
-      icon: Server,
-    },
-    {
-      title: "Profile",
-      url: "/dashboard/profile",
-      icon: User,
-    },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings,
+      title: "Modems",
+      url: "/modems",
+      icon: House,
     },
   ]
 }
@@ -85,19 +55,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-white">
+          <div className="flex aspect-square size-20 items-center justify-center rounded-lg bg-white">
             <Image
-                src="/logo-favicon.png"
-                alt="logo-favicon"
-                height={20}
-                width={20}
+                src="/logo.png"
+                alt="logo"
+                height={100}
+                width={100}
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">
-              LogPay
+              Modem Records
             </span>
-            <span className="truncate text-xs">{user?.role === "ADMIN" ? "ADMIN" : user?.role} Dashboard</span>
+            <span className="truncate text-xs">Dashboard</span>
           </div>
           <ChevronsUpDown className="ml-auto" />
         </SidebarMenuButton>
