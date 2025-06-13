@@ -1,9 +1,5 @@
 import React from 'react'
-import AttendanceLogs from '@/components/AttendanceLogs'
-import TotalDevicesCard from '@/components/cards/TotalDevicesCard'
-import TotalEmployeeCard from '@/components/cards/TotalEmployeeCard'
 import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
-import { EmployeeWeeklyAttendanceChart } from '@/components/charts/EmployeeWeeklyAttendanceChart'
 
 const Dashboard = async() => {
   return (
