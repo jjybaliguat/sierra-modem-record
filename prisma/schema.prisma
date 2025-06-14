@@ -27,7 +27,7 @@ model Modem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   type  ModemType
   condition ModemCondition @default(SECOND_HAND)
-  serial String?
+  serial String? @unique
   client Client?
   status ModemStatus @default(AVAILABLE)
   dispatchedTo String?
@@ -40,12 +40,19 @@ model Client {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   address String
-  pppoeAcc String
+  pppoeAcc String?
+  dispatchImage Photo?
   modemId String @db.ObjectId @unique
-  Modem Modem @relation(fields: [modemId], references: [id])
+  Modem Modem @relation(fields: [modemId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type Photo {
+  id              String
+  webViewLink     String
+  webContentLink  String
 }
 
 enum ModemStatus {

@@ -1,32 +1,19 @@
-"use client"
-
 import React from 'react'
-import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeToggle } from '@/components/ThemeToggler'
-import { Notifications } from '@/components/popover/Notifications'
-import HeaderBreadCrumb from '@/components/layout/HeaderBreadCrumb'
-import DateTime from '@/components/DateTime'
-import { AppSidebar } from '@/components/layout/app-sidebar'
 import Image from 'next/image'
-import { NavUser } from '@/components/layout/nav-user'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { Button } from '@/components/ui/button'
-import { signOut } from 'next-auth/react'
-import { LogOut } from 'lucide-react'
+import LogoutBtn from '@/components/buttons/LogoutBtn'
 
 const RootLayout = async({
     children
 }: {children: React.ReactNode}) => {
   return (
     <SidebarProvider>
-      <Toaster />
+      <Toaster position='top-right' />
       {/* <AppSidebar /> */}
       <SidebarInset className='overflow-hidden'>
         <div className='sticky top-0 bg-background'>
@@ -53,11 +40,7 @@ const RootLayout = async({
               </div> */}
               <div className='flex items-center gap-4'>
                 {/* <Notifications /> */}
-                <Button variant="destructive" onClick={async()=>{
-                    await signOut()
-                }}>
-                  <LogOut />
-                </Button>
+                <LogoutBtn />
                 <ThemeToggle />
               </div>
             </div>
