@@ -20,11 +20,13 @@ import Link from 'next/link'
 import { DatePicker } from '@/components/DatePicker'
 import { Portal } from "@radix-ui/react-portal"
 import { format } from 'date-fns'
+import { useSession } from 'next-auth/react'
 
 const statusColor: Record<ModemStatus, string> = {
   AVAILABLE: 'bg-green-600',
   DISPATCHED: 'bg-yellow-600',
   ASSIGNED: 'bg-blue-600',
+  DEFECTIVE: 'bg-red-600'
 }
 
 type ModemWithClient = Modem & { client: Client | null }
@@ -48,12 +50,15 @@ const modemTypeLabels: Record<ModemType, string> = {
 }
 
 export default function DashboardPage() {
+  const session = useSession()
+  const userId = session.data?.user.id
   const { data: modems = [] } = useSWR<ModemWithClient[]>('/api/modems', fetcher)
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [serialSearch, setSerialSearch] = useState('')
   const [openAssignDialog, setOpenAssignDialog] = useState(false)
   const [openUnAssignDialog, setOpenUnAssignDialog] = useState(false)
   const [openDispatchDialog, setOpenDispatchDialog] = useState(false)
+  const [openReturnDialog, setOpenReturnDialog] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
   const [openImageViewer, setOpenImageViewer] = useState(false)
   const [selectedImage, setSelectedImage] = useState<Photo>({
@@ -82,6 +87,11 @@ export default function DashboardPage() {
     dispatchedTo: '',
     dispatchedDate: new Date()
   })
+  const [returnData, setReturnData] = useState({
+    condition: '',
+    remark: ''
+  })
+  const [unAssignReason, setUnassignReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [modemToDelete, setModemToDelete] = useState<ModemWithClient | null>(null)
@@ -111,7 +121,7 @@ export default function DashboardPage() {
       const uploadedPhoto = await response.json()
       if(response.ok){
         setClientData({...clientData, dispatchImage: uploadedPhoto})
-          const response = await fetch("/api/client", {
+          const response = await fetch(`/api/client?userId=${userId}`, {
             method: "POST",
             body: JSON.stringify({
               ...clientData,
@@ -167,12 +177,16 @@ export default function DashboardPage() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const response = await fetch(`/api/client?modemId=${selectedModem?.id}`, {
+      const response = await fetch(`/api/client?modemId=${selectedModem?.id}&userId=${userId}`, {
         method: "DELETE",
+        body: JSON.stringify({
+          reason: unAssignReason
+        })
       })
       const data = await response.json()
       if(response.ok){
         setSubmitting(false)
+        setUnassignReason('')
         toast("Modem has been Unassigned", {
             description: `You successfully Unassigned ${selectedModem?.serial} to client ${clientData.name}`,
             duration: 3000,
@@ -200,7 +214,7 @@ export default function DashboardPage() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const response = await fetch("/api/modems", {
+      const response = await fetch(`/api/modems?userId=${userId}`, {
         method: "POST",
         body: JSON.stringify(modemData)
       })
@@ -272,7 +286,7 @@ export default function DashboardPage() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const response = await fetch(`/api/modems?id=${selectedModem?.id}`, {
+      const response = await fetch(`/api/modems?id=${selectedModem?.id}&userId=${userId}`, {
         method: "PATCH",
         body: JSON.stringify({
           status: ModemStatus.DISPATCHED,
@@ -292,6 +306,45 @@ export default function DashboardPage() {
           dispatchedTo: ''
         })
         setOpenDispatchDialog(false)
+        mutate("/api/modems")
+      }else{
+        setSubmitting(false)
+        toast("Error!", {
+            description: data.message,
+            duration: 3000,
+        })
+      }
+    } catch (error) {
+      setSubmitting(false)
+      console.log(error)
+      toast("Internal Server Error", {
+            description: "Something went wrong, please try again later.",
+            duration: 3000,
+        })
+    }
+  }
+
+  const handleReturnModem = async(e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const response = await fetch(`/api/modem-return?id=${selectedModem?.id}&userId=${userId}`, {
+        method: "POST",
+        body: JSON.stringify(returnData)
+      })
+
+      const data = await response.json()
+      if(response.ok){
+        setSubmitting(false)
+        toast("Modem has been returned", {
+            description: `You successfully ${returnData.condition === "GOOD"? "return" : "mark"} ${selectedModem?.serial} modem ${returnData.condition === "GOOD"? "to stock" : "as defective"}`,
+            duration: 3000,
+        })
+        setOpenReturnDialog(false)
+        setReturnData({
+          condition: "",
+          remark: ""
+        })
         mutate("/api/modems")
       }else{
         setSubmitting(false)
@@ -455,12 +508,15 @@ export default function DashboardPage() {
                 <td className="px-4 py-2">{modem.client? modem.client.remarks : "—"}</td>
                 <td className="px-4 py-2">
                   <div className='flex items-center gap-2'>
+                    {(modem.status === ModemStatus.DISPATCHED || modem.status === ModemStatus.ASSIGNED) && (
+                      <Button size="sm" variant="secondary" onClick={() => {setSelectedModem(modem); setOpenReturnDialog(true)}}>Return</Button>
+                    )}
                     {modem.status === ModemStatus.DISPATCHED && (
                       <Button size="sm" onClick={() => {setSelectedModem(modem); setOpenAssignDialog(true)}}>Assign</Button>
                     )}
-                    {modem.status === ModemStatus.ASSIGNED && (
+                    {/* {modem.status === ModemStatus.ASSIGNED && (
                       <Button size="sm" onClick={() => {setSelectedModem(modem); setOpenUnAssignDialog(true)}}>Unassign</Button>
-                    )}
+                    )} */}
                     {modem.status === ModemStatus.AVAILABLE && (
                       <Button size="sm" onClick={() => {setSelectedModem(modem); setOpenDispatchDialog(true)}}>Dispatch</Button>
                     )}
@@ -575,8 +631,15 @@ export default function DashboardPage() {
           <DialogHeader>
             <DialogTitle>Unassign Modem - {selectedModem?.serial}</DialogTitle>
           </DialogHeader>
-
-          <p>Are you sure you want to Unassign modem to client {selectedModem?.client?.name}</p>
+          <div className="space-y-4">
+            <p>Are you sure you want to Unassign modem to client {selectedModem?.client?.name}</p>
+            <Input
+              placeholder="Remark"
+              value={unAssignReason}
+              onChange={(e) => setUnassignReason(e.target.value)}
+              required
+            />
+          </div>
 
           <DialogFooter>
             <Button variant="outline" type="submit" onClick={()=>setOpenUnAssignDialog(false)}>Cancel</Button>
@@ -652,6 +715,43 @@ export default function DashboardPage() {
             <Button variant="outline" onClick={() => setOpenAddDialog(false)}>Cancel</Button>
             <Button disabled={submitting} type="submit" onClick={handleAddModem}>{submitting? "Adding..." : "Add"}</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Return Modem Modal */}
+      <Dialog open={openReturnDialog} onOpenChange={setOpenReturnDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Return Modem</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleReturnModem}>
+            <div className="space-y-4">
+              <Select required value={returnData.condition} onValueChange={(value: ModemCondition)=>setReturnData({...returnData, condition: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Modem Condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GOOD">GOOD</SelectItem>
+                  <SelectItem value="DEFECTIVE">DEFECTIVE</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Remark"
+                value={returnData.remark}
+                onChange={(e) => setReturnData({ ...returnData, remark: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className='flex justify-end gap-2 mt-4'>
+              <Button variant="outline" onClick={() => setOpenReturnDialog(false)}>Cancel</Button>
+              <Button disabled={submitting} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
+            </div>
+          </form>
+
+          {/* <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenAddDialog(false)}>Cancel</Button>
+            <Button disabled={submitting} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
 

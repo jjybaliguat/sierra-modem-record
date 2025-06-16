@@ -18,6 +18,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+    const url = new URL(req.url)
+    const searchParams = new URLSearchParams(url.search)
+    const userId = searchParams.get("userId") as string
     const body = await req.json()
     const {serial} = body
     try {
@@ -31,11 +34,23 @@ export async function POST(req: Request) {
             return NextResponse.json({message: "Serial Number Already Exist."}, {status: 400})
           }
         }
-        const modem = await prisma.modem.create({
-            data: body
+        const result = await prisma.$transaction(async (tx) => {
+          const modem = await prisma.modem.create({
+              data: body
+          })
+
+          await prisma.modemLogs.create({
+            data: {
+              userId,
+              modemId: modem.id,
+              message: `${modem.type} modem ${modem.serial? modem.serial : "No Serial"} has been added`
+            }
+          })
+
+          return modem
         })
 
-        return NextResponse.json(modem, {status: 201})
+        return NextResponse.json(result, {status: 201})
     } catch (error) {
     console.log(error)
     return NextResponse.json({message: "Internal Server Error"}, {status: 500})
@@ -46,8 +61,9 @@ export async function PATCH(req: Request){
   const url = new URL(req.url)
   const searchParams = new URLSearchParams(url.search)
   const id = searchParams.get("id") as string
+  const userId = searchParams.get("userId") as string
   const body = await req.json()
-  const {dispatchedDate} = body
+  const {dispatchedDate, dispatchedTo} = body
   try {
     const modem = await prisma.modem.update({
       where: {
@@ -56,6 +72,13 @@ export async function PATCH(req: Request){
       data: {
         ...body,
         dispatchedDate: new Date(dispatchedDate)
+      }
+    })
+    await prisma.modemLogs.create({
+      data: {
+        userId,
+        modemId: id,
+        message: `${modem.type} modem ${modem.serial? modem.serial : "No Serial"} has been dispatched to ${dispatchedTo}`
       }
     })
 

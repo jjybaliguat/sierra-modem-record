@@ -21,6 +21,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  modemLogs ModemLogs[]
 }
 
 model Modem {
@@ -35,6 +37,8 @@ model Modem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  logs ModemLogs[]
 }
 
 model Client {
@@ -53,6 +57,16 @@ model Client {
   updatedAt DateTime @updatedAt
 }
 
+model ModemLogs {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  modemId String @db.ObjectId
+  message String
+  userId String @db.ObjectId
+  User  User @relation(fields: [userId], references: [id])
+  Modem Modem @relation(fields: [modemId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
 enum AssignType {
   INSTALL
   CHANGE_MODEM
@@ -68,6 +82,7 @@ enum ModemStatus {
   AVAILABLE
   DISPATCHED
   ASSIGNED
+  DEFECTIVE
 }
 
 enum ModemCondition {
