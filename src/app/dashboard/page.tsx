@@ -450,7 +450,7 @@ export default function DashboardPage() {
                   {modem.dispatchedDate? formatDate(modem.dispatchedDate) : "—"}
                 </td>
                 <td className="px-4 py-2">
-                  {modem.client? formatDate(modem.client?.assignedDate!) : "—"}
+                  {modem.client?.assignedDate? formatDate(modem.client?.assignedDate!) : "—"}
                 </td>
                 <td className="px-4 py-2">{modem.client? modem.client.remarks : "—"}</td>
                 <td className="px-4 py-2">
