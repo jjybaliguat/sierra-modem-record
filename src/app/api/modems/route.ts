@@ -47,12 +47,16 @@ export async function PATCH(req: Request){
   const searchParams = new URLSearchParams(url.search)
   const id = searchParams.get("id") as string
   const body = await req.json()
+  const {dispatchedDate} = body
   try {
     const modem = await prisma.modem.update({
       where: {
         id
       },
-      data: body
+      data: {
+        ...body,
+        dispatchedDate: new Date(dispatchedDate)
+      }
     })
 
     return NextResponse.json({message: "Modem updated successfully"}, {status: 200})

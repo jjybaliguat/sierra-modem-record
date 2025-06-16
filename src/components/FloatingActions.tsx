@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Plus, UserPlus, LucideTrash2 } from 'lucide-react'
+import { Plus, UserPlus, LucideTrash2, PencilIcon } from 'lucide-react'
 
 interface FloatingActionsProps {
   setOpenAdd: (value: boolean) => void
@@ -27,7 +27,7 @@ export function FloatingActions({ setOpenAdd, setOpenAdjustment }: FloatingActio
 
   const actions = [
     { label: 'Add Modem', icon: <Plus className="w-4 h-4" />, onClick: () => setOpenAdd(true) },
-    { label: 'Make Adjustment', icon: <LucideTrash2 className="w-4 h-4" />, onClick: () => setOpenAdjustment(true) },
+    { label: 'Make Adjustment', icon: <PencilIcon className="w-4 h-4" />, onClick: () => setOpenAdjustment(true) },
   ]
 
   return (

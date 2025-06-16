@@ -18,7 +18,7 @@ const RootLayout = async({
       <SidebarInset className='overflow-hidden'>
         <div className='sticky top-0 bg-background'>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 z-50">
-            <div className="w-full pr-4 flex justify-between items-center">
+            <div className="w-full px-4 flex justify-between items-center">
               <div className="flex aspect-square size-20 items-center justify-center rounded-lg">
                 <Image
                     src="/logo.png"

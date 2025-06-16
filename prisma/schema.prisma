@@ -31,6 +31,7 @@ model Modem {
   client Client?
   status ModemStatus @default(AVAILABLE)
   dispatchedTo String?
+  dispatchedDate DateTime? @default(now())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -42,11 +43,19 @@ model Client {
   address String
   pppoeAcc String?
   dispatchImage Photo?
+  assignType AssignType @default(INSTALL)
+  remarks String?
+  assignedDate DateTime? @default(now())
   modemId String @db.ObjectId @unique
   Modem Modem @relation(fields: [modemId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum AssignType {
+  INSTALL
+  CHANGE_MODEM
 }
 
 type Photo {

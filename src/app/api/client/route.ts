@@ -5,11 +5,14 @@ const prisma = new PrismaClient()
 
 export async function POST(req: Request) {
     const body = await req.json()
-    const {modemId} = body
+    const {modemId, assignedDate} = body
     try {
         const result = await prisma.$transaction(async (tx) => {
             const client = await tx.client.create({
-                data: body
+                data: {
+                    ...body,
+                    assignedDate: new Date(assignedDate)
+                }
             })
 
             const modem = await tx.modem.update({

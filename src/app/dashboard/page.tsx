@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Modem, Client, ModemStatus, ModemCondition, ModemType } from '@prisma/client'
+import { Modem, Client, ModemStatus, ModemCondition, ModemType, Photo, AssignType } from '@prisma/client'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,10 @@ import { toast } from "sonner"
 import { FloatingActions } from '@/components/FloatingActions'
 import { formatDate } from '@/utils/formatDate'
 import Image from 'next/image'
+import Link from 'next/link'
+import { DatePicker } from '@/components/DatePicker'
+import { Portal } from "@radix-ui/react-portal"
+import { format } from 'date-fns'
 
 const statusColor: Record<ModemStatus, string> = {
   AVAILABLE: 'bg-green-600',
@@ -51,6 +55,12 @@ export default function DashboardPage() {
   const [openUnAssignDialog, setOpenUnAssignDialog] = useState(false)
   const [openDispatchDialog, setOpenDispatchDialog] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
+  const [openImageViewer, setOpenImageViewer] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<Photo>({
+    id: '',
+    webViewLink: '',
+    webContentLink: ''
+  })
   const [selectedModem, setSelectedModem] = useState<ModemWithClient | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const perPage = 10
@@ -64,8 +74,14 @@ export default function DashboardPage() {
     address: '',
     pppoeAcc: '',
     dispatchImage: '',
+    assignType: '',
+    assignedDate: new Date(),
+    remarks: ''
   })
-  const [dispatchTeam, setDispatchTeam] = useState("")
+  const [dispatchData, setDispatchData] = useState({
+    dispatchedTo: '',
+    dispatchedDate: new Date()
+  })
   const [submitting, setSubmitting] = useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [modemToDelete, setModemToDelete] = useState<ModemWithClient | null>(null)
@@ -100,6 +116,7 @@ export default function DashboardPage() {
             body: JSON.stringify({
               ...clientData,
               dispatchImage: uploadedPhoto,
+              assignedDate: format(clientData.assignedDate, "yyyy-MM-dd"),
               modemId: selectedModem?.id
             })
           })
@@ -115,7 +132,10 @@ export default function DashboardPage() {
               name: '',
               address: '',
               pppoeAcc: '',
-              dispatchImage: ''
+              dispatchImage: '',
+              assignType: '',
+              assignedDate: new Date(),
+              remarks: ''
             })
             mutate("/api/modems")
             setOpenAssignDialog(false)
@@ -256,17 +276,21 @@ export default function DashboardPage() {
         method: "PATCH",
         body: JSON.stringify({
           status: ModemStatus.DISPATCHED,
-          dispatchedTo: dispatchTeam
+          dispatchedDate: format(dispatchData.dispatchedDate, "yyyy-MM-dd"),
+          dispatchedTo: dispatchData.dispatchedTo
         })
       })
       const data = await response.json()
       if(response.ok){
         setSubmitting(false)
         toast("Modem has been dispatched", {
-            description: `You successfully dispatch ${modemData.type} modem to ${dispatchTeam}`,
+            description: `You successfully dispatch ${modemData.type} modem to ${dispatchData.dispatchedTo}`,
             duration: 3000,
         })
-        setDispatchTeam("")
+        setDispatchData({
+          dispatchedDate: new Date(),
+          dispatchedTo: ''
+        })
         setOpenDispatchDialog(false)
         mutate("/api/modems")
       }else{
@@ -312,17 +336,26 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Modems */}
         <Card className="p-4">
-          <h2 className="text-lg font-semibold">Total Modems</h2>
-          <p className="text-2xl font-bold">{modems.length}</p>
+          <h2 className="text-lg font-semibold">Total Modems - <span className="text-2xl font-bold">{modems.length}</span></h2>
+          <div className="space-y-1">
+            {Object.values(ModemType).map((type) => {
+                const count = modems.filter(m => m.type === type).length
+                return (
+                  <div key={type} className="flex justify-between text-sm text-muted-foreground">
+                    <span>{modemTypeLabels[type]}</span>
+                    <span>{count}</span>
+                  </div>
+                )
+              })}
+          </div>
         </Card>
 
         {/* Available + Type Breakdown */}
         <Card className="p-4">
-          <h2 className="text-lg font-semibold">Available Modems</h2>
-          <p className="text-xl font-bold mb-2">{modems.filter(m => m.status === 'AVAILABLE').length}</p>
+          <h2 className="text-lg font-semibold">Available Modems - <span className='text-xl font-bold mb-2'>{modems.filter(m => m.status === 'AVAILABLE' || m.status === "DISPATCHED").length}</span></h2>
           <div className="space-y-1">
             {Object.values(ModemType).map((type) => {
-              const count = modems.filter(m => m.status === 'AVAILABLE' && m.type === type).length
+              const count = modems.filter(m => (m.status === 'AVAILABLE' || m.status === "DISPATCHED") && m.type === type).length
               return (
                 <div key={type} className="flex justify-between text-sm text-muted-foreground">
                   <span>{modemTypeLabels[type]}</span>
@@ -335,14 +368,34 @@ export default function DashboardPage() {
 
         {/* Dispatched */}
         <Card className="p-4">
-          <h2 className="text-lg font-semibold">Dispatched</h2>
-          <p className="text-2xl font-bold">{modems.filter(m => m.status === 'DISPATCHED').length}</p>
+          <h2 className="text-lg font-semibold">Dispatched - <span className="text-2xl font-bold">{modems.filter(m => m.status === 'DISPATCHED').length}</span></h2>
+          <div className="space-y-1">
+            {Object.values(ModemType).map((type) => {
+                const count = modems.filter(m => m.status === "DISPATCHED" && m.type === type).length
+                return (
+                  <div key={type} className="flex justify-between text-sm text-muted-foreground">
+                    <span>{modemTypeLabels[type]}</span>
+                    <span>{count}</span>
+                  </div>
+                )
+              })}
+          </div>
         </Card>
 
         {/* Assigned */}
         <Card className="p-4">
-          <h2 className="text-lg font-semibold">Assigned</h2>
-          <p className="text-2xl font-bold">{modems.filter(m => m.status === 'ASSIGNED').length}</p>
+          <h2 className="text-lg font-semibold">Assigned - <span className="text-2xl font-bold">{modems.filter(m => m.status === 'ASSIGNED').length}</span></h2>
+          <div className="space-y-1">
+            {Object.values(ModemType).map((type) => {
+                const count = modems.filter(m => m.status === "ASSIGNED" && m.type === type).length
+                return (
+                  <div key={type} className="flex justify-between text-sm text-muted-foreground">
+                    <span>{modemTypeLabels[type]}</span>
+                    <span>{count}</span>
+                  </div>
+                )
+              })}
+          </div>
         </Card>
       </div>
 
@@ -357,7 +410,9 @@ export default function DashboardPage() {
               <th className="px-4 py-2 text-left">Installer/Technician</th>
               <th className="px-4 py-2 text-left">Client</th>
               <th className="px-4 py-2 text-left">Image</th>
-              <th className="px-4 py-2 text-left">UpdatedAt</th>
+              <th className="px-4 py-2 text-left">DispatchedDate</th>
+              <th className="px-4 py-2 text-left">AssignedDate</th>
+              <th className="px-4 py-2 text-left">Remarks</th>
               <th className="px-4 py-2 text-left">Action</th>
             </tr>
           </thead>
@@ -375,7 +430,7 @@ export default function DashboardPage() {
                 </td>
                 <td className="px-4 py-2">
                   {modem.client?.dispatchImage ? (
-                    <div className='relative h-[50px] w-[50px] shadow-md'>
+                    <div className='relative h-[50px] w-[50px] shadow-md cursor-pointer' onClick={()=>{setSelectedImage(modem.client?.dispatchImage!); setOpenImageViewer(true)} }>
                       <Image 
                         src={`https://drive.google.com/uc?export=view&id=${modem.client?.dispatchImage?.id}`}
                         alt="Installation photo"
@@ -392,8 +447,12 @@ export default function DashboardPage() {
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  {formatDate(modem.updatedAt)}
+                  {modem.dispatchedDate? formatDate(modem.dispatchedDate) : "—"}
                 </td>
+                <td className="px-4 py-2">
+                  {modem.client? formatDate(modem.client?.assignedDate!) : "—"}
+                </td>
+                <td className="px-4 py-2">{modem.client? modem.client.remarks : "—"}</td>
                 <td className="px-4 py-2">
                   <div className='flex items-center gap-2'>
                     {modem.status === ModemStatus.DISPATCHED && (
@@ -417,13 +476,34 @@ export default function DashboardPage() {
       <Pagination currentPage={currentPage} pageCount={pageCount} onPageChange={setCurrentPage} />
 
       {/* Assignment Modal */}
-      <Dialog open={openAssignDialog} onOpenChange={setOpenAssignDialog}>
-        <DialogContent>
+      <Dialog open={openAssignDialog} onOpenChange={setOpenAssignDialog} modal={false}>
+        {openAssignDialog && (
+          <Portal>
+            <div
+              className="fixed inset-0 bg-black/50 z-[49] pointer-events-none"
+              aria-hidden="true"
+            />
+          </Portal>
+        )}
+        <DialogContent className="overflow-visible z-50">
           <DialogHeader>
             <DialogTitle>Assign Modem - {selectedModem?.serial}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
+            <div className='flex items-center gap-2'>
+              <h1>Assigned Date</h1>
+              <DatePicker date={clientData.assignedDate} onSelect={(value: Date)=>setClientData({...clientData, assignedDate: value})} />
+            </div>
+            <Select defaultValue="INSTALL" value={clientData.assignType} onValueChange={(value: AssignType)=>setClientData({...clientData, assignType: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="Assign Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="INSTALL">INSTALL</SelectItem>
+                <SelectItem value="CHANGE_MODEM">CHANGE MODEM</SelectItem>
+              </SelectContent>
+            </Select>
             <Input
               placeholder="Client Name"
               value={clientData.name}
@@ -440,6 +520,11 @@ export default function DashboardPage() {
               value={clientData.address}
               onChange={(e) => setClientData({ ...clientData, address: e.target.value })}
               required
+            />
+             <Input
+              placeholder="Remarks"
+              value={clientData.remarks}
+              onChange={(e) => setClientData({ ...clientData, remarks: e.target.value })}
             />
 
             {/* Drag & Drop Upload */}
@@ -500,14 +585,26 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
       {/* Dispatch Modal */}
-      <Dialog open={openDispatchDialog} onOpenChange={setOpenDispatchDialog}>
-        <DialogContent>
+      <Dialog open={openDispatchDialog} onOpenChange={setOpenDispatchDialog} modal={false}>
+        {openDispatchDialog && (
+          <Portal>
+            <div
+              className="fixed inset-0 bg-black/50 z-[49] pointer-events-none"
+              aria-hidden="true"
+            />
+          </Portal>
+        )}
+        <DialogContent className="overflow-visible z-50">
           <DialogHeader>
             <DialogTitle>Dispatch Modem - {selectedModem?.serial}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            <Input placeholder="Team Name / Name" value={dispatchTeam} onChange={(e)=>setDispatchTeam(e.target.value)} required />
+            <div className='flex items-center gap-2'>
+              <h1>Dispatch Date</h1>
+              <DatePicker date={dispatchData.dispatchedDate} onSelect={(value: Date)=>setDispatchData({...dispatchData, dispatchedDate: value})} />
+            </div>
+            <Input placeholder="Team Name / Name" value={dispatchData.dispatchedTo} onChange={(e)=>setDispatchData({...dispatchData, dispatchedTo: e.target.value})} required />
           </div>
 
           <DialogFooter>
@@ -526,7 +623,7 @@ export default function DashboardPage() {
 
           <div className="space-y-4">
             <Input type='text' placeholder="Serial (optional)" value={modemData.serial} onChange={(e)=>setModemData({...modemData, serial: e.target.value})} />
-            <Select defaultValue="IOT" onValueChange={(value: ModemType)=>setModemData({...modemData, type: value})}>
+            <Select defaultValue="IOT" value={modemData.type} onValueChange={(value: ModemType)=>setModemData({...modemData, type: value})}>
               <SelectTrigger>
                 <SelectValue placeholder="Modem Type" />
               </SelectTrigger>
@@ -540,7 +637,7 @@ export default function DashboardPage() {
                 <SelectItem value="KING_CRAB">KING CRAB</SelectItem>
               </SelectContent>
             </Select>
-            <Select defaultValue="SECOND_HAND" onValueChange={(value: ModemCondition)=>setModemData({...modemData, condition: value})}>
+            <Select defaultValue="SECOND_HAND" value={modemData.condition} onValueChange={(value: ModemCondition)=>setModemData({...modemData, condition: value})}>
               <SelectTrigger>
                 <SelectValue placeholder="Condition" />
               </SelectTrigger>
@@ -568,6 +665,31 @@ export default function DashboardPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
             <Button disabled={submitting} variant="destructive" onClick={handleDeleteModem}>{submitting? "Deleting..." : "Delete"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+       {/* View Image Dialog */}
+      <Dialog open={openImageViewer} onOpenChange={setOpenImageViewer}>
+        <DialogContent className="p-0 max-w-4xl">
+          <DialogHeader className="p-4">
+            <DialogTitle>Image Viewer</DialogTitle>
+          </DialogHeader>
+
+          <div className="relative w-full h-[70vh]">
+            <Image 
+              src={`https://drive.google.com/uc?export=view&id=${selectedImage.id}`}
+              alt="Modem Image"
+              fill
+              style={{
+                objectFit: "contain",
+                objectPosition: "center",
+              }}
+              className="rounded-md"
+            />
+          </div>
+
+          <DialogFooter className="p-4">
+            <Button><Link href={selectedImage.webContentLink}>Download</Link></Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
