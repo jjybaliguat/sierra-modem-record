@@ -26,7 +26,8 @@ const statusColor: Record<ModemStatus, string> = {
   AVAILABLE: 'bg-green-600',
   DISPATCHED: 'bg-yellow-600',
   ASSIGNED: 'bg-blue-600',
-  DEFECTIVE: 'bg-red-600'
+  DEFECTIVE: 'bg-red-600',
+  PENDING_INSPECTION: 'bg-yellow-600'
 }
 
 type ModemWithClient = Modem & { client: Client | null }
@@ -368,6 +369,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-2xl font-semibold">Welcome {session.data?.user.name}</h1>
         <div className="flex flex-wrap gap-2 items-center">
+          <Link href="/dashboard/logs" className='underline text-md text-blue-600'>View Logs</Link>
           <Input placeholder="Search serial" value={serialSearch} onChange={e => setSerialSearch(e.target.value)} className="w-[200px]" />
           <Select onValueChange={setStatusFilter} defaultValue="ALL">
             <SelectTrigger className="w-[150px]">
@@ -375,9 +377,9 @@ export default function DashboardPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="AVAILABLE">Available</SelectItem>
-              <SelectItem value="DISPATCHED">Dispatched</SelectItem>
-              <SelectItem value="ASSIGNED">Assigned</SelectItem>
+              {Object.values(ModemStatus).map((value)=> (
+                <SelectItem value={value}>{value.split("_").join(" ")}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {/* <Button onClick={() => setOpenAddDialog(true)} size="sm">
@@ -508,7 +510,7 @@ export default function DashboardPage() {
                 <td className="px-4 py-2">{modem.client? modem.client.remarks : "—"}</td>
                 <td className="px-4 py-2">
                   <div className='flex items-center gap-2'>
-                    {(modem.status === ModemStatus.DISPATCHED || modem.status === ModemStatus.ASSIGNED) && (
+                    {(modem.status !== ModemStatus.AVAILABLE) && (
                       <Button size="sm" variant="secondary" onClick={() => {setSelectedModem(modem); setOpenReturnDialog(true)}}>Return</Button>
                     )}
                     {modem.status === ModemStatus.DISPATCHED && (
@@ -730,8 +732,9 @@ export default function DashboardPage() {
                   <SelectValue placeholder="Modem Condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="GOOD">GOOD</SelectItem>
-                  <SelectItem value="DEFECTIVE">DEFECTIVE</SelectItem>
+                  {Object.values(['GOOD', 'DEFECTIVE', 'PENDING_INSPECTION']).map((value)=> (
+                    <SelectItem value={value}>{value}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Input

@@ -20,13 +20,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Missing condition or remark" }, { status: 400 });
     }
 
+    const client = await prisma.client.findUnique({
+      where: {
+        modemId: id
+      }
+    })
+
     let modem;
 
     switch (condition) {
       case "GOOD":
-        await prisma.client.delete({
-            where: { modemId: id }
-        });
+        if(client){
+          await prisma.client.delete({
+              where: { modemId: id }
+          });
+        }
         modem = await prisma.modem.update({
           where: { id },
           data: {
@@ -45,9 +53,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "Modem returned successfully" }, { status: 200 });
 
       case "DEFECTIVE":
-        await prisma.client.delete({
-            where: { modemId: id }
-        });
+        if(client){
+          await prisma.client.delete({
+              where: { modemId: id }
+          });
+        }
         modem = await prisma.modem.update({
           where: { id },
           data: {
@@ -64,6 +74,28 @@ export async function POST(req: Request) {
           },
         });
         return NextResponse.json({ message: "Modem marked as defective" }, { status: 200 });
+      case "PENDING_INSPECTION":
+        if(client){
+          await prisma.client.delete({
+              where: { modemId: id }
+          });
+        }
+        modem = await prisma.modem.update({
+          where: { id },
+          data: {
+            status: "PENDING_INSPECTION",
+            dispatchedDate: null,
+            dispatchedTo: null
+          },
+        });
+        await prisma.modemLogs.create({
+          data: {
+            userId,
+            modemId: id,
+            message: `${modem.type} modem ${modem.serial || "No Serial"} marked as PENDING_INSPECTION. Remark: ${remark}`,
+          },
+        });
+        return NextResponse.json({ message: "Modem marked as PENDING_INSPECTION" }, { status: 200 });
 
       default:
         return NextResponse.json({ message: "Invalid condition" }, { status: 400 });

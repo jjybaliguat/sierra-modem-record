@@ -33,7 +33,7 @@ model Modem {
   client Client?
   status ModemStatus @default(AVAILABLE)
   dispatchedTo String?
-  dispatchedDate DateTime? @default(now())
+  dispatchedDate DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,6 +83,7 @@ enum ModemStatus {
   DISPATCHED
   ASSIGNED
   DEFECTIVE
+  PENDING_INSPECTION
 }
 
 enum ModemCondition {
