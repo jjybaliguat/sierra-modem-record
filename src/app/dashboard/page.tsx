@@ -733,7 +733,7 @@ export default function DashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {Object.values(['GOOD', 'DEFECTIVE', 'PENDING_INSPECTION']).map((value)=> (
-                    <SelectItem value={value}>{value}</SelectItem>
+                    <SelectItem key={value} value={value}>{value}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
