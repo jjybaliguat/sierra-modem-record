@@ -34,11 +34,21 @@ model Modem {
   status ModemStatus @default(AVAILABLE)
   dispatchedTo String?
   dispatchedDate DateTime?
+  defectType DefectType?
+  remarks String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   logs ModemLogs[]
+}
+
+enum DefectType {
+  WIFI_PROBLEM
+  SWITCH_PROBLEM
+  POWER_ONLY
+  NO_POWER
+  ANTENNA_BROKEN
 }
 
 model Client {

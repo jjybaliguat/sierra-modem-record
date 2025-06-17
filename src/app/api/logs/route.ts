@@ -9,6 +9,9 @@ export async function GET(req: Request){
             include: {
                 Modem: true,
                 User: true
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         })
 

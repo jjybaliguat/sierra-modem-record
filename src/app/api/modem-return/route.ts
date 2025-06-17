@@ -41,6 +41,7 @@ export async function POST(req: Request) {
             status: "AVAILABLE",
             dispatchedDate: null,
             dispatchedTo: null,
+            remarks: remark
           },
         });
         await prisma.modemLogs.create({
@@ -63,7 +64,8 @@ export async function POST(req: Request) {
           data: {
             status: "DEFECTIVE",
             dispatchedDate: null,
-            dispatchedTo: null
+            dispatchedTo: null,
+            remarks: remark
           },
         });
         await prisma.modemLogs.create({
@@ -85,7 +87,8 @@ export async function POST(req: Request) {
           data: {
             status: "PENDING_INSPECTION",
             dispatchedDate: null,
-            dispatchedTo: null
+            dispatchedTo: null,
+            remarks: remark
           },
         });
         await prisma.modemLogs.create({

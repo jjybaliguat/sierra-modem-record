@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Modem, Client, ModemStatus, ModemCondition, ModemType, Photo, AssignType } from '@prisma/client'
+import { Modem, Client, ModemStatus, ModemCondition, ModemType, Photo, AssignType, DefectType } from '@prisma/client'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,6 +61,7 @@ export default function DashboardPage() {
   const [openDispatchDialog, setOpenDispatchDialog] = useState(false)
   const [openReturnDialog, setOpenReturnDialog] = useState(false)
   const [openAddDialog, setOpenAddDialog] = useState(false)
+  const [openAdjustDialog, setOpenAdjustDialog] = useState(false)
   const [openImageViewer, setOpenImageViewer] = useState(false)
   const [selectedImage, setSelectedImage] = useState<Photo>({
     id: '',
@@ -91,6 +92,11 @@ export default function DashboardPage() {
   const [returnData, setReturnData] = useState({
     condition: '',
     remark: ''
+  })
+  const [adjustData, setAdjustData] = useState({
+    type: '',
+    remark: '',
+    defectType: ""
   })
   const [unAssignReason, setUnassignReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -364,6 +370,41 @@ export default function DashboardPage() {
     }
   }
 
+  const handleAdjustModem = async(e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const response = await fetch(`/api/modem-adjust?id=${selectedModem?.id}&userId=${userId}`, {
+        method: "POST",
+        body: JSON.stringify(adjustData)
+      })
+      const data = await response.json()
+      if(response.ok){
+        setSubmitting(false)
+        toast("Modem has been adjusted", {
+            description: `You successfully adjust modem to ${adjustData.type}`,
+            duration: 3000,
+        })
+        setAdjustData({
+          type: "",
+          remark: "",
+          defectType: ''
+        })
+        setOpenAdjustDialog(false)
+        mutate("/api/modems")
+      }else{
+        setSubmitting(false)
+        toast("Error", {
+            description: data.message,
+            duration: 3000,
+        })
+      }
+    } catch (error) {
+      setSubmitting(false)
+      console.log(error)
+    }
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -476,8 +517,8 @@ export default function DashboardPage() {
               <tr key={modem.id} className="border-t">
                 <td className="px-4 py-2">{modem.serial || '-'}</td>
                 <td className="px-4 py-2">{modem.type}</td>
-                <td className="px-4 py-2">
-                  <Badge className={cn('text-white', statusColor[modem.status])}>{modem.status}</Badge>
+                <td className="gap-2 px-4 py-2">
+                  <Badge className={cn('text-white', statusColor[modem.status])}>{modem.status} {modem.status === "DEFECTIVE" && `- ${modem.defectType}`}</Badge>
                 </td>
                 <td className="px-4 py-2">{modem.dispatchedTo}</td>
                 <td className="px-4 py-2">
@@ -507,10 +548,13 @@ export default function DashboardPage() {
                 <td className="px-4 py-2">
                   {modem.client?.assignedDate? formatDate(modem.client?.assignedDate!) : "—"}
                 </td>
-                <td className="px-4 py-2">{modem.client? modem.client.remarks : "—"}</td>
+                <td className="px-4 py-2">{modem.client? modem.client.remarks : modem.remarks? modem.remarks : "—"}</td>
                 <td className="px-4 py-2">
                   <div className='flex items-center gap-2'>
-                    {(modem.status !== ModemStatus.AVAILABLE) && (
+                    {(modem.status === ModemStatus.AVAILABLE || modem.status === ModemStatus.DEFECTIVE || modem.status === ModemStatus.PENDING_INSPECTION) && (
+                      <Button size="sm" variant="secondary" onClick={() => {setSelectedModem(modem); setOpenAdjustDialog(true)}}>Adjust</Button>
+                    )}
+                    {(modem.status === ModemStatus.DISPATCHED || modem.status === ModemStatus.ASSIGNED) && (
                       <Button size="sm" variant="secondary" onClick={() => {setSelectedModem(modem); setOpenReturnDialog(true)}}>Return</Button>
                     )}
                     {modem.status === ModemStatus.DISPATCHED && (
@@ -747,7 +791,55 @@ export default function DashboardPage() {
 
             <div className='flex justify-end gap-2 mt-4'>
               <Button variant="outline" onClick={() => setOpenReturnDialog(false)}>Cancel</Button>
-              <Button disabled={submitting} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
+              <Button disabled={submitting || returnData.condition === "" || returnData.remark === ""} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
+            </div>
+          </form>
+
+          {/* <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenAddDialog(false)}>Cancel</Button>
+            <Button disabled={submitting} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
+          </DialogFooter> */}
+        </DialogContent>
+      </Dialog>
+      {/* Adjust Modem Modal */}
+      <Dialog open={openAdjustDialog} onOpenChange={setOpenAdjustDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modem Adjustment</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAdjustModem}>
+            <div className="space-y-4">
+              <Select required value={adjustData.type} onValueChange={(value)=>setAdjustData({...adjustData, type: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Adjustment Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(selectedModem?.status === ModemStatus.DEFECTIVE || selectedModem?.status === ModemStatus.PENDING_INSPECTION) && <SelectItem value="AVAILABLE">Mark As Available</SelectItem>}
+                  <SelectItem value="DEFECTIVE">Mark As Defective</SelectItem>
+                  <SelectItem value="PENDING_INSPECTION">Move to Inspection</SelectItem>
+                </SelectContent>
+              </Select>
+              {adjustData.type === "DEFECTIVE" && <Select required value={adjustData.defectType} onValueChange={(value)=>setAdjustData({...adjustData, defectType: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Defect Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(DefectType).map((value)=>(
+                    <SelectItem key={value} value={value}>{value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>}
+              <Input
+                placeholder="Remark"
+                value={adjustData.remark}
+                onChange={(e) => setAdjustData({ ...adjustData, remark: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className='flex justify-end gap-2 mt-4'>
+              <Button type="button" variant="outline" onClick={() => setOpenAdjustDialog(false)}>Cancel</Button>
+              <Button disabled={submitting || adjustData.type === "" || (adjustData.type === "DEFECTIVE" && adjustData.defectType === "") || adjustData.remark === ""} type="submit">{submitting? "Please wait..." : "Submit"}</Button>
             </div>
           </form>
 
