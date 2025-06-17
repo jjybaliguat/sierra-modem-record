@@ -378,7 +378,7 @@ export default function DashboardPage() {
             <SelectContent>
               <SelectItem value="ALL">All</SelectItem>
               {Object.values(ModemStatus).map((value)=> (
-                <SelectItem value={value}>{value.split("_").join(" ")}</SelectItem>
+                <SelectItem key={value} value={value}>{value.split("_").join(" ")}</SelectItem>
               ))}
             </SelectContent>
           </Select>
