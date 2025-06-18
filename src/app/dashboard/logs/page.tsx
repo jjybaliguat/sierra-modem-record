@@ -28,13 +28,25 @@ interface ModemLog {
   }
 }
 
+const GetLogs = async () => {
+  const response = await fetch("/api/logs", {
+    cache: 'no-store'
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch logs")
+  }
+
+  return response.json()
+}
+
 const fetcher = (url: string) => fetch(url, {cache: "no-store"}).then(res => res.json())
 
 const ITEMS_PER_PAGE = 10
 
 export default function ModemLogsPage() {
   const [search, setSearch] = useState("")
-  const {data: logs = []} = useSWR<ModemLog[]>("/api/logs", fetcher)
+  const {data: logs = []} = useSWR<ModemLog[]>("get-logs", GetLogs)
   const [startDate, setStartDate] = useState<string>("")
   const [endDate, setEndDate] = useState<string>("")
   const [currentPage, setCurrentPage] = useState(1)
