@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient()
 
+export const revalidate = 0;
+
 export async function GET(req: Request){
     try {
         const logs = await prisma.modemLogs.findMany({
