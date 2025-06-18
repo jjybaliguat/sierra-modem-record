@@ -81,6 +81,7 @@ model ModemLogs {
 enum AssignType {
   INSTALL
   CHANGE_MODEM
+  TRANSFER
 }
 
 type Photo {

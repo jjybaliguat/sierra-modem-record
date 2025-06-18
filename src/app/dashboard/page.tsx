@@ -602,8 +602,9 @@ export default function DashboardPage() {
                 <SelectValue placeholder="Assign Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="INSTALL">INSTALL</SelectItem>
-                <SelectItem value="CHANGE_MODEM">CHANGE MODEM</SelectItem>
+                {Object.values(AssignType).map((value)=> (
+                  <SelectItem key={value} value={value}>{value.split("_").join(" ")}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Input
