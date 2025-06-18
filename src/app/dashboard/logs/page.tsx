@@ -28,7 +28,7 @@ interface ModemLog {
   }
 }
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+const fetcher = (url: string) => fetch(url, {cache: "no-store"}).then(res => res.json())
 
 const ITEMS_PER_PAGE = 10
 
