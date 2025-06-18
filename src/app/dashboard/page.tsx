@@ -518,7 +518,7 @@ export default function DashboardPage() {
                 <td className="px-4 py-2">{modem.serial || '-'}</td>
                 <td className="px-4 py-2">{modem.type}</td>
                 <td className="gap-2 px-4 py-2">
-                  <Badge className={cn('text-white', statusColor[modem.status])}>{modem.status} {modem.status === "DEFECTIVE" && `- ${modem.defectType}`}</Badge>
+                  <Badge className={cn('text-white', statusColor[modem.status])}>{modem.status} {modem.status === "DEFECTIVE" && `- ${modem.defectType}`} {modem.client?.assignType && `- ${modem.client.assignType}`}</Badge>
                 </td>
                 <td className="px-4 py-2">{modem.dispatchedTo}</td>
                 <td className="px-4 py-2">

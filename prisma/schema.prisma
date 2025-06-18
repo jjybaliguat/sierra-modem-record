@@ -45,6 +45,7 @@ model Modem {
 
 enum DefectType {
   WIFI_PROBLEM
+  LOW_SPEED
   SWITCH_PROBLEM
   POWER_ONLY
   NO_POWER
