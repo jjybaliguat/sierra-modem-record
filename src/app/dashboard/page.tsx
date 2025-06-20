@@ -132,7 +132,8 @@ export default function DashboardPage() {
             method: "POST",
             body: JSON.stringify({
               ...clientData,
-              dispatchImage: uploadedPhoto,
+              // dispatchImage: uploadedPhoto,
+              dispatchImage: null,
               assignedDate: format(clientData.assignedDate, "yyyy-MM-dd"),
               modemId: selectedModem?.id
             })
