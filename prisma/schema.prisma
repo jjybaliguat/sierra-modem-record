@@ -82,6 +82,7 @@ enum AssignType {
   INSTALL
   CHANGE_MODEM
   TRANSFER
+  RECONN
 }
 
 type Photo {

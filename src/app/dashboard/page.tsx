@@ -128,42 +128,42 @@ export default function DashboardPage() {
       const uploadedPhoto = await response.json()
       if(response.ok){
         setClientData({...clientData, dispatchImage: uploadedPhoto})
-          const response = await fetch(`/api/client?userId=${userId}`, {
-            method: "POST",
-            body: JSON.stringify({
-              ...clientData,
-              // dispatchImage: uploadedPhoto,
-              dispatchImage: null,
-              assignedDate: format(clientData.assignedDate, "yyyy-MM-dd"),
-              modemId: selectedModem?.id
+            const response = await fetch(`/api/client?userId=${userId}`, {
+              method: "POST",
+              body: JSON.stringify({
+                ...clientData,
+                // dispatchImage: uploadedPhoto,
+                dispatchImage: null,
+                assignedDate: format(clientData.assignedDate, "yyyy-MM-dd"),
+                modemId: selectedModem?.id
+              })
             })
-          })
-          const data = await response.json()
-          if(response.ok){
-            setSubmitting(false)
-            setFile(null)
-            toast("Modem has been assigned", {
-                description: `You successfully assigned ${selectedModem?.serial} to client ${clientData.name}`,
-                duration: 3000,
-            })
-            setClientData({
-              name: '',
-              address: '',
-              pppoeAcc: '',
-              dispatchImage: '',
-              assignType: '',
-              assignedDate: new Date(),
-              remarks: ''
-            })
-            mutate("/api/modems")
-            setOpenAssignDialog(false)
-          }else{
-            setSubmitting(false)
-            toast("Error", {
-                description: data.message,
-                duration: 3000,
-            })
-          }
+            const data = await response.json()
+            if(response.ok){
+              setSubmitting(false)
+              setFile(null)
+              toast("Modem has been assigned", {
+                  description: `You successfully assigned ${selectedModem?.serial} to client ${clientData.name}`,
+                  duration: 3000,
+              })
+              setClientData({
+                name: '',
+                address: '',
+                pppoeAcc: '',
+                dispatchImage: '',
+                assignType: '',
+                assignedDate: new Date(),
+                remarks: ''
+              })
+              mutate("/api/modems")
+              setOpenAssignDialog(false)
+            }else{
+              setSubmitting(false)
+              toast("Error", {
+                  description: data.message,
+                  duration: 3000,
+              })
+            }
       }else{
         setSubmitting(false)
         toast("Error uploading image.", {
@@ -666,7 +666,7 @@ export default function DashboardPage() {
           </div>
 
           <DialogFooter>
-            <Button disabled={submitting || !file} type="submit" onClick={handleAssign}>
+            <Button disabled={submitting || !file || !userId} type="submit" onClick={handleAssign}>
               {submitting ? 'Assigning...' : 'Assign'}
             </Button>
           </DialogFooter>

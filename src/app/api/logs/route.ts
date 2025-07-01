@@ -17,6 +17,8 @@ export async function GET(req: Request){
             }
         })
 
+        console.log(logs)
+
         return NextResponse.json(logs, {status: 200})
     } catch (error) {
         console.log(error)
