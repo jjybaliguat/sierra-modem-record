@@ -50,6 +50,7 @@ enum DefectType {
   POWER_ONLY
   NO_POWER
   ANTENNA_BROKEN
+  REDLOS_OPTICAL_PROBLEM
 }
 
 model Client {
