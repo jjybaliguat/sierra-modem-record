@@ -104,7 +104,7 @@ export default function DashboardPage() {
   const [modemToDelete, setModemToDelete] = useState<ModemWithClient | null>(null)
   const [file, setFile] = useState<any | null>()
 
-  const filtered = modems.filter(m => {
+  const filtered = modems?.filter(m => {
     const matchesStatus = statusFilter === 'ALL' || m.status === statusFilter
     const matchesSerial = m.serial?.toLowerCase().includes(serialSearch.toLowerCase())
     return matchesStatus && matchesSerial
@@ -121,13 +121,13 @@ export default function DashboardPage() {
       if(file){
         formData.append("file", file)
       }
-      const response: any = await fetch('/api/upload-drive', {
-          method: 'POST',
-          body: formData,
-      });
-      const uploadedPhoto = await response.json()
-      if(response.ok){
-        setClientData({...clientData, dispatchImage: uploadedPhoto})
+      // const response: any = await fetch('/api/upload-drive', {
+      //     method: 'POST',
+      //     body: formData,
+      // });
+      // const uploadedPhoto = await response.json()
+      // if(response.ok){
+        setClientData({...clientData})
             const response = await fetch(`/api/client?userId=${userId}`, {
               method: "POST",
               body: JSON.stringify({
@@ -164,13 +164,13 @@ export default function DashboardPage() {
                   duration: 3000,
               })
             }
-      }else{
-        setSubmitting(false)
-        toast("Error uploading image.", {
-            description: "Something went wrong while uploading image. please try again later",
-            duration: 3000,
-        })
-      }
+      // }else{
+      //   setSubmitting(false)
+      //   toast("Error uploading image.", {
+      //       description: "Something went wrong while uploading image. please try again later",
+      //       duration: 3000,
+      //   })
+      // }
     } catch (error) {
       console.log(error)
       setSubmitting(false)
@@ -632,7 +632,7 @@ export default function DashboardPage() {
             />
 
             {/* Drag & Drop Upload */}
-            <div
+            {/* <div
               className="border border-dashed border-gray-400 rounded-md p-4 text-center cursor-pointer hover:bg-gray-50 transition"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -661,12 +661,12 @@ export default function DashboardPage() {
                   if (file) setFile(file)
                 }}
               />
-            </div>
-            {submitting && <p>Uploading file may take some time. Please wait.</p>}
+            </div> */}
+            {/* {submitting && <p>Uploading file may take some time. Please wait.</p>} */}
           </div>
 
           <DialogFooter>
-            <Button disabled={submitting || !file || !userId} type="submit" onClick={handleAssign}>
+            <Button disabled={submitting || !userId || !clientData.name || !clientData.address || !clientData.assignType} type="submit" onClick={handleAssign}>
               {submitting ? 'Assigning...' : 'Assign'}
             </Button>
           </DialogFooter>
