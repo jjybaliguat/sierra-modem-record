@@ -51,6 +51,7 @@ enum DefectType {
   NO_POWER
   ANTENNA_BROKEN
   REDLOS_OPTICAL_PROBLEM
+  GATEWAY_INACCESSIBLE
 }
 
 model Client {
